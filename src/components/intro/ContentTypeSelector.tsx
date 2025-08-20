@@ -1,0 +1,109 @@
+import React from 'react';
+import { Presentation, FileText, BookOpen } from 'lucide-react';
+import { ContentType } from '../../types';
+
+interface ContentTypeSelectorProps {
+  selectedType: ContentType;
+  onTypeSelect: (type: ContentType) => void;
+}
+
+const contentTypes = [
+  {
+    id: 'ppt' as ContentType,
+    title: 'PPT 발표 자료',
+    description: '프레젠테이션용 슬라이드 자료',
+    icon: Presentation,
+    features: ['제목 슬라이드', '기능 소개', '시장 분석', '제품 포트폴리오', '가격 정책'],
+    color: 'from-blue-500 to-purple-600'
+  },
+  {
+    id: 'brochure' as ContentType,
+    title: '브로슈어',
+    description: '제품/서비스 소개 카탈로그',
+    icon: FileText,
+    features: ['브랜드 정보', '제품 라인업', '특별 혜택', '가격 정보'],
+    color: 'from-pink-500 to-red-500'
+  },
+  {
+    id: 'manual' as ContentType,
+    title: '사용설명서',
+    description: '제품 사용법 및 가이드',
+    icon: BookOpen,
+    features: ['개요', '설치 방법', '사용법', '문제 해결', '유지보수'],
+    color: 'from-green-500 to-teal-600'
+  }
+];
+
+const ContentTypeSelector: React.FC<ContentTypeSelectorProps> = ({
+  selectedType,
+  onTypeSelect
+}) => {
+  return (
+    <div className="space-y-6">
+      <div className="text-center">
+        <h2 className="text-2xl font-bold text-gray-900 mb-2">
+          콘텐츠 타입을 선택하세요
+        </h2>
+        <p className="text-gray-600">
+          번역 연습에 사용할 콘텐츠의 형태를 선택해주세요
+        </p>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        {contentTypes.map((type) => {
+          const Icon = type.icon;
+          const isSelected = selectedType === type.id;
+          
+          return (
+            <div
+              key={type.id}
+              onClick={() => onTypeSelect(type.id)}
+              className={`
+                relative p-6 rounded-xl border-2 cursor-pointer transition-all duration-300
+                ${isSelected 
+                  ? 'border-primary-500 bg-primary-50 shadow-lg scale-105' 
+                  : 'border-gray-200 bg-white hover:border-gray-300 hover:shadow-md'
+                }
+              `}
+            >
+              {/* 선택 표시 */}
+              {isSelected && (
+                <div className="absolute -top-2 -right-2 w-6 h-6 bg-primary-500 rounded-full flex items-center justify-center">
+                  <div className="w-3 h-3 bg-white rounded-full"></div>
+                </div>
+              )}
+
+              {/* 아이콘 */}
+              <div className={`
+                w-12 h-12 rounded-lg flex items-center justify-center mb-4
+                bg-gradient-to-br ${type.color}
+              `}>
+                <Icon className="w-6 h-6 text-white" />
+              </div>
+
+              {/* 제목과 설명 */}
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                {type.title}
+              </h3>
+              <p className="text-sm text-gray-600 mb-4">
+                {type.description}
+              </p>
+
+              {/* 특징 목록 */}
+              <ul className="space-y-1">
+                {type.features.map((feature, index) => (
+                  <li key={index} className="text-xs text-gray-500 flex items-center">
+                    <div className="w-1 h-1 bg-gray-400 rounded-full mr-2"></div>
+                    {feature}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+};
+
+export default ContentTypeSelector;
