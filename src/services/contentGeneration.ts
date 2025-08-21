@@ -104,36 +104,67 @@ function generatePromptForType(request: ContentRequest): string {
   }
 }
 
-// PPT 전용 간단한 프롬프트 - 직접적이고 명확하게
+// PPT 전용 HTML 슬라이드 프롬프트 - 시각적이고 인터랙티브하게
 function generatePPTPrompt(topic: string, style: string, industry: string, language: string, difficulty: string): string {
   return `
-${topic}에 대한 PPT 발표 자료를 작성해주세요.
+${topic}에 대한 PPT 발표 자료를 HTML 형태로 작성해주세요.
 
-다음 형식으로 4개 섹션을 작성해주세요:
+다음 JSON 형식으로 5개 슬라이드를 작성해주세요:
 
-섹션 1 (제목 슬라이드):
-${topic}의 개요와 소개를 간단히 설명해주세요.
+{
+  "slides": [
+    {
+      "id": 1,
+      "title": "제목 슬라이드",
+      "html": "<div style='완전한 HTML과 인라인 CSS'>${topic} 소개 슬라이드</div>"
+    },
+    {
+      "id": 2, 
+      "title": "핵심 기능",
+      "html": "<div style='완전한 HTML과 인라인 CSS'>핵심 기능들을 카드 형태로 표시</div>"
+    },
+    {
+      "id": 3,
+      "title": "시장 분석", 
+      "html": "<div style='완전한 HTML과 인라인 CSS'>차트와 그래프가 포함된 시장 분석</div>"
+    },
+    {
+      "id": 4,
+      "title": "가격 정보",
+      "html": "<div style='완전한 HTML과 인라인 CSS'>가격표와 혜택 정보</div>"
+    },
+    {
+      "id": 5,
+      "title": "마무리",
+      "html": "<div style='완전한 HTML과 인라인 CSS'>CTA와 연락처 정보</div>"
+    }
+  ]
+}
 
-섹션 2 (핵심 기능):
-${topic}의 주요 특징이나 기능 4가지를 설명해주세요.
-각 기능은 간단한 제목과 설명으로 구성해주세요.
+슬라이드 제작 규칙:
+1. 각 슬라이드는 완전한 HTML div로 작성
+2. 모든 스타일은 인라인 CSS로 포함
+3. 배경: 그라데이션 사용 (linear-gradient)
+4. 크기: width:100%, height:100%, 16:9 비율 고려
+5. 폰트: 한국어 지원 폰트 사용
+6. 색상: 슬라이드별로 다른 색상 테마
+7. 이미지 대신 CSS 아이콘 사용 (📱, 💰, 📊, ⭐ 등)
+8. 애니메이션 효과 포함 (transform, transition)
+9. 반응형 디자인 (flexbox, grid 활용)
+10. 데이터 시각화: CSS로 구현된 차트나 프로그레스 바
 
-섹션 3 (시장 분석):
-${topic}의 시장 현황, 경쟁력, 성과 등을 설명해주세요.
-구체적인 수치나 퍼센트가 있으면 포함해주세요.
+시각적 요소:
+- 슬라이드 1: 메인 타이틀과 부제목, 브랜드 컬러
+- 슬라이드 2: 4개 기능을 카드 형태로 배치, 아이콘 포함
+- 슬라이드 3: CSS 바 차트나 원형 차트로 데이터 표현
+- 슬라이드 4: 가격표를 테이블이나 카드 형태로 구성
+- 슬라이드 5: 콜투액션 버튼과 연락처 정보
 
-섹션 4 (혜택 및 가격):
-${topic}의 가격 정보, 특별 혜택, 구매 조건 등을 설명해주세요.
-가격은 ₩ 표시로 작성해주세요.
+주제: ${topic}
+스타일: ${style}
+언어: ${language}
 
-작성 규칙:
-- 각 섹션은 3-5문장으로 구성
-- PPT에 적합한 간결하고 명확한 문체
-- ${style} 스타일로 작성
-- 구체적인 정보와 수치 포함
-- 한국어로 작성
-
-섹션별로 구분해서 작성해주세요.
+반드시 위 JSON 형식으로만 응답하고, 각 html 필드에는 완전한 인라인 스타일 HTML을 포함해주세요.
 `;
 }
 
@@ -387,7 +418,7 @@ function getSectionCount(type: ContentType): number {
   return counts[type];
 }
 
-// AI 응답 파싱 - 간단한 텍스트 기반
+// AI 응답 파싱 - JSON 슬라이드 및 텍스트 모두 지원
 function parseAIResponse(data: any, type: ContentType) {
   try {
     // AI 응답에서 텍스트 추출
@@ -395,7 +426,32 @@ function parseAIResponse(data: any, type: ContentType) {
     
     console.log('AI 원본 응답:', responseText);
     
-    // 섹션별로 분리 ("섹션 1", "섹션 2" 등으로 구분)
+    // PPT 타입이고 JSON 형태의 slides가 있는지 확인
+    if (type === 'ppt') {
+      try {
+        // JSON 부분 추출 시도
+        const jsonMatch = responseText.match(/\{[\s\S]*\}/);
+        if (jsonMatch) {
+          const jsonData = JSON.parse(jsonMatch[0]);
+          
+          // slides 배열이 있으면 PPT 슬라이드 데이터로 처리
+          if (jsonData.slides && Array.isArray(jsonData.slides)) {
+            console.log('PPT 슬라이드 데이터 파싱 성공:', jsonData.slides);
+            
+            return {
+              title: '프레젠테이션',
+              subtitle: 'AI 생성 PPT',
+              sections: jsonData.slides.map((slide: any) => slide.title || `슬라이드 ${slide.id}`),
+              slides: jsonData.slides // PPT 전용 슬라이드 데이터 추가
+            };
+          }
+        }
+      } catch (jsonError) {
+        console.log('JSON 파싱 실패, 텍스트 파싱으로 전환:', jsonError);
+      }
+    }
+    
+    // 기존 텍스트 기반 파싱 (PPT JSON 파싱 실패시 또는 다른 타입)
     const sections = [];
     const sectionPattern = /섹션\s*(\d+)[:\s]*([\s\S]*?)(?=섹션\s*\d+|$)/g;
     let match;
@@ -412,13 +468,14 @@ function parseAIResponse(data: any, type: ContentType) {
       const paragraphs = responseText.split('\n\n')
         .map(p => p.trim())
         .filter(p => p.length > 20)
-        .slice(0, 4); // PPT는 4개 섹션
+        .slice(0, type === 'ppt' ? 5 : 4); 
       
       sections.push(...paragraphs);
     }
     
-    // 최소 4개 섹션 보장
-    while (sections.length < 4) {
+    // 최소 섹션 수 보장
+    const minSections = type === 'ppt' ? 5 : 4;
+    while (sections.length < minSections) {
       sections.push(`섹션 ${sections.length + 1}에 대한 내용이 생성되지 않았습니다.`);
     }
     
@@ -426,13 +483,11 @@ function parseAIResponse(data: any, type: ContentType) {
     const lines = responseText.split('\n').filter(line => line.trim());
     const firstLine = lines[0] || '';
     
-    // 제목 추출 (첫 번째 줄에서)
     let title = firstLine.replace(/^[#\-\*\s]*/, '').trim();
     if (title.length > 30) {
       title = title.substring(0, 30) + '...';
     }
     
-    // 부제목 추출 (두 번째 줄에서)
     let subtitle = lines[1] || '';
     subtitle = subtitle.replace(/^[#\-\*\s]*/, '').trim();
     if (subtitle.length > 50) {
@@ -442,7 +497,7 @@ function parseAIResponse(data: any, type: ContentType) {
     const result = {
       title: title || '새로운 프레젠테이션',
       subtitle: subtitle || '상세 내용',
-      sections: sections.slice(0, 4)
+      sections: sections.slice(0, minSections)
     };
     
     console.log('파싱된 결과:', result);
@@ -598,13 +653,13 @@ function generateTranslationSectionsFromOriginal(originalSections: string[]) {
     lines.forEach((line, lineIndex) => {
       // 의미있는 길이의 텍스트만 번역 섹션으로 추가
       if (line.length > 10) {
-        sections.push({
+          sections.push({
           id: `section_${sectionIndex}_line_${lineIndex}`,
           originalText: line
-        });
-      }
-    });
-    
+          });
+        }
+      });
+
     // 불릿 포인트도 개별 번역 단위로 추가
     const bulletPoints = extractBulletPoints(sectionText);
     bulletPoints.forEach((bullet, bulletIndex) => {
@@ -612,8 +667,8 @@ function generateTranslationSectionsFromOriginal(originalSections: string[]) {
         id: `section_${sectionIndex}_bullet_${bulletIndex}`,
         originalText: bullet
       });
-    });
-  });
+        });
+      });
 
   return sections;
 }
@@ -631,17 +686,17 @@ function generateAdvancedTranslationSections(data: any, type: ContentType) {
     lines.forEach((line, lineIndex) => {
       // 제목, 가격, 중요 정보 등은 별도 세션으로 분리
       if (isImportantLine(line)) {
-        sections.push({
+            sections.push({
           id: `section_${sectionIndex}_important_${lineIndex}`,
           originalText: line
-        });
+            });
       } else if (line.length > 20) { // 의미있는 길이의 텍스트만
-        sections.push({
+              sections.push({
           id: `section_${sectionIndex}_line_${lineIndex}`,
           originalText: line
+            });
+          }
         });
-      }
-    });
     
     // 불릿 포인트나 특징들을 개별 번역 단위로 분리
     const bulletPoints = extractBulletPoints(sectionText);
@@ -650,8 +705,8 @@ function generateAdvancedTranslationSections(data: any, type: ContentType) {
         id: `section_${sectionIndex}_bullet_${bulletIndex}`,
         originalText: bullet
       });
-    });
-  });
+        });
+      });
 
   return sections;
 }

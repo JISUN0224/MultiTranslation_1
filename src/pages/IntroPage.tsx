@@ -58,13 +58,19 @@ const IntroPage: React.FC = () => {
       {/* 헤더 */}
       <header className="bg-white shadow-sm border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-center h-16">
+          <div className="flex items-center justify-between h-16">
             <div className="flex items-center space-x-3">
               <Globe className="h-8 w-8 text-primary-600" />
               <h1 className="text-xl font-semibold text-gray-900">
                 AI 번역 연습 시스템
               </h1>
             </div>
+            <a 
+              href="/test" 
+              className="px-4 py-2 bg-blue-100 hover:bg-blue-200 text-blue-700 rounded-lg transition-colors text-sm font-medium"
+            >
+              🧪 AI PPT 테스트
+            </a>
           </div>
         </div>
       </header>

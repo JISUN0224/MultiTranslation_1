@@ -31,39 +31,14 @@ export const ContentProvider: React.FC<ContentProviderProps> = ({ children }) =>
                 setGenerationProgress(0);
                 setGenerationMessage('시작 중...');
 
-                // 진행률 시뮬레이션
-                const progressPromise = new Promise<void>((resolve) => {
-                  const steps = [
-                    { progress: 10, message: '주제 분석 중...' },
-                    { progress: 25, message: '콘텐츠 구조 설계 중...' },
-                    { progress: 40, message: 'AI 모델에 요청 중...' },
-                    { progress: 60, message: '콘텐츠 생성 중...' },
-                    { progress: 80, message: '번역 섹션 구성 중...' },
-                    { progress: 95, message: '최종 검토 중...' },
-                    { progress: 100, message: '완료!' }
-                  ];
+                // 진행 상황 콜백 함수
+                const onProgress = (progress: number, message: string) => {
+                  setGenerationProgress(progress);
+                  setGenerationMessage(message);
+                };
 
-                  let currentStep = 0;
-                  const interval = setInterval(() => {
-                    if (currentStep < steps.length) {
-                      const step = steps[currentStep];
-                      setGenerationProgress(step.progress);
-                      setGenerationMessage(step.message);
-                      currentStep++;
-                    } else {
-                      clearInterval(interval);
-                      resolve();
-                    }
-                  }, 500 + Math.random() * 1000);
-                });
-
-                // AI 콘텐츠 생성
-                const contentPromise = generateContentWithAI(request);
-
-                // 두 작업을 병렬로 실행
-                await Promise.all([progressPromise, contentPromise]);
-
-                const content = await contentPromise;
+                // AI 콘텐츠 생성 (실제 진행 상황과 연동)
+                const content = await generateContentWithAI(request, onProgress);
                 setGeneratedContent(content);
 
               } catch (error) {

@@ -69,9 +69,9 @@ const FeatureCard: React.FC<{
       <h3 className="text-base font-bold text-white mb-1">
         <DynamicText text={title} maxLength={25} />
       </h3>
-      <p className="text-blue-50 text-xs leading-relaxed">
+      <div className="text-blue-50 text-xs leading-relaxed">
         <DynamicText text={description} maxLength={150} className="description" />
-      </p>
+      </div>
     </div>
   </ResponsiveCard>
 );

@@ -3,6 +3,12 @@ export interface ContentData {
   title: string;
   subtitle?: string;
   sections: string[];
+  slides?: Array<{
+    id: number;
+    title: string;
+    html: string;
+  }>;
+  styles?: string;
 }
 
 export interface TemplateProps {
@@ -37,6 +43,8 @@ export interface TranslationSection {
   originalText: string;
   translatedText?: string;
   feedback?: FeedbackData;
+  html?: string; // AI HTML 생성 방식용
+  title?: string; // AI HTML 생성 방식용
 }
 
 // PPT 관련 타입
