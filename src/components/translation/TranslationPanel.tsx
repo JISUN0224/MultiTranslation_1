@@ -36,7 +36,7 @@ const TranslationPanel: React.FC<TranslationPanelProps> = ({ sourceText, content
         scores: { accuracy: 75, fluency: 70, appropriateness: 80 },
         feedback: {
           strengths: ['번역이 전반적으로 이해 가능합니다'],
-          improvements: ['더 자연스러운 영어 표현이 필요합니다'],
+          improvements: ['더 자연스러운 번역 표현이 필요합니다'],
           suggestions: ['더 구체적이고 명확한 표현을 사용해보세요']
         },
         referenceTranslation: '전문가 수준의 참고 번역을 제공할 수 없습니다.'

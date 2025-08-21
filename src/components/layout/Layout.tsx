@@ -17,15 +17,15 @@ const Layout: React.FC<LayoutProps> = ({ header, contentArea, translationPanel }
         {/* Desktop: 좌우 분할, Mobile: 상하 분할 */}
         <div className="flex flex-col lg:flex-row gap-6 h-[calc(100vh-140px)]">
           {/* 콘텐츠 영역 - Desktop: 60%, Mobile: 전체 높이의 50% */}
-          <div className="w-full lg:w-3/5 h-1/2 lg:h-full">
-            <div className="bg-white rounded-lg shadow-lg border border-gray-200 h-full">
+          <div className="w-full lg:w-3/5 h-1/2 lg:h-full flex">
+            <div className="bg-white rounded-lg shadow-lg border border-gray-200 w-full h-full">
               {contentArea}
             </div>
           </div>
 
           {/* 번역 패널 - Desktop: 40%, Mobile: 전체 높이의 50% */}
-          <div className="w-full lg:w-2/5 h-1/2 lg:h-full">
-            <div className="bg-white rounded-lg shadow-lg border border-gray-200 h-full">
+          <div className="w-full lg:w-2/5 h-1/2 lg:h-full flex">
+            <div className="bg-white rounded-lg shadow-lg border border-gray-200 w-full h-full">
               {translationPanel}
             </div>
           </div>

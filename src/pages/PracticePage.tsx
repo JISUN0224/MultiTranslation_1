@@ -30,6 +30,7 @@ const PracticePage: React.FC = () => {
     handleContentTypeChange,
     goToPreviousSection,
     goToNextSection,
+    goToSection,
   } = useTranslation('ppt');
 
   // 생성된 콘텐츠가 없으면 기본 데이터 사용
@@ -45,6 +46,7 @@ const PracticePage: React.FC = () => {
     totalSections,
     onPrevious: goToPreviousSection,
     onNext: goToNextSection,
+    onSectionChange: goToSection,
   };
 
   // 현재 콘텐츠 타입에 따른 템플릿 컴포넌트 선택

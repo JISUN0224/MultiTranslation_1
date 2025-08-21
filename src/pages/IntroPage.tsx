@@ -15,7 +15,7 @@ const IntroPage: React.FC = () => {
   const [selectedType, setSelectedType] = useState<ContentType>('ppt');
   const [topic, setTopic] = useState('');
   const [difficulty, setDifficulty] = useState<'beginner' | 'intermediate' | 'advanced'>('intermediate');
-  const [language, setLanguage] = useState<'ko-en' | 'ko-ja' | 'ko-zh'>('ko-en');
+  const [language, setLanguage] = useState<'ko-zh' | 'zh-ko'>('ko-zh');
   const [style, setStyle] = useState('전문적인');
   const [industry, setIndustry] = useState('');
 

@@ -6,8 +6,8 @@ interface TopicInputProps {
   onTopicChange: (topic: string) => void;
   difficulty: 'beginner' | 'intermediate' | 'advanced';
   onDifficultyChange: (difficulty: 'beginner' | 'intermediate' | 'advanced') => void;
-  language: 'ko-en' | 'ko-ja' | 'ko-zh';
-  onLanguageChange: (language: 'ko-en' | 'ko-ja' | 'ko-zh') => void;
+  language: 'ko-zh' | 'zh-ko';
+  onLanguageChange: (language: 'ko-zh' | 'zh-ko') => void;
   style: string;
   onStyleChange: (style: string) => void;
   industry: string;
@@ -33,9 +33,8 @@ const TopicInput: React.FC<TopicInputProps> = ({
   ];
 
   const languages = [
-    { value: 'ko-en', label: '한국어 → 영어', flag: '🇺🇸' },
-    { value: 'ko-ja', label: '한국어 → 일본어', flag: '🇯🇵' },
-    { value: 'ko-zh', label: '한국어 → 중국어', flag: '🇨🇳' }
+    { value: 'ko-zh', label: '한국어 → 중국어', flag: '🇨🇳' },
+    { value: 'zh-ko', label: '중국어 → 한국어', flag: '🇰🇷' }
   ];
 
   const styles = [

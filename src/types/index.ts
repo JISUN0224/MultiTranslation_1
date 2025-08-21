@@ -17,7 +17,7 @@ export interface ContentRequest {
   type: ContentType;
   topic: string;
   difficulty: 'beginner' | 'intermediate' | 'advanced';
-  language: 'ko-en' | 'ko-ja' | 'ko-zh';
+  language: 'ko-zh' | 'zh-ko';
   style?: string;
   length?: 'short' | 'medium' | 'long';
   industry?: string;
@@ -144,6 +144,7 @@ export interface NavigationProps {
   totalSections: number;
   onPrevious: () => void;
   onNext: () => void;
+  onSectionChange?: (index: number) => void;
 }
 
 export interface ContentTypeOption {

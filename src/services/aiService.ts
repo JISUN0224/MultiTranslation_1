@@ -40,6 +40,11 @@ const getStructureGuide = (type: ContentType): string => {
 
 // 콘텐츠 생성 프롬프트 생성
 const createContentPrompt = (request: ContentRequest): string => {
+  const languageMap = {
+    'ko-zh': '한국어 → 중국어',
+    'zh-ko': '중국어 → 한국어'
+  };
+  
   return `
 당신은 전문 콘텐츠 제작자입니다. 다음 요구사항에 맞는 ${request.type} 콘텐츠를 제작해주세요.
 
@@ -49,7 +54,7 @@ const createContentPrompt = (request: ContentRequest): string => {
 - 난이도: ${request.difficulty}
 - 작성 스타일: ${request.style}
 - 업계: ${request.industry || '일반'}
-- 대상 언어: 한국어 → 영어 번역 연습용
+- 대상 언어: ${languageMap[request.language]} 번역 연습용
 
 【${request.type} 구조】
 ${getStructureGuide(request.type)}
@@ -83,7 +88,7 @@ const createAnalysisPrompt = (original: string, translation: string, contentType
 
 【평가 기준】
 1. 정확성 (0-100): 원문 의미 전달 정도
-2. 자연스러움 (0-100): 영어로서의 자연스러움
+2. 자연스러움 (0-100): 번역 언어로서의 자연스러움
 3. 적합성 (0-100): 해당 콘텐츠 타입에 맞는 문체
 
 【중요】반드시 다음 JSON 형식으로만 응답해주세요. 다른 설명이나 텍스트는 포함하지 마세요:
@@ -255,9 +260,9 @@ export const analyzeTranslation = async (
       return {
         scores: { accuracy: 75, fluency: 70, appropriateness: 80 },
         feedback: {
-          strengths: ['번역이 전반적으로 이해 가능합니다'],
-          improvements: ['더 자연스러운 영어 표현이 필요합니다'],
-          suggestions: ['더 구체적이고 명확한 표현을 사용해보세요']
+                  strengths: ['번역이 전반적으로 이해 가능합니다'],
+        improvements: ['더 자연스러운 번역 표현이 필요합니다'],
+        suggestions: ['더 구체적이고 명확한 표현을 사용해보세요']
         },
         referenceTranslation: '전문가 수준의 참고 번역을 제공할 수 없습니다.'
       };

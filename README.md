@@ -10,7 +10,7 @@ React + Vite + TypeScript + Tailwind CSS 기반의 AI 번역 연습 웹 애플�
 - **실시간 생성**: Gemini AI API를 통한 즉시 콘텐츠 생성
 
 ### 2. 번역 연습 시스템
-- **고정 템플릿**: 안정적인 HTML 템플릿 기반 콘텐츠 표시
+- **동적 템플릿**: AI가 생성한 JSON 데이터를 파싱하여 템플릿에 동적 삽입
 - **섹션별 연습**: 단계별 번역 연습 진행
 - **실시간 피드백**: AI 기반 번역 품질 분석
 
@@ -29,8 +29,7 @@ npm install
 ### 2. 환경변수 설정
 `.env` 파일을 생성하고 Gemini API 키를 설정하세요:
 ```env
-VITE_GEMINI_API_KEY=your_api_key_here
-VITE_API_TIMEOUT=30000
+REACT_APP_GEMINI_API_KEY=your_api_key_here
 ```
 
 ### 3. 개발 서버 실행
@@ -49,15 +48,15 @@ npm run build
 src/
 ├── components/
 │   ├── layout/          # 레이아웃 컴포넌트
-│   ├── content/         # 콘텐츠 템플릿
+│   ├── content/         # 콘텐츠 템플릿 (AI JSON 파싱)
 │   ├── translation/     # 번역 관련 컴포넌트
 │   └── intro/          # 인트로 페이지 컴포넌트
 ├── pages/              # 페이지 컴포넌트
-├── services/           # AI 서비스
+├── services/           # AI 서비스 (Gemini API)
 ├── contexts/           # React Context
 ├── hooks/              # 커스텀 훅
 ├── types/              # TypeScript 타입 정의
-└── data/               # 샘플 데이터
+└── utils/              # 유틸리티 함수
 ```
 
 ## 🎨 사용법
@@ -69,7 +68,7 @@ src/
 4. **생성 시작**: "콘텐츠 생성하기" 버튼 클릭
 
 ### 2. 번역 연습
-1. **콘텐츠 확인**: 생성된 콘텐츠를 왼쪽에서 확인
+1. **콘텐츠 확인**: AI가 생성한 콘텐츠를 왼쪽에서 확인
 2. **번역 입력**: 오른쪽 패널에서 번역 입력
 3. **AI 분석**: "AI 분석" 버튼으로 번역 품질 평가
 4. **피드백 확인**: 점수, 장점, 개선점, 참고 번역 확인
@@ -92,7 +91,8 @@ src/
 
 ### AI 통합
 - **콘텐츠 생성**: Gemini AI를 통한 전문적인 콘텐츠 생성
-- **번역 분석**: 실시간 번역 품질 평가 및 피드백
+- **JSON 파싱**: AI 응답을 구조화된 데이터로 파싱
+- **동적 템플릿**: 파싱된 데이터를 템플릿에 동적 삽입
 - **에러 처리**: API 오류 시 대체 콘텐츠 제공
 
 ### 사용자 경험
@@ -105,7 +105,7 @@ src/
 1. [Google AI Studio](https://makersuite.google.com/app/apikey)에서 API 키 발급
 2. `.env` 파일에 키 설정:
    ```env
-   VITE_GEMINI_API_KEY=your_actual_api_key_here
+   REACT_APP_GEMINI_API_KEY=your_actual_api_key_here
    ```
 3. 애플리케이션 재시작
 

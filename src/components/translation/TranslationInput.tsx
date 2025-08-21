@@ -16,7 +16,7 @@ const TranslationInput: React.FC<TranslationInputProps> = ({
   onSubmit,
   onReset,
   isLoading = false,
-  placeholder = "여기에 영어 번역을 입력하세요...",
+  placeholder = "여기에 번역을 입력하세요...",
 }) => {
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
@@ -28,7 +28,7 @@ const TranslationInput: React.FC<TranslationInputProps> = ({
   return (
     <div className="space-y-3">
       <div className="flex items-center justify-between">
-        <h3 className="text-sm font-medium text-gray-900">번역문 (영어)</h3>
+        <h3 className="text-sm font-medium text-gray-900">번역문</h3>
         <div className="flex space-x-2">
           <button
             onClick={onReset}
