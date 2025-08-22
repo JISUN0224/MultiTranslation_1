@@ -89,7 +89,7 @@ const IntroPage: React.FC = () => {
             <div className="flex items-center justify-between">
               <h3 className="text-white font-semibold">콘텐츠 생성 설정</h3>
               <div className="flex items-center space-x-2 text-white text-sm">
-                <span>PPT 생성</span>
+                <span>{selectedType === 'ppt' ? 'PPT 생성' : '설명서 생성'}</span>
                 <div className="w-2 h-2 bg-white rounded-full"></div>
               </div>
             </div>

@@ -493,7 +493,8 @@ export const checkAPIKey = (): boolean => {
 export const analyzeTranslation = async (
   originalText: string, 
   translatedText: string, 
-  contentType: ContentType
+  contentType: ContentType,
+  language: string = 'ko-zh'
 ): Promise<TranslationAnalysis> => {
   const GEMINI_API_KEY = (import.meta as any).env?.VITE_GEMINI_API_KEY;
   const GEMINI_API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent';
@@ -502,8 +503,13 @@ export const analyzeTranslation = async (
     throw new Error('Gemini API 키가 설정되지 않았습니다.');
   }
   
+  // 언어별 설정
+  const isChineseToKorean = language === 'zh-ko';
+  const sourceLanguage = isChineseToKorean ? '중국어' : '한국어';
+  const targetLanguage = isChineseToKorean ? '한국어' : '중국어';
+  
   const prompt = `
-다음 한국어 원문과 중국어 번역문을 평가해주세요.
+다음 ${sourceLanguage} 원문과 ${targetLanguage} 번역문을 평가해주세요.
 
 원문: "${originalText}"
 번역문: "${translatedText}"
@@ -528,6 +534,8 @@ export const analyzeTranslation = async (
 - accuracy (정확성): 원문의 의미가 정확히 전달되었는지 (0-100점)
 - fluency (자연스러움): 번역문이 자연스럽게 읽히는지 (0-100점)  
 - appropriateness (적합성): 문맥에 적절한지 (0-100점)
+
+**중요:** ${sourceLanguage}에서 ${targetLanguage}로의 번역을 평가하고 있습니다.
 
 반드시 위 JSON 형식으로만 응답해주세요.
 `;

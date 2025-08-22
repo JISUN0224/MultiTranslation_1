@@ -16,7 +16,7 @@ export interface TemplateProps {
   currentSection: number;
 }
 
-export type ContentType = 'ppt';
+export type ContentType = 'ppt' | 'manual';
 
 // AI 콘텐츠 생성 관련 타입
 export interface ContentRequest {
@@ -36,6 +36,7 @@ export interface GeneratedContent {
   createdAt: Date;
   data: any; // PPTData
   sections: TranslationSection[];
+  html?: string; // Manual HTML 콘텐츠용
 }
 
 export interface TranslationSection {

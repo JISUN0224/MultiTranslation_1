@@ -22,6 +22,10 @@ export interface ParsedPPTContent {
 
 // 텍스트 길이에 따른 동적 크기 조정
 export function getTextDisplayConfig(text: string) {
+  if (!text || typeof text !== 'string') {
+    return { fontSize: 'text-base', maxLines: 2, truncate: false };
+  }
+  
   const length = text.length;
   
   if (length <= 20) {

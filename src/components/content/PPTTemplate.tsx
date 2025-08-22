@@ -27,6 +27,10 @@ const DynamicText: React.FC<{
   className?: string;
   maxLength?: number;
 }> = ({ text, className = '', maxLength }) => {
+  if (!text || typeof text !== 'string') {
+    return <div className={`${className}`}>콘텐츠를 불러오는 중...</div>;
+  }
+  
   const config = getTextDisplayConfig(text);
   
   // PPT 컴텍스트에 따른 자동 길이 조정
@@ -44,13 +48,13 @@ const DynamicText: React.FC<{
     }
   }
   
-  const displayText = text.length > autoMaxLength ? 
-    smartTextSplit(text, autoMaxLength) : text;
+  const displayText = text.length > (autoMaxLength || 80) ? 
+    smartTextSplit(text, autoMaxLength || 80) : text;
   
   return (
-    <div className={`${config.fontSize} ${className}`}>
+    <span className={`${config.fontSize} ${className}`}>
       {displayText}
-    </div>
+    </span>
   );
 };
 

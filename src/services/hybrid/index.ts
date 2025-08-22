@@ -1,9 +1,10 @@
-// 🚀 하이브리드 시스템 통합 파일 - PPT 전용
+// 🚀 하이브리드 시스템 통합 파일 - PPT & Manual 지원
 // services/hybrid/index.ts
 
 export { generateHybridPPT, checkHybridAPIKey, estimateTokenUsage } from './hybridAIService';
 export { generateHybridPPT as generateHybridPPTContent } from './hybridContentService';
 export { getTemplateSlides } from './templates/templateEngine';
+export { generateHybridManual } from './hybridManualService';
 
 // 🎯 통합 하이브리드 생성 함수
 export const generateHybridContent = async (
@@ -16,6 +17,10 @@ export const generateHybridContent = async (
     case 'ppt':
       const { generateHybridPPT } = await import('./hybridAIService');
       return await generateHybridPPT(request, onProgress);
+      
+    case 'manual':
+      const { generateHybridManual } = await import('./hybridManualService');
+      return await generateHybridManual(request, onProgress);
       
     default:
       throw new Error(`지원하지 않는 콘텐츠 타입: ${request.type}`);
@@ -62,6 +67,19 @@ const pptRequest = {
 };
 
 const pptResult = await generateHybridContent(pptRequest, (progress, message) => {
+  console.log(\`\${progress}%: \${message}\`);
+});
+
+// Manual 생성
+const manualRequest = {
+  topic: '스마트폰 사용법',
+  type: 'manual',
+  industry: 'IT/기술',
+  style: '친근한',
+  language: 'ko-zh'
+};
+
+const manualResult = await generateHybridContent(manualRequest, (progress, message) => {
   console.log(\`\${progress}%: \${message}\`);
 });
 `;

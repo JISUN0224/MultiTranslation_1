@@ -199,11 +199,15 @@ function createTitleSlide(data: HybridPPTData, colors: any): SlideData {
 }
 
 function createFeaturesSlide(data: HybridPPTData, colors: any): SlideData {
+  // 언어별 제목 설정
+  const isChinese = data.language === 'zh-ko';
+  const title = isChinese ? '核心功能' : '핵심 기능';
+  
   return {
     id: 2,
-    title: '핵심 기능',
+    title: title,
     html: `<div style="background: ${colors.secondary}; color: white; min-height: 600px; padding: 60px;">
-      <h2 style="text-align: center; font-size: 3rem; margin-bottom: 40px;">핵심 기능</h2>
+      <h2 style="text-align: center; font-size: 3rem; margin-bottom: 40px;">${title}</h2>
       <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 30px;">
         ${data.features.map(feature => `
           <div style="background: rgba(255,255,255,0.2); padding: 30px; border-radius: 15px; text-align: center;">
@@ -218,12 +222,16 @@ function createFeaturesSlide(data: HybridPPTData, colors: any): SlideData {
 }
 
 function createStatsSlide(data: HybridPPTData, colors: any): SlideData {
+  // 언어별 제목 설정
+  const isChinese = data.language === 'zh-ko';
+  const title = isChinese ? '市场分析' : '시장 분석';
+  
   return {
     id: 3,
-    title: '시장 분석',
+    title: title,
     html: `<div style="background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); color: white; min-height: 600px; padding: 40px; display: flex; flex-direction: column;">
       <!-- 상단: 제목 -->
-      <h2 style="text-align: center; font-size: 3rem; margin-bottom: 30px;">📊 시장 분석</h2>
+      <h2 style="text-align: center; font-size: 3rem; margin-bottom: 30px;">📊 ${title}</h2>
       
       <!-- 중단: 통계 카드들 -->
       <div style="display: flex; justify-content: center; gap: 40px; margin-bottom: 40px;">
@@ -239,7 +247,7 @@ function createStatsSlide(data: HybridPPTData, colors: any): SlideData {
       <div style="flex: 1; display: flex; gap: 30px; align-items: stretch;">
         <!-- 왼쪽: 그래프 -->
         <div style="flex: 1; background: rgba(255,255,255,0.1); border-radius: 15px; padding: 25px; backdrop-filter: blur(10px);">
-          <h3 style="text-align: center; font-size: 1.5rem; margin-bottom: 20px; color: ${colors.accent};">📈 성장 추이</h3>
+          <h3 style="text-align: center; font-size: 1.5rem; margin-bottom: 20px; color: ${colors.accent};">📈 ${isChinese ? '增长趋势' : '성장 추이'}</h3>
           <div style="display: flex; align-items: end; justify-content: space-around; height: 120px; margin-bottom: 15px;">
             <div style="display: flex; flex-direction: column; align-items: center;">
               <div style="width: 30px; background: linear-gradient(to top, ${colors.stats.gold}, ${colors.stats.blue}); border-radius: 5px 5px 0 0; height: 60px; margin-bottom: 8px;"></div>
@@ -258,20 +266,20 @@ function createStatsSlide(data: HybridPPTData, colors: any): SlideData {
               <span style="font-size: 0.8rem;">2025</span>
             </div>
           </div>
-          <div style="text-align: center; font-size: 0.9rem; opacity: 0.8;">연간 성장률: +25%</div>
+          <div style="text-align: center; font-size: 0.9rem; opacity: 0.8;">${isChinese ? '年增长率: +25%' : '연간 성장률: +25%'}</div>
         </div>
         
         <!-- 오른쪽: 텍스트 설명 -->
         <div style="flex: 1; background: rgba(255,255,255,0.1); border-radius: 15px; padding: 25px; backdrop-filter: blur(10px);">
-          <h3 style="text-align: center; font-size: 1.5rem; margin-bottom: 20px; color: ${colors.accent};">💡 시장 인사이트</h3>
+          <h3 style="text-align: center; font-size: 1.5rem; margin-bottom: 20px; color: ${colors.accent};">💡 ${isChinese ? '市场洞察' : '시장 인사이트'}</h3>
           <div style="line-height: 1.6; font-size: 0.95rem;">
-            <p style="margin-bottom: 15px;">• <strong>글로벌 확장:</strong> 해외 시장 진출로 매출 성장 가속화</p>
-            <p style="margin-bottom: 15px;">• <strong>기술 혁신:</strong> AI 기술 도입으로 경쟁력 강화</p>
-            <p style="margin-bottom: 15px;">• <strong>고객 만족:</strong> 서비스 품질 개선으로 재구매율 증가</p>
-            <p style="margin-bottom: 15px;">• <strong>시장 점유율:</strong> 주요 경쟁사 대비 우위 확보</p>
+            <p style="margin-bottom: 15px;">• <strong>${isChinese ? '全球扩张:' : '글로벌 확장:'}</strong> ${isChinese ? '海外市场进入加速营收增长' : '해외 시장 진출로 매출 성장 가속화'}</p>
+            <p style="margin-bottom: 15px;">• <strong>${isChinese ? '技术创新:' : '기술 혁신:'}</strong> ${isChinese ? 'AI技术引入增强竞争力' : 'AI 기술 도입으로 경쟁력 강화'}</p>
+            <p style="margin-bottom: 15px;">• <strong>${isChinese ? '客户满意:' : '고객 만족:'}</strong> ${isChinese ? '服务质量改善提高回购率' : '서비스 품질 개선으로 재구매율 증가'}</p>
+            <p style="margin-bottom: 15px;">• <strong>${isChinese ? '市场份额:' : '시장 점유율:'}</strong> ${isChinese ? '主要竞争对手相比保持优势' : '주요 경쟁사 대비 우위 확보'}</p>
           </div>
           <div style="text-align: center; margin-top: 20px; padding: 10px; background: rgba(255,255,255,0.1); border-radius: 10px; font-size: 0.9rem;">
-            🎯 <strong>목표:</strong> 2025년까지 시장 점유율 1위 달성
+            🎯 <strong>${isChinese ? '目标:' : '목표:'}</strong> ${isChinese ? '2025年之前实现市场份额第一' : '2025년까지 시장 점유율 1위 달성'}
           </div>
         </div>
       </div>
@@ -280,7 +288,15 @@ function createStatsSlide(data: HybridPPTData, colors: any): SlideData {
 }
 
 function createPricingSlide(data: HybridPPTData, colors: any): SlideData {
-  const defaultPricing = [
+  // 언어별 제목 설정
+  const isChinese = data.language === 'zh-ko';
+  const title = isChinese ? '价格政策' : '가격 정책';
+  
+  const defaultPricing = isChinese ? [
+    { name: '基本', price: '¥29,900', features: ['基本功能', '5GB存储'], highlight: false },
+    { name: '高级', price: '¥59,900', features: ['所有功能', '无限存储'], highlight: true },
+    { name: '企业', price: '¥99,900', features: ['高级功能', '优先支持'], highlight: false }
+  ] : [
     { name: '기본', price: '₩29,900', features: ['기본 기능', '5GB 저장'], highlight: false },
     { name: '프리미엄', price: '₩59,900', features: ['모든 기능', '무제한 저장'], highlight: true },
     { name: '엔터프라이즈', price: '₩99,900', features: ['고급 기능', '우선 지원'], highlight: false }
@@ -290,9 +306,9 @@ function createPricingSlide(data: HybridPPTData, colors: any): SlideData {
   
   return {
     id: 4,
-    title: '가격 정책',
+    title: title,
     html: `<div style="background: ${colors.primary}; color: white; min-height: 600px; padding: 60px;">
-      <h2 style="text-align: center; font-size: 3rem; margin-bottom: 40px;">💰 가격 정책</h2>
+      <h2 style="text-align: center; font-size: 3rem; margin-bottom: 40px;">💰 ${title}</h2>
       <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 30px; max-width: 1000px; margin: 0 auto;">
         ${pricing.map(plan => `
           <div style="background: rgba(255,255,255,0.2); padding: 40px; border-radius: 20px; text-align: center; ${plan.highlight ? 'border: 2px solid #FFD700; transform: scale(1.05);' : ''}">
@@ -309,7 +325,15 @@ function createPricingSlide(data: HybridPPTData, colors: any): SlideData {
 }
 
 function createTimelineSlide(data: HybridPPTData, colors: any): SlideData {
-  const defaultTimeline = [
+  // 언어별 제목 설정
+  const isChinese = data.language === 'zh-ko';
+  const title = isChinese ? '未来计划' : '향후 계획';
+  
+  const defaultTimeline = isChinese ? [
+    { year: '2024', title: '发布', description: '正式推出' },
+    { year: '2025', title: '扩展', description: '功能增强' },
+    { year: '2026', title: '全球化', description: '海外进军' }
+  ] : [
     { year: '2024', title: '출시', description: '공식 런칭' },
     { year: '2025', title: '확장', description: '기능 강화' },
     { year: '2026', title: '글로벌', description: '해외 진출' }
@@ -319,9 +343,9 @@ function createTimelineSlide(data: HybridPPTData, colors: any): SlideData {
   
   return {
     id: 5,
-    title: '향후 계획',
+    title: title,
     html: `<div style="background: ${colors.secondary}; color: white; min-height: 600px; padding: 60px;">
-      <h2 style="text-align: center; font-size: 3rem; margin-bottom: 40px;">🚀 향후 계획</h2>
+              <h2 style="text-align: center; font-size: 3rem; margin-bottom: 40px;">🚀 ${title}</h2>
       <div style="display: flex; justify-content: space-between; max-width: 800px; margin: 0 auto;">
         ${timeline.map(item => `
           <div style="text-align: center;">

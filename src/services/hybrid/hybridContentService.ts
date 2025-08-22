@@ -45,15 +45,31 @@ export const generateHybridPPT = async (
 
 // AI 데이터 생성 함수 (간단한 버전)
 async function generatePPTAIData(request: ContentRequest) {
+  // 언어별 제목 설정
+  const isChinese = request.language === 'zh-ko';
+  const slideTitles = {
+    marketAnalysis: isChinese ? '市场分析' : '시장 분석',
+    coreFeatures: isChinese ? '核心功能' : '핵심 기능',
+    pricing: isChinese ? '价格政策' : '가격 정책',
+    growthStrategy: isChinese ? '成长战略' : '성장 전략'
+  };
+  
+  const slideDescriptions = {
+    marketAnalysis: isChinese ? '当前市场情况和趋势' : '현재 시장 상황과 트렌드',
+    coreFeatures: isChinese ? '主要特点和优势' : '주요 특징과 장점',
+    pricing: isChinese ? '有竞争力的价格策略' : '경쟁력 있는 가격 전략',
+    growthStrategy: isChinese ? '未来发展方向' : '미래 발전 방향'
+  };
+  
   // 실제로는 Gemini API 호출, 지금은 샘플 데이터
   return {
     title: request.topic,
-    subtitle: `${request.topic}에 대한 종합적인 분석`,
+    subtitle: isChinese ? `${request.topic}的综合分析` : `${request.topic}에 대한 종합적인 분석`,
     features: [
-      { icon: '📊', title: '시장 분석', description: '현재 시장 상황과 트렌드' },
-      { icon: '🚀', title: '핵심 기능', description: '주요 특징과 장점' },
-      { icon: '💰', title: '가격 정책', description: '경쟁력 있는 가격 전략' },
-      { icon: '📈', title: '성장 전략', description: '미래 발전 방향' }
+      { icon: '📊', title: slideTitles.marketAnalysis, description: slideDescriptions.marketAnalysis },
+      { icon: '🚀', title: slideTitles.coreFeatures, description: slideDescriptions.coreFeatures },
+      { icon: '💰', title: slideTitles.pricing, description: slideDescriptions.pricing },
+      { icon: '📈', title: slideTitles.growthStrategy, description: slideDescriptions.growthStrategy }
     ],
     chartData: [
       { year: '2022', value: 12 },

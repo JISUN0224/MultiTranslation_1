@@ -9,9 +9,10 @@ import FeedbackSection from './FeedbackSection';
 interface TranslationPanelProps {
   sourceText: string;
   contentType?: ContentType;
+  language?: string;
 }
 
-const TranslationPanel: React.FC<TranslationPanelProps> = ({ sourceText, contentType = 'ppt' }) => {
+const TranslationPanel: React.FC<TranslationPanelProps> = ({ sourceText, contentType = 'ppt', language = 'ko-zh' }) => {
   const [translationText, setTranslationText] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [feedback, setFeedback] = useState<TranslationAnalysis | null>(null);
@@ -26,7 +27,7 @@ const TranslationPanel: React.FC<TranslationPanelProps> = ({ sourceText, content
     
     try {
       // 실제 AI 번역 분석
-      const analysis = await analyzeTranslation(sourceText, translationText, contentType);
+      const analysis = await analyzeTranslation(sourceText, translationText, contentType, language);
       setFeedback(analysis);
       setShowFeedback(true);
     } catch (error) {

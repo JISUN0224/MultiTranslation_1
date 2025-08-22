@@ -82,7 +82,11 @@ const createHybridPrompt = (request: ContentRequest): string => {
 - timeline: 발전/로드맵 3단계
 - 주제: ${request.topic}
 - 스타일: ${request.style || '전문적인'}
-- 언어: ${request.language === 'ko-zh' ? '한국어' : '중국어'}
+
+**중요한 언어 요구사항:**
+- 생성 언어: ${request.language === 'ko-zh' ? '한국어' : '중국어'}
+- 모든 텍스트(제목, 설명, 라벨 등)를 ${request.language === 'ko-zh' ? '한국어' : '중국어'}로 작성
+- JSON 내의 모든 문자열을 ${request.language === 'ko-zh' ? '한국어' : '중국어'}로 생성
 
 반드시 위 JSON 형식으로만 응답하세요.
 `;

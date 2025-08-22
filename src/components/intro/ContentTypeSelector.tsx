@@ -1,5 +1,5 @@
 import React from 'react';
-import { Presentation } from 'lucide-react';
+import { Presentation, BookOpen } from 'lucide-react';
 import { ContentType } from '../../types';
 
 interface ContentTypeSelectorProps {
@@ -15,6 +15,14 @@ const contentTypes = [
     icon: Presentation,
     features: ['제목 슬라이드', '기능 소개', '시장 분석', '제품 포트폴리오', '가격 정책'],
     color: 'from-blue-500 to-purple-600'
+  },
+  {
+    id: 'manual' as ContentType,
+    title: '설명서/매뉴얼',
+    description: '상세한 사용법과 가이드 문서',
+    icon: BookOpen,
+    features: ['개요 및 목적', '단계별 가이드', '주의사항', '문제해결', '자주 묻는 질문'],
+    color: 'from-green-500 to-teal-600'
   }
 ];
 
@@ -33,7 +41,7 @@ const ContentTypeSelector: React.FC<ContentTypeSelectorProps> = ({
         </p>
       </div>
 
-      <div className="max-w-md mx-auto">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
         {contentTypes.map((type) => {
           const Icon = type.icon;
           const isSelected = selectedType === type.id;

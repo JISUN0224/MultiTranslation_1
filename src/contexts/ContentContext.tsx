@@ -7,6 +7,7 @@ import { generateHybridPPT, checkHybridAPIKey } from '../services/hybrid'; // �
 
 interface ContentContextType {
   generatedContent: GeneratedContent | null;
+  currentRequest: ContentRequest | null;
   isGenerating: boolean;
   generationProgress: number;
   generationMessage: string;
@@ -32,12 +33,14 @@ export const ContentProvider: React.FC<ContentProviderProps> = ({ children }) =>
   const [generationMessage, setGenerationMessage] = useState('');
   const [isAPIKeyValid] = useState(checkAPIKey());
   const [useSampleData, setUseSampleData] = useState(false);
+  const [currentRequest, setCurrentRequest] = useState<ContentRequest | null>(null);
   
   // 🚀 하이브리드 모드가 기본값 (legacy=true로 기존 방식 사용 가능)
   const useLegacyMode = new URLSearchParams(window.location.search).get('legacy') === 'true';
   const useHybridMode = !useLegacyMode; // 기본값: 하이브리드
 
   const generateNewContent = async (request: ContentRequest) => {
+    setCurrentRequest(request);
     try {
       setIsGenerating(true);
       setGenerationProgress(0);
@@ -86,6 +89,7 @@ export const ContentProvider: React.FC<ContentProviderProps> = ({ children }) =>
 
   const clearContent = () => {
     setGeneratedContent(null);
+    setCurrentRequest(null);
     // localStorage에서도 콘텐츠 제거
     localStorage.removeItem('generatedContent');
     setGenerationProgress(0);
@@ -97,6 +101,7 @@ export const ContentProvider: React.FC<ContentProviderProps> = ({ children }) =>
 
   const value: ContentContextType = {
     generatedContent,
+    currentRequest,
     isGenerating,
     generationProgress,
     generationMessage,

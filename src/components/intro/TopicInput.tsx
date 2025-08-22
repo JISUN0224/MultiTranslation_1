@@ -25,8 +25,8 @@ const TopicInput: React.FC<TopicInputProps> = ({
   ];
 
   const languages = [
-    { value: 'ko-zh', label: '한국어 → 중국어', flag: '🇨🇳' },
-    { value: 'zh-ko', label: '중국어 → 한국어', flag: '🇰🇷' }
+    { value: 'ko-zh', label: 'KR 한국어', flag: '🇰🇷' },
+    { value: 'zh-ko', label: 'CN 중국어', flag: '🇨🇳' }
   ];
 
 
@@ -49,11 +49,11 @@ const TopicInput: React.FC<TopicInputProps> = ({
             type="text"
             value={topic}
             onChange={(e) => onTopicChange(e.target.value)}
-            placeholder="예: 스마트폰 신제품, 화장품 브랜드, 카페 메뉴..."
+            placeholder="예: 스마트폰, 갤럭시 워치, 스마트 TV, 넷플릭스 등 설명서 또는 PPT에 어울리는 주제"
             className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
           />
           <p className="mt-1 text-sm text-gray-500">
-            구체적이고 명확한 주제를 입력해주세요
+            설명서 또는 PPT에 어울리는 주제를 입력해주세요
           </p>
         </div>
       </div>
@@ -94,7 +94,7 @@ const TopicInput: React.FC<TopicInputProps> = ({
           {/* 언어 선택 */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-3">
-              번역 언어
+              생성 언어
             </label>
             <div className="space-y-2">
               {languages.map((lang) => (

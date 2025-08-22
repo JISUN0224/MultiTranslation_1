@@ -25,7 +25,7 @@ const SourceText: React.FC<SourceTextProps> = ({ text, onCopy, onSpeak }) => {
   return (
     <div className="space-y-3">
       <div className="flex items-center justify-between">
-        <h3 className="text-sm font-medium text-gray-900">원문 (한국어)</h3>
+        <h3 className="text-sm font-medium text-gray-900">원문</h3>
         <div className="flex space-x-1">
           <button
             onClick={handleSpeak}
