@@ -1,5 +1,5 @@
 import React from 'react';
-import { Presentation, FileText, BookOpen } from 'lucide-react';
+import { Presentation } from 'lucide-react';
 import { ContentType } from '../../types';
 
 interface ContentTypeSelectorProps {
@@ -15,22 +15,6 @@ const contentTypes = [
     icon: Presentation,
     features: ['제목 슬라이드', '기능 소개', '시장 분석', '제품 포트폴리오', '가격 정책'],
     color: 'from-blue-500 to-purple-600'
-  },
-  {
-    id: 'brochure' as ContentType,
-    title: '브로슈어',
-    description: '제품/서비스 소개 카탈로그',
-    icon: FileText,
-    features: ['브랜드 정보', '제품 라인업', '특별 혜택', '가격 정보'],
-    color: 'from-pink-500 to-red-500'
-  },
-  {
-    id: 'manual' as ContentType,
-    title: '사용설명서',
-    description: '제품 사용법 및 가이드',
-    icon: BookOpen,
-    features: ['개요', '설치 방법', '사용법', '문제 해결', '유지보수'],
-    color: 'from-green-500 to-teal-600'
   }
 ];
 
@@ -49,7 +33,7 @@ const ContentTypeSelector: React.FC<ContentTypeSelectorProps> = ({
         </p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="max-w-md mx-auto">
         {contentTypes.map((type) => {
           const Icon = type.icon;
           const isSelected = selectedType === type.id;
@@ -59,7 +43,7 @@ const ContentTypeSelector: React.FC<ContentTypeSelectorProps> = ({
               key={type.id}
               onClick={() => onTypeSelect(type.id)}
               className={`
-                relative p-6 rounded-xl border-2 cursor-pointer transition-all duration-300
+                relative p-8 rounded-xl border-2 cursor-pointer transition-all duration-300
                 ${isSelected 
                   ? 'border-primary-500 bg-primary-50 shadow-lg scale-105' 
                   : 'border-gray-200 bg-white hover:border-gray-300 hover:shadow-md'
@@ -75,25 +59,25 @@ const ContentTypeSelector: React.FC<ContentTypeSelectorProps> = ({
 
               {/* 아이콘 */}
               <div className={`
-                w-12 h-12 rounded-lg flex items-center justify-center mb-4
+                w-16 h-16 rounded-lg flex items-center justify-center mb-6
                 bg-gradient-to-br ${type.color}
               `}>
-                <Icon className="w-6 h-6 text-white" />
+                <Icon className="w-8 h-8 text-white" />
               </div>
 
               {/* 제목과 설명 */}
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">
+              <h3 className="text-xl font-semibold text-gray-900 mb-3">
                 {type.title}
               </h3>
-              <p className="text-sm text-gray-600 mb-4">
+              <p className="text-gray-600 mb-6">
                 {type.description}
               </p>
 
               {/* 특징 목록 */}
-              <ul className="space-y-1">
+              <ul className="space-y-2">
                 {type.features.map((feature, index) => (
-                  <li key={index} className="text-xs text-gray-500 flex items-center">
-                    <div className="w-1 h-1 bg-gray-400 rounded-full mr-2"></div>
+                  <li key={index} className="text-sm text-gray-500 flex items-center">
+                    <div className="w-1.5 h-1.5 bg-gray-400 rounded-full mr-3"></div>
                     {feature}
                   </li>
                 ))}

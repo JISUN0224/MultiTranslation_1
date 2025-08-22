@@ -16,8 +16,6 @@ const IntroPage: React.FC = () => {
   const [topic, setTopic] = useState('');
   const [difficulty, setDifficulty] = useState<'beginner' | 'intermediate' | 'advanced'>('intermediate');
   const [language, setLanguage] = useState<'ko-zh' | 'zh-ko'>('ko-zh');
-  const [style, setStyle] = useState('전문적인');
-  const [industry, setIndustry] = useState('');
 
   // 폼 유효성 검사
   const isFormValid = topic.trim().length > 0;
@@ -30,9 +28,7 @@ const IntroPage: React.FC = () => {
       type: selectedType,
       topic: topic.trim(),
       difficulty,
-      language,
-      style,
-      industry: industry || undefined
+      language
     };
 
                   try {
@@ -58,20 +54,14 @@ const IntroPage: React.FC = () => {
       {/* 헤더 */}
       <header className="bg-white shadow-sm border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
-            <div className="flex items-center space-x-3">
-              <Globe className="h-8 w-8 text-primary-600" />
-              <h1 className="text-xl font-semibold text-gray-900">
-                AI 번역 연습 시스템
-              </h1>
+                      <div className="flex items-center justify-center h-16">
+              <div className="flex items-center space-x-3">
+                <Globe className="h-8 w-8 text-primary-600" />
+                <h1 className="text-xl font-semibold text-gray-900">
+                  AI 번역 연습 시스템
+                </h1>
+              </div>
             </div>
-            <a 
-              href="/test" 
-              className="px-4 py-2 bg-blue-100 hover:bg-blue-200 text-blue-700 rounded-lg transition-colors text-sm font-medium"
-            >
-              🧪 AI PPT 테스트
-            </a>
-          </div>
         </div>
       </header>
 
@@ -99,9 +89,8 @@ const IntroPage: React.FC = () => {
             <div className="flex items-center justify-between">
               <h3 className="text-white font-semibold">콘텐츠 생성 설정</h3>
               <div className="flex items-center space-x-2 text-white text-sm">
-                <span>단계 1/2</span>
+                <span>PPT 생성</span>
                 <div className="w-2 h-2 bg-white rounded-full"></div>
-                <div className="w-2 h-2 bg-white bg-opacity-30 rounded-full"></div>
               </div>
             </div>
           </div>
@@ -128,10 +117,6 @@ const IntroPage: React.FC = () => {
                 onDifficultyChange={setDifficulty}
                 language={language}
                 onLanguageChange={setLanguage}
-                style={style}
-                onStyleChange={setStyle}
-                industry={industry}
-                onIndustryChange={setIndustry}
               />
             </div>
           </div>

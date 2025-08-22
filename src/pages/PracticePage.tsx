@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import '../App.css';
 
 // Components
@@ -7,8 +7,6 @@ import Header from '../components/layout/Header';
 import TranslationPanel from '../components/translation/TranslationPanel';
 import PPTTemplate from '../components/content/PPTTemplate';
 import PPTDirectRender from '../components/content/PPTDirectRender'; // ✅ TestPage와 동일한 컴포넌트 사용
-import BrochureTemplate from '../components/content/BrochureTemplate';
-import ManualTemplate from '../components/content/ManualTemplate';
 
 // Hooks
 import { useTranslation } from '../hooks/useTranslation';
@@ -77,10 +75,13 @@ const PracticePage: React.FC = () => {
     onSectionChange: goToSection,
   };
 
+  // ✅ 추출된 텍스트 상태 관리
+  const [extractedText, setExtractedText] = useState<string>('');
+
   // ✅ 텍스트 추출 콜백 (TestPage와 동일)
   const handleTextExtracted = (text: string) => {
     console.log('추출된 텍스트:', text);
-    // 필요시 번역 패널에 전달하는 로직 추가 가능
+    setExtractedText(text);
   };
 
   // 현재 콘텐츠 타입에 따른 템플릿 컴포넌트 선택
@@ -100,10 +101,6 @@ const PracticePage: React.FC = () => {
             onTextExtracted={handleTextExtracted}
           /> : 
           <PPTTemplate {...templateProps} />;
-      case 'brochure':
-        return <BrochureTemplate {...templateProps} />;
-      case 'manual':
-        return <ManualTemplate {...templateProps} />;
       default:
         return <PPTTemplate {...templateProps} />;
     }
@@ -119,10 +116,15 @@ const PracticePage: React.FC = () => {
     />
   );
 
-  // ✅ 번역 패널에 현재 슬라이드 텍스트 전달
+  // ✅ 번역 패널에 추출된 텍스트 전달 (추출된 텍스트가 있으면 사용, 없으면 기존 방식)
   const getCurrentSlideText = () => {
+    // 추출된 텍스트가 있으면 우선 사용
+    if (extractedText) {
+      return extractedText;
+    }
+    
+    // 기존 방식으로 텍스트 추출
     if (slides.length > 0 && slides[currentSection]) {
-      // HTML에서 텍스트 추출
       const htmlContent = slides[currentSection].html;
       try {
         const parser = new DOMParser();

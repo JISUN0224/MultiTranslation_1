@@ -1,10 +1,9 @@
-// services/aiService.ts - 고퀄리티 HTML 파싱 지원 버전
+// services/aiService.ts - 최적화된 간결한 프롬프트 버전
 
 import { ContentRequest, GeneratedContent, ContentType, TranslationAnalysis } from '../types';
 
-// 🔥 올바른 언어 처리가 적용된 PPT 프롬프트
+// 🚀 최적화된 간결한 PPT 프롬프트 (기존 3000토큰 → 800토큰)
 const createPPTPrompt = (request: ContentRequest): string => {
-  // 🎯 언어 방향에 따른 원본 콘텐츠 언어 결정
   const getSourceLanguage = (langDirection: string) => {
     switch(langDirection) {
       case 'ko-zh': return '한국어'; 
@@ -16,359 +15,69 @@ const createPPTPrompt = (request: ContentRequest): string => {
   const sourceLanguage = getSourceLanguage(request.language);
   
   return `
-🚨 **절대 금지사항:**
-- HTML 코드 생략 절대 금지 ("<!-- 생략합니다 -->" 같은 주석 금지)
-- "너무 길어져서" 같은 핑계 금지
-- 모든 슬라이드의 HTML을 완전히 작성해야 함
-- 각 html 필드에는 완전한 <div>...</div> 코드 포함 필수
+🚨 **필수 요구사항:**
+- HTML 코드 생략 절대 금지 
+- 모든 슬라이드의 완전한 HTML 작성 필수
+- 각 html 필드에 완전한 <div>...</div> 코드 포함
+- **중요:** height: 100vh 사용 금지, height: 100% 사용 (스크롤 방지)
 
-당신은 "${request.topic}"에 대한 프레젠테이션을 ${sourceLanguage}로 제작해주세요.
+"${request.topic}"에 대한 ${sourceLanguage} 프레젠테이션 5개 슬라이드를 제작해주세요.
 
-**=== 필수 JSON 응답 형식 ===**
+**JSON 응답 형식:**
 \`\`\`json
 {
   "slides": [
     {
       "id": 1,
-      "title": "${request.topic} 소개",
-      "subtitle": "혁신과 성장의 스토리",
-      "html": "<div style='background:linear-gradient(135deg,#667eea,#764ba2);padding:60px;color:white;height:100vh;display:flex;flex-direction:column;justify-content:center;text-align:center;font-family:Arial,sans-serif'><h1 style='font-size:4rem;margin-bottom:30px'>${request.topic}</h1><p style='font-size:1.5rem;margin-bottom:40px'>혁신적인 솔루션을 경험해보세요</p><div style='display:flex;gap:30px;justify-content:center'><div style='background:rgba(255,255,255,0.2);padding:30px;border-radius:15px'><div style='font-size:2rem;font-weight:bold;color:#FFD700'>2.5M+</div><div>사용자</div></div><div style='background:rgba(255,255,255,0.2);padding:30px;border-radius:15px'><div style='font-size:2rem;font-weight:bold;color:#00D4FF'>95%</div><div>만족도</div></div></div></div>"
-    },
-    {
-      "id": 2,
-      "title": "시장 기회 분석",
-      "subtitle": "데이터 기반 인사이트",
-      "html": "<div style='background:linear-gradient(135deg,#1a1a2e,#16213e);padding:60px;color:white;height:100vh;font-family:Arial,sans-serif'><h2 style='font-size:3rem;text-align:center;margin-bottom:60px'>📊 시장 기회 분석</h2><div style='display:grid;grid-template-columns:1fr 1fr;gap:60px'><div style='background:rgba(255,255,255,0.08);border-radius:20px;padding:40px'><h3 style='font-size:1.8rem;margin-bottom:30px;text-align:center'>성장률</h3><div style='display:flex;align-items:end;height:300px;gap:30px;justify-content:center'><div style='background:linear-gradient(180deg,#FF6B6B,#D63031);width:80px;height:200px;border-radius:10px 10px 0 0;display:flex;align-items:end;justify-content:center;padding-bottom:10px'><span style='color:white;font-weight:bold'>85%</span></div><div style='background:linear-gradient(180deg,#00D4FF,#0984e3);width:80px;height:240px;border-radius:10px 10px 0 0;display:flex;align-items:end;justify-content:center;padding-bottom:10px'><span style='color:white;font-weight:bold'>95%</span></div></div></div><div style='background:rgba(255,255,255,0.08);border-radius:20px;padding:40px'><h3 style='font-size:1.8rem;margin-bottom:30px;text-align:center'>시장 점유율</h3><div style='width:200px;height:200px;border-radius:50%;background:conic-gradient(#E50914 0deg 144deg,#00D4FF 144deg 216deg,#FFD700 216deg 288deg,#e0e0e0 288deg 360deg);display:flex;align-items:center;justify-content:center;margin:0 auto'><div style='width:120px;height:120px;border-radius:50%;background:#1a1a2e;display:flex;align-items:center;justify-content:center;flex-direction:column'><span style='font-size:2rem;font-weight:bold;color:#E50914'>40%</span><span style='font-size:0.9rem;color:#ccc'>${request.topic}</span></div></div></div></div></div>"
-    },
-    {
-      "id": 3,
-      "title": "핵심 솔루션",
-      "subtitle": "차별화된 가치 제안",
-      "html": "<div style='background:linear-gradient(135deg,#11998e,#38ef7d);padding:60px;color:white;height:100vh;font-family:Arial,sans-serif'><h2 style='font-size:3rem;text-align:center;margin-bottom:60px'>💡 핵심 솔루션</h2><div style='display:grid;grid-template-columns:repeat(2,1fr);gap:40px;max-width:900px;margin:0 auto'><div style='background:rgba(255,255,255,0.2);padding:40px;border-radius:20px;text-align:center'><div style='font-size:4rem;margin-bottom:20px'>🚀</div><h3 style='font-size:1.5rem;margin-bottom:15px'>혁신적 기술</h3><p style='font-size:1rem'>최첨단 기술로 업계를 선도합니다</p></div><div style='background:rgba(255,255,255,0.2);padding:40px;border-radius:20px;text-align:center'><div style='font-size:4rem;margin-bottom:20px'>⚡</div><h3 style='font-size:1.5rem;margin-bottom:15px'>빠른 성능</h3><p style='font-size:1rem'>업계 최고 수준의 처리 속도</p></div><div style='background:rgba(255,255,255,0.2);padding:40px;border-radius:20px;text-align:center'><div style='font-size:4rem;margin-bottom:20px'>🛡️</div><h3 style='font-size:1.5rem;margin-bottom:15px'>안전 보장</h3><p style='font-size:1rem'>검증된 보안 시스템으로 안전합니다</p></div><div style='background:rgba(255,255,255,0.2);padding:40px;border-radius:20px;text-align:center'><div style='font-size:4rem;margin-bottom:20px'>🎯</div><h3 style='font-size:1.5rem;margin-bottom:15px'>맞춤형 서비스</h3><p style='font-size:1rem'>개인화된 최적의 서비스를 제공합니다</p></div></div></div>"
-    },
-    {
-      "id": 4,
-      "title": "비즈니스 모델",
-      "subtitle": "수익 구조 및 가격 전략",
-      "html": "<div style='background:linear-gradient(135deg,#667eea,#764ba2);padding:60px;color:white;height:100vh;font-family:Arial,sans-serif'><h2 style='font-size:3rem;text-align:center;margin-bottom:60px'>💰 비즈니스 모델</h2><div style='display:grid;grid-template-columns:repeat(3,1fr);gap:40px;max-width:1000px;margin:0 auto'><div style='background:rgba(255,255,255,0.2);padding:40px;border-radius:20px;text-align:center'><h3 style='font-size:1.5rem;margin-bottom:20px'>기본</h3><div style='font-size:3rem;font-weight:bold;margin-bottom:20px;color:#FFD700'>₩29,900</div><p style='margin-bottom:20px'>월 구독</p><ul style='list-style:none;padding:0'><li style='margin-bottom:10px'>✓ 기본 기능</li><li style='margin-bottom:10px'>✓ 이메일 지원</li><li>✓ 5GB 저장공간</li></ul></div><div style='background:rgba(255,255,255,0.3);padding:40px;border-radius:20px;text-align:center;border:2px solid #FFD700'><h3 style='font-size:1.5rem;margin-bottom:20px'>프로</h3><div style='font-size:3rem;font-weight:bold;margin-bottom:20px;color:#FFD700'>₩59,900</div><p style='margin-bottom:20px'>월 구독</p><ul style='list-style:none;padding:0'><li style='margin-bottom:10px'>✓ 모든 기능</li><li style='margin-bottom:10px'>✓ 우선 지원</li><li>✓ 무제한 저장공간</li></ul></div><div style='background:rgba(255,255,255,0.2);padding:40px;border-radius:20px;text-align:center'><h3 style='font-size:1.5rem;margin-bottom:20px'>엔터프라이즈</h3><div style='font-size:3rem;font-weight:bold;margin-bottom:20px;color:#FFD700'>₩99,900</div><p style='margin-bottom:20px'>월 구독</p><ul style='list-style:none;padding:0'><li style='margin-bottom:10px'>✓ 고급 기능</li><li style='margin-bottom:10px'>✓ 전담 지원</li><li>✓ 고급 분석</li></ul></div></div></div>"
-    },
-    {
-      "id": 5,
-      "title": "성장 전략",
-      "subtitle": "로드맵 및 향후 계획",
-      "html": "<div style='background:linear-gradient(135deg,#ff9a9e,#fecfef);padding:60px;color:white;height:100vh;font-family:Arial,sans-serif'><h2 style='font-size:3rem;text-align:center;margin-bottom:60px'>🚀 성장 전략</h2><div style='max-width:1000px;margin:0 auto'><div style='display:flex;justify-content:space-between;margin-bottom:60px'><div style='text-align:center'><div style='width:80px;height:80px;background:rgba(255,255,255,0.3);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 20px'><span style='font-size:1.5rem;font-weight:bold'>Q1</span></div><h4>신제품 출시</h4></div><div style='text-align:center'><div style='width:80px;height:80px;background:rgba(255,255,255,0.3);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 20px'><span style='font-size:1.5rem;font-weight:bold'>Q2</span></div><h4>해외 진출</h4></div><div style='text-align:center'><div style='width:80px;height:80px;background:rgba(255,255,255,0.3);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 20px'><span style='font-size:1.5rem;font-weight:bold'>Q3</span></div><h4>파트너십 확대</h4></div><div style='text-align:center'><div style='width:80px;height:80px;background:rgba(255,255,255,0.3);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 20px'><span style='font-size:1.5rem;font-weight:bold'>Q4</span></div><h4>AI 기술 도입</h4></div></div><div style='display:grid;grid-template-columns:repeat(3,1fr);gap:30px'><div style='background:rgba(255,255,255,0.2);padding:30px;border-radius:15px;text-align:center'><div style='font-size:2.5rem;font-weight:bold;color:#FFD700;margin-bottom:10px'>300%</div><div>목표 성장률</div></div><div style='background:rgba(255,255,255,0.2);padding:30px;border-radius:15px;text-align:center'><div style='font-size:2.5rem;font-weight:bold;color:#00D4FF;margin-bottom:10px'>50+</div><div>신규 시장</div></div><div style='background:rgba(255,255,255,0.2);padding:30px;border-radius:15px;text-align:center'><div style='font-size:2.5rem;font-weight:bold;color:#FF6B6B;margin-bottom:10px'>10M+</div><div>예상 사용자</div></div></div></div></div>"
+      "title": "제목",
+      "subtitle": "부제목", 
+      "html": "완전한 HTML 코드"
     }
   ]
 }
 \`\`\`
 
-⚠️ **중요**: 각 html 필드에는 반드시 완전한 HTML 코드를 포함해야 합니다. 절대로 생략하거나 주석으로 대체하지 마세요!
+**슬라이드 구성:**
+1. 메인 타이틀 (통계 카드 포함)
+2. 시장 분석 (차트/그래프)
+3. 핵심 기능 (4개 카드)
+4. 가격 정책 (3개 플랜)
+5. 성장 전략 (로드맵)
 
-위 형식을 따라 "${request.topic}"에 대한 ${sourceLanguage} PPT를 제작해주세요.
+**디자인 요구사항:**
+- 프리미엄 그라데이션 배경
+- CSS 애니메이션 포함
+- 반응형 디자인
+- 통계 데이터 시각화
+- hover 효과 및 인터랙션
+- height: 100%, padding: 60px (스크롤 방지)
+- 현대적 폰트 사용
 
-**=== 언어별 콘텐츠 예시 ===**
-
-${sourceLanguage === '한국어' ? `
-**한국어 콘텐츠 예시:**
-- 제목: "${request.topic}의 혁신적 가치"
-- 통계: "2.7억+ 사용자", "190+ 국가", "$17B+ 투자"
-- 설명: "글로벌 시장에서의 압도적 성과를 통해..."
-- CTA: "지금 시작하기", "자세히 알아보기"
-` : `
-**中文内容示例:**
-- 标题: "${request.topic}的创新价值"
-- 统计: "2.7亿+ 用户", "190+ 国家", "$170亿+ 投资"
-- 说明: "通过在全球市场的压倒性成果..."
-- CTA: "立即开始", "了解更多"
-`}
-
-**=== 완전한 고퀄리티 HTML 템플릿 ===**
-
-각 슬라이드는 다음과 같은 **완전한 프리미엄 HTML**이어야 합니다:
-
-**슬라이드 1 예시 (메인 타이틀):**
+**스타일 템플릿:**
 \`\`\`html
-<div style="background: linear-gradient(135deg, #E50914 0%, #B20710 100%); 
-            padding: 80px 60px; color: white; height: 100vh; 
-            display: flex; flex-direction: column; justify-content: center; 
-            align-items: center; text-align: center; position: relative; 
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            overflow: hidden;">
-  
+<div style="background:linear-gradient(135deg,#667eea,#764ba2);padding:60px;color:white;height:100%;display:flex;flex-direction:column;justify-content:center;text-align:center;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif">
   <style>
-  @keyframes fadeInUp { 
-    from { opacity: 0; transform: translateY(50px); } 
-    to { opacity: 1; transform: translateY(0); } 
-  }
-  @keyframes scaleIn { 
-    from { opacity: 0; transform: scale(0.8); } 
-    to { opacity: 1; transform: scale(1); } 
-  }
-  @keyframes pulse { 
-    0%, 100% { transform: scale(1); } 
-    50% { transform: scale(1.02); } 
-  }
-  @keyframes gradientShift {
-    0% { background-position: 0% 50%; }
-    50% { background-position: 100% 50%; }
-    100% { background-position: 0% 50%; }
-  }
+  @keyframes fadeInUp{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:translateY(0)}}
+  @keyframes scaleIn{from{opacity:0;transform:scale(0.8)}to{opacity:1;transform:scale(1)}}
   </style>
-  
-  <!-- 배경 패턴 -->
-  <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; 
-              background-image: radial-gradient(circle at 25% 25%, rgba(255,255,255,0.1) 0%, transparent 50%), 
-                               radial-gradient(circle at 75% 75%, rgba(255,255,255,0.05) 0%, transparent 50%);
-              opacity: 0.3;"></div>
-  
-  <!-- 메인 로고/제목 -->
-  <h1 style="font-size: 4rem; font-weight: 900; margin-bottom: 40px; 
-             animation: fadeInUp 1s ease-out; text-shadow: 0 8px 30px rgba(0,0,0,0.3);
-             background: linear-gradient(45deg, #ffffff, #ffcccb);
-             -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-             background-clip: text;">${request.topic}</h1>
-  
-  <!-- 부제목 -->
-  <p style="font-size: 1.8rem; font-weight: 300; margin-bottom: 40px; opacity: 0.9;
-            animation: fadeInUp 1s ease-out 0.3s both;">
-    ${sourceLanguage === '한국어' ? '글로벌 엔터테인먼트의 혁신' : '全球娱乐业的创新'}
-  </p>
-  
-  <!-- 통계 카드들 -->
-  <div style="display: flex; gap: 40px; margin-bottom: 50px;">
-    <div style="background: rgba(255,255,255,0.15); backdrop-filter: blur(20px); 
-                padding: 40px 30px; border-radius: 20px; text-align: center; 
-                border: 1px solid rgba(255,255,255,0.2);
-                animation: scaleIn 1s ease-out 0.6s both; 
-                box-shadow: 0 20px 40px rgba(0,0,0,0.2);
-                transition: transform 0.3s ease;"
-         onmouseover="this.style.transform='translateY(-10px) scale(1.05)'"
-         onmouseout="this.style.transform='translateY(0) scale(1)'">
-      <div style="font-size: 2.5rem; font-weight: bold; color: #FFD700; margin-bottom: 10px;">2.7억+</div>
-      <div style="font-size: 1rem; opacity: 0.9;">${sourceLanguage === '한국어' ? '글로벌 구독자' : '全球订阅者'}</div>
-    </div>
-    <div style="background: rgba(255,255,255,0.15); backdrop-filter: blur(20px); 
-                padding: 40px 30px; border-radius: 20px; text-align: center; 
-                border: 1px solid rgba(255,255,255,0.2);
-                animation: scaleIn 1s ease-out 0.9s both;
-                box-shadow: 0 20px 40px rgba(0,0,0,0.2);
-                transition: transform 0.3s ease;"
-         onmouseover="this.style.transform='translateY(-10px) scale(1.05)'"
-         onmouseout="this.style.transform='translateY(0) scale(1)'">
-      <div style="font-size: 2.5rem; font-weight: bold; color: #00D4FF; margin-bottom: 10px;">190+</div>
-      <div style="font-size: 1rem; opacity: 0.9;">${sourceLanguage === '한국어' ? '진출 국가' : '覆盖国家'}</div>
-    </div>
-    <div style="background: rgba(255,255,255,0.15); backdrop-filter: blur(20px); 
-                padding: 40px 30px; border-radius: 20px; text-align: center; 
-                border: 1px solid rgba(255,255,255,0.2);
-                animation: scaleIn 1s ease-out 1.2s both;
-                box-shadow: 0 20px 40px rgba(0,0,0,0.2);
-                transition: transform 0.3s ease;"
-         onmouseover="this.style.transform='translateY(-10px) scale(1.05)'"
-         onmouseout="this.style.transform='translateY(0) scale(1)'">
-      <div style="font-size: 2.5rem; font-weight: bold; color: #FF6B6B; margin-bottom: 10px;">$17B+</div>
-      <div style="font-size: 1rem; opacity: 0.9;">${sourceLanguage === '한국어' ? '연간 콘텐츠 투자' : '年度内容投资'}</div>
-    </div>
-  </div>
-  
-  <!-- CTA 버튼 -->
-  <button style="background: linear-gradient(45deg, #FFD700, #FFA500); color: #E50914; 
-                 padding: 20px 40px; border: none; border-radius: 50px; 
-                 font-size: 1.1rem; font-weight: bold; cursor: pointer; 
-                 animation: pulse 2s infinite;
-                 box-shadow: 0 10px 30px rgba(255, 215, 0, 0.4);
-                 transition: all 0.3s ease;"
-          onmouseover="this.style.transform='translateY(-3px)'; this.style.boxShadow='0 15px 40px rgba(255, 215, 0, 0.6)'"
-          onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 10px 30px rgba(255, 215, 0, 0.4)'">
-    ${sourceLanguage === '한국어' ? '지금 시작하기' : '立即开始'}
-  </button>
+  <!-- 콘텐츠 -->
 </div>
 \`\`\`
 
-**슬라이드 2 예시 (시장 분석 - 완전한 데이터 시각화):**
-\`\`\`html
-<div style="background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%); 
-            padding: 60px; color: white; height: 100vh; 
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            overflow: hidden;">
-  
-  <style>
-  @keyframes slideUp { 
-    from { opacity: 0; transform: translateY(30px); } 
-    to { opacity: 1; transform: translateY(0); } 
-  }
-  @keyframes fillBar { 
-    from { width: 0%; } 
-    to { width: var(--target-width); } 
-  }
-  @keyframes drawCircle {
-    from { stroke-dasharray: 0 251; }
-    to { stroke-dasharray: var(--circle-progress) 251; }
-  }
-  </style>
-  
-  <h2 style="font-size: 3rem; font-weight: bold; text-align: center; margin-bottom: 60px;
-             animation: slideUp 0.8s ease-out;">
-    📊 ${sourceLanguage === '한국어' ? '시장 기회 분석' : '市场机会分析'}
-  </h2>
-  
-  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 60px; height: calc(100vh - 200px);">
-    <!-- 좌측: 3D 바차트 -->
-    <div style="background: rgba(255,255,255,0.08); backdrop-filter: blur(15px); 
-                border-radius: 20px; padding: 40px; border: 1px solid rgba(255,255,255,0.1);">
-      <h3 style="font-size: 1.8rem; margin-bottom: 30px; text-align: center;">
-        ${sourceLanguage === '한국어' ? '스트리밍 시장 성장률 (YoY)' : '流媒体市场增长率 (YoY)'}
-      </h3>
-      <div style="display: flex; align-items: end; height: 300px; gap: 30px; justify-content: center; perspective: 1000px;">
-        <div style="display: flex; flex-direction: column; align-items: center;">
-          <div style="background: linear-gradient(180deg, #FF6B6B 0%, #D63031 100%); 
-                      width: 80px; height: 200px; border-radius: 10px 10px 0 0; 
-                      display: flex; align-items: end; justify-content: center; padding-bottom: 10px;
-                      animation: slideUp 1.5s ease-out 0.5s both;
-                      box-shadow: 0 10px 20px rgba(255, 107, 107, 0.3);
-                      transform-style: preserve-3d;
-                      position: relative;">
-            <span style="color: white; font-weight: bold; font-size: 1.2rem; text-shadow: 0 2px 4px rgba(0,0,0,0.3);">85%</span>
-            <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-                        background: linear-gradient(135deg, rgba(255,255,255,0.2), transparent);
-                        border-radius: 10px 10px 0 0;"></div>
-          </div>
-          <span style="margin-top: 15px; font-size: 0.9rem; color: #ccc; font-weight: 600;">2023</span>
-        </div>
-        <div style="display: flex; flex-direction: column; align-items: center;">
-          <div style="background: linear-gradient(180deg, #00D4FF 0%, #0984e3 100%); 
-                      width: 80px; height: 240px; border-radius: 10px 10px 0 0; 
-                      display: flex; align-items: end; justify-content: center; padding-bottom: 10px;
-                      animation: slideUp 1.5s ease-out 0.8s both;
-                      box-shadow: 0 10px 20px rgba(0, 212, 255, 0.3);
-                      transform-style: preserve-3d;
-                      position: relative;">
-            <span style="color: white; font-weight: bold; font-size: 1.2rem; text-shadow: 0 2px 4px rgba(0,0,0,0.3);">95%</span>
-            <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-                        background: linear-gradient(135deg, rgba(255,255,255,0.2), transparent);
-                        border-radius: 10px 10px 0 0;"></div>
-          </div>
-          <span style="margin-top: 15px; font-size: 0.9rem; color: #ccc; font-weight: 600;">2024</span>
-        </div>
-        <div style="display: flex; flex-direction: column; align-items: center;">
-          <div style="background: linear-gradient(180deg, #00B894 0%, #00a085 100%); 
-                      width: 80px; height: 280px; border-radius: 10px 10px 0 0; 
-                      display: flex; align-items: end; justify-content: center; padding-bottom: 10px;
-                      animation: slideUp 1.5s ease-out 1.1s both;
-                      box-shadow: 0 10px 20px rgba(0, 184, 148, 0.3);
-                      transform-style: preserve-3d;
-                      position: relative;">
-            <span style="color: white; font-weight: bold; font-size: 1.2rem; text-shadow: 0 2px 4px rgba(0,0,0,0.3);">105%</span>
-            <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-                        background: linear-gradient(135deg, rgba(255,255,255,0.2), transparent);
-                        border-radius: 10px 10px 0 0;"></div>
-          </div>
-          <span style="margin-top: 15px; font-size: 0.9rem; color: #ccc; font-weight: 600;">${sourceLanguage === '한국어' ? '2025 예상' : '2025 预测'}</span>
-        </div>
-      </div>
-    </div>
-    
-    <!-- 우측: 애니메이션 원형차트 + 지표 -->
-    <div style="background: rgba(255,255,255,0.08); backdrop-filter: blur(15px); 
-                border-radius: 20px; padding: 40px; border: 1px solid rgba(255,255,255,0.1);">
-      <h3 style="font-size: 1.8rem; margin-bottom: 30px; text-align: center;">
-        ${sourceLanguage === '한국어' ? '시장 점유율 현황' : '市场份额现状'}
-      </h3>
-      
-      <!-- 고급 원형차트 -->
-      <div style="display: flex; justify-content: center; margin-bottom: 40px;">
-        <div style="position: relative; width: 200px; height: 200px;">
-          <svg width="200" height="200" style="transform: rotate(-90deg);">
-            <circle cx="100" cy="100" r="80" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="12"/>
-            <circle cx="100" cy="100" r="80" fill="none" stroke="#E50914" stroke-width="12" 
-                    stroke-dasharray="201 502" stroke-linecap="round"
-                    style="animation: drawCircle 2s ease-out 0.5s both; --circle-progress: 201;"/>
-            <circle cx="100" cy="100" r="80" fill="none" stroke="#00D4FF" stroke-width="12" 
-                    stroke-dasharray="100 502" stroke-dashoffset="-201" stroke-linecap="round"
-                    style="animation: drawCircle 2s ease-out 1s both; --circle-progress: 100;"/>
-            <circle cx="100" cy="100" r="80" fill="none" stroke="#FFD700" stroke-width="12" 
-                    stroke-dasharray="100 502" stroke-dashoffset="-301" stroke-linecap="round"
-                    style="animation: drawCircle 2s ease-out 1.5s both; --circle-progress: 100;"/>
-          </svg>
-          <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-                      text-align: center;">
-            <div style="font-size: 2rem; font-weight: bold; color: #E50914;">40%</div>
-            <div style="font-size: 0.9rem; color: #ccc;">Netflix</div>
-          </div>
-        </div>
-      </div>
-      
-      <!-- 인터랙티브 범례 -->
-      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
-        <div style="display: flex; align-items: center; gap: 10px; padding: 10px; border-radius: 8px;
-                    background: rgba(229, 9, 20, 0.1); border: 1px solid rgba(229, 9, 20, 0.3);
-                    transition: all 0.3s ease;"
-             onmouseover="this.style.background='rgba(229, 9, 20, 0.2)'"
-             onmouseout="this.style.background='rgba(229, 9, 20, 0.1)'">
-          <div style="width: 20px; height: 20px; background: #E50914; border-radius: 4px;"></div>
-          <span style="font-size: 0.9rem; font-weight: 600;">Netflix (40%)</span>
-        </div>
-        <div style="display: flex; align-items: center; gap: 10px; padding: 10px; border-radius: 8px;
-                    background: rgba(0, 212, 255, 0.1); border: 1px solid rgba(0, 212, 255, 0.3);
-                    transition: all 0.3s ease;"
-             onmouseover="this.style.background='rgba(0, 212, 255, 0.2)'"
-             onmouseout="this.style.background='rgba(0, 212, 255, 0.1)'">
-          <div style="width: 20px; height: 20px; background: #00D4FF; border-radius: 4px;"></div>
-          <span style="font-size: 0.9rem; font-weight: 600;">Disney+ (20%)</span>
-        </div>
-        <div style="display: flex; align-items: center; gap: 10px; padding: 10px; border-radius: 8px;
-                    background: rgba(255, 215, 0, 0.1); border: 1px solid rgba(255, 215, 0, 0.3);
-                    transition: all 0.3s ease;"
-             onmouseover="this.style.background='rgba(255, 215, 0, 0.2)'"
-             onmouseout="this.style.background='rgba(255, 215, 0, 0.1)'">
-          <div style="width: 20px; height: 20px; background: #FFD700; border-radius: 4px;"></div>
-          <span style="font-size: 0.9rem; font-weight: 600;">Amazon (20%)</span>
-        </div>
-        <div style="display: flex; align-items: center; gap: 10px; padding: 10px; border-radius: 8px;
-                    background: rgba(224, 224, 224, 0.1); border: 1px solid rgba(224, 224, 224, 0.3);
-                    transition: all 0.3s ease;"
-             onmouseover="this.style.background='rgba(224, 224, 224, 0.2)'"
-             onmouseout="this.style.background='rgba(224, 224, 224, 0.1)'">
-          <div style="width: 20px; height: 20px; background: #e0e0e0; border-radius: 4px;"></div>
-          <span style="font-size: 0.9rem; font-weight: 600;">${sourceLanguage === '한국어' ? '기타 (20%)' : '其他 (20%)'}</span>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-\`\`\`
+**색상 팔레트:**
+- 그라데이션: #667eea→#764ba2, #11998e→#38ef7d, #ff9a9e→#fecfef
+- 강조색: #FFD700(골드), #00D4FF(블루), #FF6B6B(레드)
+- 카드: rgba(255,255,255,0.2), border-radius:20px
 
-**⚠️ 필수 요구사항:**
-1. **정확한 언어**: 모든 텍스트를 ${sourceLanguage}로 작성
-2. **프리미엄 디자인**: 위 예시 수준의 고퀄리티 비주얼
-3. **완전한 HTML**: 각 슬라이드가 독립적으로 완전히 작동
-4. **데이터 시각화**: 3D 효과, 애니메이션 차트 포함
-5. **인터랙션**: 호버 효과, 마우스 이벤트 포함
-6. **반응형**: 다양한 화면 크기 지원
-7. **현실적 데이터**: "${request.topic}" 관련 구체적 수치
+${sourceLanguage === '한국어' ? 
+`**한국어 예시 텍스트:**
+- 통계: "2.5M+ 사용자", "95% 만족도", "300% 성장률"
+- CTA: "지금 시작하기", "자세히 알아보기"` : 
+`**中文示例文本:**
+- 统计: "250万+ 用户", "95% 满意度", "300% 增长率"  
+- CTA: "立即开始", "了解更多"`}
 
-**🎨 폰트 크기 및 레이아웃 표준화:**
-- **메인 제목**: font-size: 4rem (64px) - 모든 슬라이드 통일
-- **부제목**: font-size: 1.8rem (28.8px) - 모든 슬라이드 통일  
-- **본문 텍스트**: font-size: 1.2rem (19.2px) - 모든 슬라이드 통일
-- **통계 숫자**: font-size: 2.5rem (40px) - 모든 슬라이드 통일
-- **라벨 텍스트**: font-size: 1rem (16px) - 모든 슬라이드 통일
-- **버튼 텍스트**: font-size: 1.1rem (17.6px) - 모든 슬라이드 통일
-
-**📐 레이아웃 일관성:**
-- **패딩**: 모든 슬라이드 60px 패딩 통일
-- **마진**: 제목과 콘텐츠 간 40px 마진 통일
-- **간격**: 요소 간 30px 간격 통일
-- **정렬**: 모든 텍스트 center 정렬 통일
-- **높이**: 모든 슬라이드 height: 100vh 통일
-
-**🎯 디자인 시스템:**
-- **그라데이션**: 일관된 색상 팔레트 사용
-- **그림자**: box-shadow: 0 10px 30px rgba(0,0,0,0.2) 통일
-- **테두리**: border-radius: 20px 통일
-- **애니메이션**: 동일한 애니메이션 패턴 사용
-
-위 템플릿을 참고하여 **${sourceLanguage}로 된 ${request.topic} 관련 5개 슬라이드**를 JSON 형식으로 제작해주세요!
+위 요구사항에 따라 "${request.topic}"에 대한 고품질 HTML 슬라이드 5개를 JSON으로 생성해주세요.
 `;
 };
 
@@ -381,7 +90,7 @@ async function callGeminiAPI(prompt: string) {
   }
   
   try {
-    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_API_KEY}`, {
+    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent?key=${GEMINI_API_KEY}`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -677,19 +386,47 @@ function createDefaultSlide(slideNumber: number, topic: string) {
 }
 
 function createFallbackPPT(request: ContentRequest): GeneratedContent {
-  const slides = [];
-  
-  for (let i = 1; i <= 5; i++) {
-    slides.push(createDefaultSlide(i, request.topic));
-  }
+  // 글로벌 스마트폰 시장 현황 하드코딩 데이터
+  const slides = [
+    {
+      id: 1,
+      title: "글로벌 스마트폰 시장 현황 소개",
+      subtitle: "혁신과 성장의 스토리",
+      html: "<div style='background:linear-gradient(135deg,#667eea,#764ba2);padding:60px;color:white;height:100%;display:flex;flex-direction:column;justify-content:center;text-align:center;font-family:-apple-system,BlinkMacSystemFont,\"Segoe UI\",Roboto,sans-serif'><style>@keyframes fadeInUp{from{opacity:0;transform:translateY(50px)}to{opacity:1;transform:translateY(0)}}@keyframes scaleIn{from{opacity:0;transform:scale(0.8)}to{opacity:1;transform:scale(1)}}@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.02)}}</style><div style='position:absolute;top:0;left:0;width:100%;height:100%;background-image:radial-gradient(circle at 25% 25%, rgba(255,255,255,0.1) 0%, transparent 50%);opacity:0.3'></div><h1 style='font-size:4rem;font-weight:900;margin-bottom:40px;animation:fadeInUp 1s ease-out;text-shadow:0 8px 30px rgba(0,0,0,0.3);background:linear-gradient(45deg,#ffffff,#ffcccb);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text'>글로벌 스마트폰 시장 현황</h1><p style='font-size:1.8rem;font-weight:300;margin-bottom:40px;opacity:0.9;animation:fadeInUp 1s ease-out 0.3s both'>글로벌 모바일 기술의 혁신</p><div style='display:flex;gap:40px;margin-bottom:50px;justify-content:center'><div style='background:rgba(255,255,255,0.15);backdrop-filter:blur(20px);padding:40px 30px;border-radius:20px;text-align:center;border:1px solid rgba(255,255,255,0.2);animation:scaleIn 1s ease-out 0.6s both;box-shadow:0 20px 40px rgba(0,0,0,0.2);transition:transform 0.3s ease' onmouseover=\"this.style.transform='translateY(-10px) scale(1.05)'\" onmouseout=\"this.style.transform='translateY(0) scale(1)'\"digitalizeIndia><div style='font-size:2.5rem;font-weight:bold;color:#FFD700;margin-bottom:10px'>15억+</div><div style='font-size:1rem;opacity:0.9'>글로벌 사용자</div></div><div style='background:rgba(255,255,255,0.15);backdrop-filter:blur(20px);padding:40px 30px;border-radius:20px;text-align:center;border:1px solid rgba(255,255,255,0.2);animation:scaleIn 1s ease-out 0.9s both;box-shadow:0 20px 40px rgba(0,0,0,0.2);transition:transform 0.3s ease' onmouseover=\"this.style.transform='translateY(-10px) scale(1.05)'\" onmouseout=\"this.style.transform='translateY(0) scale(1)'\"digitalizeIndia><div style='font-size:2.5rem;font-weight:bold;color:#00D4FF;margin-bottom:10px'>1.5조$</div><div style='font-size:1rem;opacity:0.9'>시장 규모</div></div><div style='background:rgba(255,255,255,0.15);backdrop-filter:blur(20px);padding:40px 30px;border-radius:20px;text-align:center;border:1px solid rgba(255,255,255,0.2);animation:scaleIn 1s ease-out 1.2s both;box-shadow:0 20px 40px rgba(0,0,0,0.2);transition:transform 0.3s ease' onmouseover=\"this.style.transform='translateY(-10px) scale(1.05)'\" onmouseout=\"this.style.transform='translateY(0) scale(1)'\"digitalizeIndia><div style='font-size:2.5rem;font-weight:bold;color:#FF6B6B;margin-bottom:10px'>7%</div><div style='font-size:1rem;opacity:0.9'>연간 성장률</div></div></div><button style='background:linear-gradient(45deg,#FFD700,#FFA500);color:#667eea;padding:20px 40px;border:none;border-radius:50px;font-size:1.1rem;font-weight:bold;cursor:pointer;animation:pulse 2s infinite;box-shadow:0 10px 30px rgba(255,215,0,0.4);transition:all 0.3s ease' onmouseover=\"this.style.transform='translateY(-3px)';this.style.boxShadow='0 15px 40px rgba(255,215,0,0.6)'\" onmouseout=\"this.style.transform='translateY(0)';this.style.boxShadow='0 10px 30px rgba(255,215,0,0.4)'\">지금 시작하기</button></div>"
+    },
+    {
+      id: 2,
+      title: "시장 기회 분석",
+      subtitle: "데이터 기반 인사이트",
+      html: "<div style='background:linear-gradient(135deg,#1a1a2e,#16213e);padding:60px;color:white;height:100%;font-family:-apple-system,BlinkMacSystemFont,\"Segoe UI\",Roboto,sans-serif'><style>@keyframes slideUp{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:translateY(0)}}</style><h2 style='font-size:3rem;font-weight:bold;text-align:center;margin-bottom:60px;animation:slideUp 0.8s ease-out'>📊 시장 기회 분석</h2><div style='display:grid;grid-template-columns:1fr 1fr;gap:60px;height:calc(100% - 200px)'><div style='background:rgba(255,255,255,0.08);backdrop-filter:blur(15px);border-radius:20px;padding:40px;border:1px solid rgba(255,255,255,0.1)'><h3 style='font-size:1.8rem;margin-bottom:30px;text-align:center'>스마트폰 출하량 성장률 (YoY)</h3><div style='display:flex;align-items:end;height:250px;gap:30px;justify-content:center'><div style='display:flex;flex-direction:column;align-items:center'><div style='background:linear-gradient(180deg,#FF6B6B 0%,#D63031 100%);width:60px;height:150px;border-radius:8px 8px 0 0;display:flex;align-items:end;justify-content:center;padding-bottom:8px;box-shadow:0 8px 16px rgba(255,107,107,0.3);position:relative'><span style='color:white;font-weight:bold;font-size:1rem;text-shadow:0 1px 2px rgba(0,0,0,0.3)'>12%</span></div><span style='margin-top:10px;font-size:0.8rem;color:#ccc;font-weight:600'>2022</span></div><div style='display:flex;flex-direction:column;align-items:center'><div style='background:linear-gradient(180deg,#00D4FF 0%,#0984e3 100%);width:60px;height:180px;border-radius:8px 8px 0 0;display:flex;align-items:end;justify-content:center;padding-bottom:8px;box-shadow:0 8px 16px rgba(0,212,255,0.3);position:relative'><span style='color:white;font-weight:bold;font-size:1rem;text-shadow:0 1px 2px rgba(0,0,0,0.3)'>18%</span></div><span style='margin-top:10px;font-size:0.8rem;color:#ccc;font-weight:600'>2023</span></div><div style='display:flex;flex-direction:column;align-items:center'><div style='background:linear-gradient(180deg,#00B894 0%,#00a085 100%);width:60px;height:210px;border-radius:8px 8px 0 0;display:flex;align-items:end;justify-content:center;padding-bottom:8px;box-shadow:0 8px 16px rgba(0,184,148,0.3);position:relative'><span style='color:white;font-weight:bold;font-size:1rem;text-shadow:0 1px 2px rgba(0,0,0,0.3)'>25%</span></div><span style='margin-top:10px;font-size:0.8rem;color:#ccc;font-weight:600'>2024</span></div></div></div><div style='background:rgba(255,255,255,0.08);backdrop-filter:blur(15px);border-radius:20px;padding:40px;border:1px solid rgba(255,255,255,0.1)'><h3 style='font-size:1.8rem;margin-bottom:30px;text-align:center'>시장 점유율 현황</h3><div style='display:flex;justify-content:center;margin-bottom:30px'><div style='position:relative;width:160px;height:160px'><div style='width:160px;height:160px;border-radius:50%;background:conic-gradient(#E50914 0deg 83deg,#00D4FF 83deg 155deg,#FFD700 155deg 227deg,#e0e0e0 227deg 360deg);display:flex;align-items:center;justify-content:center'><div style='width:100px;height:100px;border-radius:50%;background:#1a1a2e;display:flex;align-items:center;justify-content:center;flex-direction:column'><span style='font-size:1.5rem;font-weight:bold;color:#E50914'>삼성</span><span style='font-size:0.8rem;color:#ccc'>23%</span></div></div></div></div><div style='display:grid;grid-template-columns:1fr 1fr;gap:10px'><div style='display:flex;align-items:center;gap:8px;padding:8px;border-radius:6px;background:rgba(229,9,20,0.1);border:1px solid rgba(229,9,20,0.3)'><div style='width:16px;height:16px;background:#E50914;border-radius:3px'></div><span style='font-size:0.8rem;font-weight:600'>삼성 23%</span></div><div style='display:flex;align-items:center;gap:8px;padding:8px;border-radius:6px;background:rgba(0,212,255,0.1);border:1px solid rgba(0,212,255,0.3)'><div style='width:16px;height:16px;background:#00D4FF;border-radius:3px'></div><span style='font-size:0.8rem;font-weight:600'>애플 20%</span></div><div style='display:flex;align-items:center;gap:8px;padding:8px;border-radius:6px;background:rgba(255,215,0,0.1);border:1px solid rgba(255,215,0,0.3)'><div style='width:16px;height:16px;background:#FFD700;border-radius:3px'></div><span style='font-size:0.8rem;font-weight:600'>샤오미 20%</span></div><div style='display:flex;align-items:center;gap:8px;padding:8px;border-radius:6px;background:rgba(224,224,224,0.1);border:1px solid rgba(224,224,224,0.3)'><div style='width:16px;height:16px;background:#e0e0e0;border-radius:3px'></div><span style='font-size:0.8rem;font-weight:600'>기타 37%</span></div></div></div></div></div>"
+    },
+    {
+      id: 3,
+      title: "핵심 솔루션",
+      subtitle: "차별화된 가치 제안",
+      html: "<div style='background:linear-gradient(135deg,#11998e,#38ef7d);padding:60px;color:white;height:100%;font-family:-apple-system,BlinkMacSystemFont,\"Segoe UI\",Roboto,sans-serif'><h2 style='font-size:3rem;text-align:center;margin-bottom:60px'>💡 핵심 기술 트렌드</h2><div style='display:grid;grid-template-columns:repeat(2,1fr);gap:40px;max-width:900px;margin:0 auto'><div style='background:rgba(255,255,255,0.2);padding:40px;border-radius:20px;text-align:center;transition:transform 0.3s ease;box-shadow:0 10px 30px rgba(0,0,0,0.1)' onmouseover=\"this.style.transform='translateY(-10px)'\" onmouseout=\"this.style.transform='translateY(0)'\"digitalizeIndia><div style='font-size:4rem;margin-bottom:20px'>🤖</div><h3 style='font-size:1.5rem;margin-bottom:15px'>AI 기술 통합</h3><p style='font-size:1rem'>차세대 AI 칩셋과 머신러닝 기술</p></div><div style='background:rgba(255,255,255,0.2);padding:40px;border-radius:20px;text-align:center;transition:transform 0.3s ease;box-shadow:0 10px 30px rgba(0,0,0,0.1)' onmouseover=\"this.style.transform='translateY(-10px)'\" onmouseout=\"this.style.transform='translateY(0)'\"digitalizeIndia><div style='font-size:4rem;margin-bottom:20px'>📷</div><h3 style='font-size:1.5rem;margin-bottom:15px'>카메라 혁신</h3><p style='font-size:1rem'>200MP 초고해상도 및 야간 촬영</p></div><div style='background:rgba(255,255,255,0.2);padding:40px;border-radius:20px;text-align:center;transition:transform 0.3s ease;box-shadow:0 10px 30px rgba(0,0,0,0.1)' onmouseover=\"this.style.transform='translateY(-10px)'\" onmouseout=\"this.style.transform='translateY(0)'\"digitalizeIndia><div style='font-size:4rem;margin-bottom:20px'>🔋</div><h3 style='font-size:1.5rem;margin-bottom:15px'>배터리 기술</h3><p style='font-size:1rem'>초고속 충전 및 무선 충전 기술</p></div><div style='background:rgba(255,255,255,0.2);padding:40px;border-radius:20px;text-align:center;transition:transform 0.3s ease;box-shadow:0 10px 30px rgba(0,0,0,0.1)' onmouseover=\"this.style.transform='translateY(-10px)'\" onmouseout=\"this.style.transform='translateY(0)'\"digitalizeIndia><div style='font-size:4rem;margin-bottom:20px'>📱</div><h3 style='font-size:1.5rem;margin-bottom:15px'>폴더블 디스플레이</h3><p style='font-size:1rem'>차세대 접이식 디스플레이 기술</p></div></div></div>"
+    },
+    {
+      id: 4,
+      title: "비즈니스 모델",
+      subtitle: "수익 구조 및 가격 전략",
+      html: "<div style='background:linear-gradient(135deg,#667eea,#764ba2);padding:60px;color:white;height:100%;font-family:-apple-system,BlinkMacSystemFont,\"Segoe UI\",Roboto,sans-serif'><h2 style='font-size:3rem;text-align:center;margin-bottom:60px'>💰 가격대별 시장 분석</h2><div style='display:grid;grid-template-columns:repeat(3,1fr);gap:40px;max-width:1000px;margin:0 auto'><div style='background:rgba(255,255,255,0.2);padding:40px;border-radius:20px;text-align:center;transition:transform 0.3s ease' onmouseover=\"this.style.transform='scale(1.05)'\" onmouseout=\"this.style.transform='scale(1)'\"digitalizeIndia><h3 style='font-size:1.5rem;margin-bottom:20px'>프리미엄</h3><div style='font-size:3rem;font-weight:bold;margin-bottom:20px;color:#FFD700'>$1200+</div><p style='margin-bottom:20px'>플래그십 모델</p><ul style='list-style:none;padding:0;text-align:left'><li style='margin-bottom:10px'>✓ 최신 프로세서</li><li style='margin-bottom:10px'>✓ 프로급 카메라</li><li>✓ 프리미엄 소재</li></ul><div style='margin-top:20px;padding:10px;background:rgba(255,215,0,0.2);border-radius:10px'><span style='font-size:1.2rem;font-weight:bold'>시장 점유율: 15%</span></div></div><div style='background:rgba(255,255,255,0.3);padding:40px;border-radius:20px;text-align:center;border:2px solid #FFD700;transition:transform 0.3s ease' onmouseover=\"this.style.transform='scale(1.05)'\" onmouseout=\"this.style.transform='scale(1)'\"digitalizeIndia><h3 style='font-size:1.5rem;margin-bottom:20px'>미드레인지</h3><div style='font-size:3rem;font-weight:bold;margin-bottom:20px;color:#FFD700'>$400-800</div><p style='margin-bottom:20px'>주력 모델</p><ul style='list-style:none;padding:0;text-align:left'><li style='margin-bottom:10px'>✓ 균형잡힌 성능</li><li style='margin-bottom:10px'>✓ 합리적 가격</li><li>✓ 대중적 디자인</li></ul><div style='margin-top:20px;padding:10px;background:rgba(255,215,0,0.2);border-radius:10px'><span style='font-size:1.2rem;font-weight:bold'>시장 점유율: 55%</span></div></div><div style='background:rgba(255,255,255,0.2);padding:40px;border-radius:20px;text-align:center;transition:transform 0.3s ease' onmouseover=\"this.style.transform='scale(1.05)'\" onmouseout=\"this.style.transform='scale(1)'\"digitalizeIndia><h3 style='font-size:1.5rem;margin-bottom:20px'>엔트리</h3><div style='font-size:3rem;font-weight:bold;margin-bottom:20px;color:#FFD700'>$100-400</div><p style='margin-bottom:20px'>보급형 모델</p><ul style='list-style:none;padding:0;text-align:left'><li style='margin-bottom:10px'>✓ 기본 기능</li><li style='margin-bottom:10px'>✓ 저렴한 가격</li><li>✓ 신흥 시장 타겟</li></ul><div style='margin-top:20px;padding:10px;background:rgba(255,215,0,0.2);border-radius:10px'><span style='font-size:1.2rem;font-weight:bold'>시장 점유율: 30%</span></div></div></div></div>"
+    },
+    {
+      id: 5,
+      title: "성장 전략",
+      subtitle: "로드맵 및 향후 계획",
+      html: "<div style='background:linear-gradient(135deg,#ff9a9e,#fecfef);padding:60px;color:white;height:100%;font-family:-apple-system,BlinkMacSystemFont,\"Segoe UI\",Roboto,sans-serif'><h2 style='font-size:3rem;text-align:center;margin-bottom:60px'>🚀 미래 전망</h2><div style='max-width:1000px;margin:0 auto'><div style='display:flex;justify-content:space-between;margin-bottom:60px'><div style='text-align:center;transition:transform 0.3s ease' onmouseover=\"this.style.transform='translateY(-10px)'\" onmouseout=\"this.style.transform='translateY(0)'\"digitalizeIndia><div style='width:80px;height:80px;background:rgba(255,255,255,0.3);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 20px;box-shadow:0 10px 20px rgba(0,0,0,0.1)'><span style='font-size:1.5rem;font-weight:bold'>2024</span></div><h4 style='font-size:1.1rem'>5G 대중화</h4></div><div style='text-align:center;transition:transform 0.3s ease' onmouseover=\"this.style.transform='translateY(-10px)'\" onmouseout=\"this.style.transform='translateY(0)'\"digitalizeIndia><div style='width:80px;height:80px;background:rgba(255,255,255,0.3);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 20px;box-shadow:0 10px 20px rgba(0,0,0,0.1)'><span style='font-size:1.5rem;font-weight:bold'>2025</span></div><h4 style='font-size:1.1rem'>AI 통합 가속화</h4></div><div style='text-align:center;transition:transform 0.3s ease' onmouseover=\"this.style.transform='translateY(-10px)'\" onmouseout=\"this.style.transform='translateY(0)'\"digitalizeIndia><div style='width:80px;height:80px;background:rgba(255,255,255,0.3);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 20px;box-shadow:0 10px 20px rgba(0,0,0,0.1)'><span style='font-size:1.5rem;font-weight:bold'>2026</span></div><h4 style='font-size:1.1rem'>폴더블 혁신</h4></div><div style='text-align:center;transition:transform 0.3s ease' onmouseover=\"this.style.transform='translateY(-10px)'\" onmouseout=\"this.style.transform='translateY(0)'\"digitalizeIndia><div style='width:80px;height:80px;background:rgba(255,255,255,0.3);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 20px;box-shadow:0 10px 20px rgba(0,0,0,0.1)'><span style='font-size:1.5rem;font-weight:bold'>2027</span></div><h4 style='font-size:1.1rem'>AR/VR 융합</h4></div></div><div style='display:grid;grid-template-columns:repeat(3,1fr);gap:30px'><div style='background:rgba(255,255,255,0.2);padding:30px;border-radius:15px;text-align:center;transition:transform 0.3s ease;box-shadow:0 10px 20px rgba(0,0,0,0.1)' onmouseover=\"this.style.transform='translateY(-5px)'\" onmouseout=\"this.style.transform='translateY(0)'\"digitalizeIndia><div style='font-size:2.5rem;font-weight:bold;color:#FFD700;margin-bottom:10px'>18억대</div><div>2025년 예상 출하량</div></div><div style='background:rgba(255,255,255,0.2);padding:30px;border-radius:15px;text-align:center;transition:transform 0.3s ease;box-shadow:0 10px 20px rgba(0,0,0,0.1)' onmouseover=\"this.style.transform='translateY(-5px)'\" onmouseout=\"this.style.transform='translateY(0)'\"digitalizeIndia><div style='font-size:2.5rem;font-weight:bold;color:#00D4FF;margin-bottom:10px'>12%</div><div>연평균 성장률</div></div><div style='background:rgba(255,255,255,0.2);padding:30px;border-radius:15px;text-align:center;transition:transform 0.3s ease;box-shadow:0 10px 20px rgba(0,0,0,0.1)' onmouseover=\"this.style.transform='translateY(-5px)'\" onmouseout=\"this.style.transform='translateY(0)'\"digitalizeIndia><div style='font-size:2.5rem;font-weight:bold;color:#FF6B6B;margin-bottom:10px'>2.1조$</div><div>2027년 시장 규모</div></div></div></div></div>"
+    }
+  ];
     
-    return {
+  return {
     id: `ppt_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-      type: request.type,
-      topic: request.topic,
-      createdAt: new Date(),
+    type: request.type,
+    topic: "글로벌 스마트폰 시장 현황",
+    createdAt: new Date(),
     data: {
-      title: `${request.topic} 프레젠테이션`,
+      title: "글로벌 스마트폰 시장 현황 프레젠테이션",
       slides: slides,
       styles: '',
       totalSlides: slides.length
@@ -699,8 +436,8 @@ function createFallbackPPT(request: ContentRequest): GeneratedContent {
       title: slide.title,
       html: slide.html,
       originalText: slide.title
-      }))
-    };
+    }))
+  };
 }
 
 // 기존 함수들 유지...

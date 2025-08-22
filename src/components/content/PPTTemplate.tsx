@@ -268,7 +268,7 @@ const PPTTemplate: React.FC<PPTTemplateProps> = ({ data, currentSection, navigat
                        {/* 짧은 슬라이드 비율 */}
             <div 
               className="relative w-full max-w-2xl mx-auto bg-gradient-to-br from-blue-900 via-indigo-800 to-purple-900 rounded-2xl shadow-2xl overflow-hidden border-4 border-white"
-              style={{ aspectRatio: '210/200' }}
+              style={{ aspectRatio: '16/9', minHeight: '600px' }}
             >
             {/* 배경 효과 */}
             <div className="absolute inset-0 opacity-30">

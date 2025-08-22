@@ -1,5 +1,5 @@
 import React from 'react';
-import { Globe, FileText, BookOpen, Presentation as PresentationIcon } from 'lucide-react';
+import { Globe, Presentation as PresentationIcon } from 'lucide-react';
 import { ContentType, ContentTypeOption } from '../../types';
 
 interface HeaderProps {
@@ -17,8 +17,6 @@ const Header: React.FC<HeaderProps> = ({
 }) => {
   const contentTypes: ContentTypeOption[] = [
     { id: 'ppt', label: 'PPT', icon: PresentationIcon },
-    { id: 'brochure', label: '브로슈어', icon: FileText },
-    { id: 'manual', label: '설명서', icon: BookOpen },
   ];
 
   return (

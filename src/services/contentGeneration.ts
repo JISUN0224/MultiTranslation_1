@@ -146,7 +146,7 @@ ${topic}에 대한 PPT 발표 자료를 HTML 형태로 작성해주세요.
 2. 모든 스타일은 인라인 CSS로 포함
 3. 배경: 그라데이션 사용 (linear-gradient)
 4. 크기: width:100%, height:100%, 16:9 비율 고려
-5. 폰트: 한국어 지원 폰트 사용
+5. 폰트: 'Segoe UI', 'Malgun Gothic', sans-serif (한국어 지원)
 6. 색상: 슬라이드별로 다른 색상 테마
 7. 이미지 대신 CSS 아이콘 사용 (📱, 💰, 📊, ⭐ 등)
 8. 애니메이션 효과 포함 (transform, transition)
@@ -154,15 +154,69 @@ ${topic}에 대한 PPT 발표 자료를 HTML 형태로 작성해주세요.
 10. 데이터 시각화: CSS로 구현된 차트나 프로그레스 바
 
 시각적 요소:
-- 슬라이드 1: 메인 타이틀과 부제목, 브랜드 컬러
-- 슬라이드 2: 4개 기능을 카드 형태로 배치, 아이콘 포함
-- 슬라이드 3: CSS 바 차트나 원형 차트로 데이터 표현
+- 슬라이드 1: 메인 타이틀과 부제목은 각각 다른 줄에 배치, 중앙 정렬, 배경에 아이콘이나 도형 추가
+- 슬라이드 2: 4개 기능을 카드 형태로 배치, 아이콘 포함, 호버 효과
+- 슬라이드 3: 3개 통계 박스와 하단에 추가 정보나 차트 포함, 빈 공간 최소화
 - 슬라이드 4: 가격표를 테이블이나 카드 형태로 구성
 - 슬라이드 5: 콜투액션 버튼과 연락처 정보
+
+필수 디자인 요구사항:
+- 슬라이드 1: 제목과 부제목을 반드시 다른 줄에 배치 (flex-direction: column 사용)
+- 슬라이드 3: 3개 박스 아래에 추가 콘텐츠 배치 (차트, 설명, 그래프 등)로 공간 활용
+- 모든 슬라이드: 최소 높이 800px 확보
+- 텍스트 가독성 확보 (적절한 폰트 크기와 대비)
 
 주제: ${topic}
 스타일: ${style}
 언어: ${language}
+
+예시 참고 - 슬라이드 1 (제목과 부제목 반드시 분리):
+```html
+<div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; color: white; font-family: 'Segoe UI', 'Malgun Gothic', sans-serif; position: relative;">
+  <div style="font-size: 5rem; margin-bottom: 30px;">🚀</div>
+  <h1 style="font-size: 4rem; font-weight: bold; margin: 0 0 30px 0; text-shadow: 2px 2px 8px rgba(0,0,0,0.3); line-height: 1.2;">${topic}</h1>
+  <p style="font-size: 1.8rem; margin: 0 0 40px 0; opacity: 0.9; text-shadow: 1px 1px 4px rgba(0,0,0,0.3); line-height: 1.4;">부제목은 반드시 여기에 별도로</p>
+  <div style="background: rgba(255,255,255,0.2); padding: 15px 40px; border-radius: 50px; font-size: 1.2rem; font-weight: bold;">시작하기</div>
+</div>
+```
+
+예시 참고 - 슬라이드 3 (3개 박스 + 하단 차트로 공간 활용):
+```html
+<div style="background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); width: 100%; height: 100%; display: flex; flex-direction: column; color: white; padding: 60px; font-family: 'Segoe UI', 'Malgun Gothic', sans-serif;">
+  <div style="text-align: center; margin-bottom: 50px;">
+    <h2 style="font-size: 3rem; margin-bottom: 15px;">📊 시장 분석</h2>
+  </div>
+  
+  <div style="display: flex; justify-content: center; gap: 40px; margin-bottom: 60px;">
+    <div style="background: rgba(255,215,0,0.2); padding: 40px; border-radius: 20px; text-align: center; min-width: 200px;">
+      <div style="font-size: 3.5rem; color: #FFD700; margin-bottom: 10px;">20억+</div>
+      <div style="font-size: 1.2rem;">글로벌 조회수</div>
+    </div>
+    <div style="background: rgba(0,212,255,0.2); padding: 40px; border-radius: 20px; text-align: center; min-width: 200px;">
+      <div style="font-size: 3.5rem; color: #00D4FF; margin-bottom: 10px;">50+</div>
+      <div style="font-size: 1.2rem;">진출 국가</div>
+    </div>
+    <div style="background: rgba(255,107,107,0.2); padding: 40px; border-radius: 20px; text-align: center; min-width: 200px;">
+      <div style="font-size: 3.5rem; color: #FF6B6B; margin-bottom: 10px;">300만+</div>
+      <div style="font-size: 1.2rem;">팬 수</div>
+    </div>
+  </div>
+  
+  <div style="flex: 1; display: grid; grid-template-columns: 1fr 1fr; gap: 30px;">
+    <div style="background: rgba(255,255,255,0.05); border-radius: 20px; padding: 30px;">
+      <h3 style="margin-bottom: 20px;">📈 성장률</h3>
+      <div style="background: rgba(255,255,255,0.1); height: 8px; border-radius: 4px; margin-bottom: 10px;"><div style="background: #FFD700; height: 100%; width: 87%; border-radius: 4px;"></div></div>
+      <div style="background: rgba(255,255,255,0.1); height: 8px; border-radius: 4px;"><div style="background: #00D4FF; height: 100%; width: 94%; border-radius: 4px;"></div></div>
+    </div>
+    <div style="background: rgba(255,255,255,0.05); border-radius: 20px; padding: 30px;">
+      <h3 style="margin-bottom: 20px;">🌍 지역별 인기</h3>
+      <div style="margin-bottom: 10px;">아시아: 95%</div>
+      <div style="margin-bottom: 10px;">북미: 78%</div>
+      <div>유럽: 82%</div>
+    </div>
+  </div>
+</div>
+```
 
 반드시 위 JSON 형식으로만 응답하고, 각 html 필드에는 완전한 인라인 스타일 HTML을 포함해주세요.
 `;

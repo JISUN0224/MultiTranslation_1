@@ -25,12 +25,15 @@ const PPTDirectRender: React.FC<PPTDirectRenderProps> = ({ slides, onTextExtract
     }
   }, [currentSlide, slides, onTextExtracted]);
 
-  // HTML에서 텍스트 추출 함수
+  // HTML에서 텍스트 추출 함수 (CSS 코드 제외)
   const extractTextFromHTML = (html: string): string => {
     try {
+      // CSS 스타일 태그 제거
+      const htmlWithoutCSS = html.replace(/<style[^>]*>[\s\S]*?<\/style>/gi, '');
+      
       // DOMParser로 HTML 파싱
       const parser = new DOMParser();
-      const doc = parser.parseFromString(html, 'text/html');
+      const doc = parser.parseFromString(htmlWithoutCSS, 'text/html');
       
       // 텍스트만 추출 (태그 제거)
       const textContent = doc.body.textContent || doc.body.innerText || '';
@@ -109,17 +112,19 @@ const PPTDirectRender: React.FC<PPTDirectRenderProps> = ({ slides, onTextExtract
         </div>
       </div>
 
-      {/* 메인 슬라이드 영역 - 더 큰 비율 */}
-      <div className="flex-1 flex items-center justify-center p-2">
+      {/* 메인 슬라이드 영역 - 유동적 높이로 스크롤 가능 */}
+      <div className="flex-1 overflow-auto p-4">
         <div className="w-full max-w-full mx-auto">
           <div 
             className="relative w-full shadow-2xl rounded-lg overflow-hidden"
-            style={{ aspectRatio: '4/3', minHeight: '300px' }}
+            style={{ aspectRatio: '16/9', minHeight: '600px', maxHeight: '1000px' }}
           >
-            {/* 🔥 HTML 직접 렌더링 */}
+            {/* 🔥 HTML 직접 렌더링 - height 100vh를 100%로 변경 */}
             <div 
               className="w-full h-full"
-              dangerouslySetInnerHTML={{ __html: slide.html }}
+              dangerouslySetInnerHTML={{ 
+                __html: slide.html.replace(/height:\s*100vh/g, 'height: 100%')
+              }}
             />
             
             {/* 슬라이드 번호 오버레이 */}

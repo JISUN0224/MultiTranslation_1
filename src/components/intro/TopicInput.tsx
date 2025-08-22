@@ -8,10 +8,6 @@ interface TopicInputProps {
   onDifficultyChange: (difficulty: 'beginner' | 'intermediate' | 'advanced') => void;
   language: 'ko-zh' | 'zh-ko';
   onLanguageChange: (language: 'ko-zh' | 'zh-ko') => void;
-  style: string;
-  onStyleChange: (style: string) => void;
-  industry: string;
-  onIndustryChange: (industry: string) => void;
 }
 
 const TopicInput: React.FC<TopicInputProps> = ({
@@ -20,11 +16,7 @@ const TopicInput: React.FC<TopicInputProps> = ({
   difficulty,
   onDifficultyChange,
   language,
-  onLanguageChange,
-  style,
-  onStyleChange,
-  industry,
-  onIndustryChange
+  onLanguageChange
 }) => {
   const difficulties = [
     { value: 'beginner', label: '초급', description: '기본적인 표현과 문장' },
@@ -37,27 +29,7 @@ const TopicInput: React.FC<TopicInputProps> = ({
     { value: 'zh-ko', label: '중국어 → 한국어', flag: '🇰🇷' }
   ];
 
-  const styles = [
-    '전문적인',
-    '친근한',
-    '마케팅용',
-    '학술적인',
-    '간결한',
-    '상세한'
-  ];
 
-  const industries = [
-    'IT/기술',
-    '화장품/뷰티',
-    '식품/음료',
-    '패션/의류',
-    '자동차',
-    '건강/의료',
-    '교육',
-    '금융',
-    '여행/레저',
-    '기타'
-  ];
 
   return (
     <div className="space-y-8">
@@ -141,45 +113,6 @@ const TopicInput: React.FC<TopicInputProps> = ({
               ))}
             </div>
           </div>
-        </div>
-
-        {/* 스타일 선택 */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-3">
-            작성 스타일
-          </label>
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
-            {styles.map((styleOption) => (
-              <label key={styleOption} className="flex items-center space-x-2 cursor-pointer">
-                <input
-                  type="radio"
-                  name="style"
-                  value={styleOption}
-                  checked={style === styleOption}
-                  onChange={(e) => onStyleChange(e.target.value)}
-                  className="w-4 h-4 text-primary-600 focus:ring-primary-500"
-                />
-                <span className="text-sm text-gray-900">{styleOption}</span>
-              </label>
-            ))}
-          </div>
-        </div>
-
-        {/* 업계 선택 */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-3">
-            업계 (선택사항)
-          </label>
-          <select
-            value={industry}
-            onChange={(e) => onIndustryChange(e.target.value)}
-            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-          >
-            <option value="">업계를 선택하세요</option>
-            {industries.map((ind) => (
-              <option key={ind} value={ind}>{ind}</option>
-            ))}
-          </select>
         </div>
       </div>
     </div>
