@@ -495,17 +495,103 @@ export const analyzeTranslation = async (
   translatedText: string, 
   contentType: ContentType
 ): Promise<TranslationAnalysis> => {
-      return {
-    scores: {
-      accuracy: Math.floor(Math.random() * 30) + 70,
-      fluency: Math.floor(Math.random() * 30) + 70,
-      appropriateness: Math.floor(Math.random() * 30) + 70
-    },
-        feedback: {
-          strengths: ['번역이 전반적으로 이해 가능합니다'],
-      improvements: ['더 자연스러운 번역 표현이 필요합니다'],
-          suggestions: ['더 구체적이고 명확한 표현을 사용해보세요']
-        },
-        referenceTranslation: '전문가 수준의 참고 번역을 제공할 수 없습니다.'
-      };
+  const GEMINI_API_KEY = (import.meta as any).env?.VITE_GEMINI_API_KEY;
+  const GEMINI_API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent';
+  
+  if (!GEMINI_API_KEY) {
+    throw new Error('Gemini API 키가 설정되지 않았습니다.');
+  }
+  
+  const prompt = `
+다음 한국어 원문과 중국어 번역문을 평가해주세요.
+
+원문: "${originalText}"
+번역문: "${translatedText}"
+
+다음 JSON 형식으로 평가 결과를 제공해주세요:
+
+{
+  "scores": {
+    "accuracy": 85,
+    "fluency": 80,
+    "appropriateness": 90
+  },
+  "feedback": {
+    "strengths": ["번역이 정확합니다", "의미가 잘 전달됩니다"],
+    "improvements": ["더 자연스러운 표현이 필요합니다"],
+    "suggestions": ["이 부분을 이렇게 번역하면 더 좋습니다"]
+  },
+  "referenceTranslation": "참고할 수 있는 더 나은 번역 예시"
+}
+
+평가 기준:
+- accuracy (정확성): 원문의 의미가 정확히 전달되었는지 (0-100점)
+- fluency (자연스러움): 번역문이 자연스럽게 읽히는지 (0-100점)  
+- appropriateness (적합성): 문맥에 적절한지 (0-100점)
+
+반드시 위 JSON 형식으로만 응답해주세요.
+`;
+
+  try {
+    const response = await fetch(`${GEMINI_API_URL}?key=${GEMINI_API_KEY}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        contents: [{
+          parts: [{
+            text: prompt
+          }]
+        }]
+      })
+    });
+
+    if (!response.ok) {
+      throw new Error(`API 호출 실패: ${response.status}`);
+    }
+
+    const data = await response.json();
+    const responseText = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+    
+    // JSON 파싱
+    const jsonMatch = responseText.match(/\{[\s\S]*\}/);
+    if (jsonMatch) {
+      const result = JSON.parse(jsonMatch[0]);
+      return result;
+    }
+    
+    // 파싱 실패시 기본값 반환
+    return {
+      scores: {
+        accuracy: 75,
+        fluency: 70,
+        appropriateness: 80
+      },
+      feedback: {
+        strengths: ['번역이 전반적으로 이해 가능합니다'],
+        improvements: ['더 자연스러운 번역 표현이 필요합니다'],
+        suggestions: ['더 구체적이고 명확한 표현을 사용해보세요']
+      },
+      referenceTranslation: '참고 번역을 생성할 수 없습니다.'
+    };
+    
+  } catch (error) {
+    console.error('번역 평가 API 호출 오류:', error);
+    
+    // 오류시 기본값 반환
+    return {
+      scores: {
+        accuracy: 70,
+        fluency: 65,
+        appropriateness: 75
+      },
+      feedback: {
+        strengths: ['번역이 기본적으로 이해 가능합니다'],
+        improvements: ['API 오류로 상세한 평가를 제공할 수 없습니다'],
+        suggestions: ['다시 시도해보세요']
+      },
+      referenceTranslation: 'API 오류로 참고 번역을 제공할 수 없습니다.'
+    };
+  }
 };

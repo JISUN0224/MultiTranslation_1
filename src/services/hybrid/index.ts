@@ -1,10 +1,9 @@
-// 🚀 하이브리드 시스템 통합 파일 - PPT, 브로슈어, 설명서 지원
+// 🚀 하이브리드 시스템 통합 파일 - PPT 전용
 // services/hybrid/index.ts
 
 export { generateHybridPPT, checkHybridAPIKey, estimateTokenUsage } from './hybridAIService';
-export { generateHybridBrochure, generateHybridManual } from './hybridContentService';
+export { generateHybridPPT as generateHybridPPTContent } from './hybridContentService';
 export { getTemplateSlides } from './templates/templateEngine';
-export { getBrochurePages } from './templates/brochureTemplateEngine';
 
 // 🎯 통합 하이브리드 생성 함수
 export const generateHybridContent = async (
@@ -17,14 +16,6 @@ export const generateHybridContent = async (
     case 'ppt':
       const { generateHybridPPT } = await import('./hybridAIService');
       return await generateHybridPPT(request, onProgress);
-      
-    case 'brochure':
-      const { generateHybridBrochure } = await import('./hybridContentService');
-      return await generateHybridBrochure(request, onProgress);
-      
-    case 'manual':
-      const { generateHybridManual } = await import('./hybridContentService');
-      return await generateHybridManual(request, onProgress);
       
     default:
       throw new Error(`지원하지 않는 콘텐츠 타입: ${request.type}`);
@@ -59,7 +50,7 @@ export const getComparisonData = () => ({
 
 // 🎨 사용 예시
 export const hybridUsageExample = `
-// 1. PPT 생성
+// PPT 생성
 import { generateHybridContent } from './services/hybrid';
 
 const pptRequest = {
@@ -73,24 +64,4 @@ const pptRequest = {
 const pptResult = await generateHybridContent(pptRequest, (progress, message) => {
   console.log(\`\${progress}%: \${message}\`);
 });
-
-// 2. 브로슈어 생성
-const brochureRequest = {
-  topic: '프리미엄 화장품',
-  type: 'brochure',
-  industry: '화장품/뷰티',
-  style: '마케팅용'
-};
-
-const brochureResult = await generateHybridContent(brochureRequest, onProgress);
-
-// 3. 설명서 생성
-const manualRequest = {
-  topic: '스마트워치',
-  type: 'manual',
-  industry: 'IT/기술',
-  style: '전문적인'
-};
-
-const manualResult = await generateHybridContent(manualRequest, onProgress);
 `;

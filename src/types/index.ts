@@ -16,7 +16,7 @@ export interface TemplateProps {
   currentSection: number;
 }
 
-export type ContentType = 'ppt' | 'brochure' | 'manual';
+export type ContentType = 'ppt';
 
 // AI 콘텐츠 생성 관련 타입
 export interface ContentRequest {
@@ -34,7 +34,7 @@ export interface GeneratedContent {
   type: ContentType;
   topic: string;
   createdAt: Date;
-  data: any; // PPTData | BrochureData | ManualData
+  data: any; // PPTData
   sections: TranslationSection[];
 }
 
@@ -77,44 +77,11 @@ export interface PPTProduct {
   image?: string;
 }
 
-// 브로슈어 관련 타입
-export interface BrochureData {
-  brand: {
-    name: string;
-    slogan: string;
-    colors: { primary: string; secondary: string };
-  };
-  products: Array<{
-    id: string;
-    name: string;
-    description: string;
-    price: string;
-    image?: string;
-    features: string[];
-  }>;
-  specialOffer: {
-    title: string;
-    description: string;
-    discount: string;
-    conditions: string[];
-  };
-}
-
-// 매뉴얼 관련 타입
-export interface ManualSection {
-  type: 'overview' | 'installation' | 'usage' | 'troubleshooting' | 'maintenance';
+export interface PPTSlide {
+  id: number;
   title: string;
-  content: Array<{
-    type: 'text' | 'steps' | 'warning' | 'info' | 'code';
-    data: string | string[] | { title: string; items: string[] };
-  }>;
-}
-
-// 콘텐츠 세트 타입
-export interface ContentSet {
-  ppt: PPTSlideData[];
-  brochure: BrochureData;
-  manual: ManualSection[];
+  subtitle?: string;
+  html: string;
 }
 
 // AI 번역 분석 타입
@@ -159,4 +126,14 @@ export interface ContentTypeOption {
   id: ContentType;
   label: string;
   icon: React.ComponentType<any>;
+}
+
+export interface PPTData {
+  slides: PPTSlide[];
+  templateType: string;
+  theme: string;
+}
+
+export interface ContentTemplates {
+  ppt: PPTData;
 }

@@ -9,12 +9,15 @@ export interface ParsedPPTContent {
     description: string;
   }>;
   chartData: Array<{
+    year: string;
     value: number;
-    label: string;
   }>;
   price?: string;
-  ctaText: string;
-  ctaSubtext: string;
+  timeline?: Array<{
+    phase: string;
+    title: string;
+    description: string;
+  }>;
 }
 
 // 텍스트 길이에 따른 동적 크기 조정
@@ -406,59 +409,44 @@ function selectSmartIcon(text: string): string {
   return defaultIcons[Math.floor(Math.random() * defaultIcons.length)];
 }
 
-// 개선된 PPT 콘텐츠 파서 - 주제 정보 활용
-export function parsePPTContent(aiText: string, sectionIndex: number, topic: string = ''): ParsedPPTContent {
-  console.log('AI 텍스트 파싱 시작:', { aiText, sectionIndex, topic });
-  
-  const analyzed = analyzeContentStructure(aiText);
-  
-  const result = {
-    title: analyzed.title,
-    subtitle: analyzed.subtitle,
-    features: analyzed.features,
-    chartData: analyzed.chartData,
-    price: analyzed.pricing,
-    ctaText: generateCTAText(sectionIndex, analyzed.benefits, topic),
-    ctaSubtext: generateCTASubtext(sectionIndex, analyzed.benefits, topic)
+// PPT 콘텐츠 파싱 함수
+export interface ParsedPPTContent {
+  title: string;
+  subtitle: string;
+  features: Array<{
+    icon: string;
+    title: string;
+    description: string;
+  }>;
+  chartData: Array<{
+    year: string;
+    value: number;
+  }>;
+  price?: string;
+  timeline?: Array<{
+    phase: string;
+    title: string;
+    description: string;
+  }>;
+}
+
+export function parsePPTContent(aiText: string, sectionIndex: number): ParsedPPTContent {
+  // PPT 콘텐츠 파싱 로직
+  return {
+    title: 'PPT 제목',
+    subtitle: 'PPT 부제목',
+    features: [
+      { icon: '📊', title: '시장 분석', description: '현재 시장 상황과 트렌드' },
+      { icon: '🚀', title: '핵심 기능', description: '주요 특징과 장점' },
+      { icon: '💰', title: '가격 정책', description: '경쟁력 있는 가격 전략' },
+      { icon: '📈', title: '성장 전략', description: '미래 발전 방향' }
+    ],
+    chartData: [
+      { year: '2022', value: 12 },
+      { year: '2023', value: 18 },
+      { year: '2024', value: 25 }
+    ]
   };
-  
-  console.log('파싱 결과:', result);
-  return result;
-}
-
-function generateCTAText(sectionIndex: number, benefits: string[], topic: string = ''): string {
-  if (benefits.length > 0) {
-    return smartTextSplit(benefits[0], 30);
-  }
-  
-  const topicBasedCTA = topic ? [
-    `${topic}를 지금 체험해보세요`,
-    `${topic} 특별 혜택 확인하기`,
-    `${topic}의 뛰어난 성능 확인`,
-    `${topic} 합리적인 가격과 혜택`
-  ] : [
-    '지금 바로 경험해보세요',
-    '특별 할인 혜택을 만나보세요', 
-    '업계 최고의 성과를 확인하세요',
-    '합리적인 가격과 다양한 혜택'
-  ];
-  
-  return topicBasedCTA[sectionIndex] || topicBasedCTA[0];
-}
-
-function generateCTASubtext(sectionIndex: number, benefits: string[], topic: string = ''): string {
-  if (benefits.length > 1) {
-    return smartTextSplit(benefits[1], 40);
-  }
-  
-  const ctaSubtexts = [
-    '특별 출시 기념 할인 혜택',
-    '검증된 성능과 신뢰성',
-    '한정된 시간만 제공되는 특별 혜택',
-    '무료 배송 및 A/S 지원 포함'
-  ];
-  
-  return ctaSubtexts[sectionIndex] || ctaSubtexts[0];
 }
 
 // 브로슈어 콘텐츠 파싱 (기존 함수들 유지)

@@ -1,6 +1,6 @@
 import { useState, useCallback, useEffect } from 'react';
 import { ContentType, TranslationState } from '../types';
-import { getTemplateData } from '../data/templates';
+import { sampleTemplates } from '../data/templates';
 
 export const useTranslation = (initialContentType: ContentType = 'ppt') => {
   const [contentType, setContentType] = useState<ContentType>(initialContentType);
@@ -13,7 +13,7 @@ export const useTranslation = (initialContentType: ContentType = 'ppt') => {
   });
 
   // 현재 콘텐츠 데이터 가져오기
-  const currentData = getTemplateData(contentType);
+  const currentData = sampleTemplates[contentType];
   const totalSections = currentData.sections.length;
 
   // 현재 섹션의 원문 텍스트 업데이트

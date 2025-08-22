@@ -9,6 +9,30 @@ interface FeedbackSectionProps {
   showReference: boolean;
 }
 
+// 별점 컴포넌트
+const StarRating: React.FC<{ score: number }> = ({ score }) => {
+  const maxStars = 5;
+  const filledStars = Math.round((score / 100) * maxStars);
+  
+  return (
+    <div className="flex items-center space-x-1">
+      {[...Array(maxStars)].map((_, index) => (
+        <Star
+          key={index}
+          className={`h-4 w-4 ${
+            index < filledStars 
+              ? 'text-yellow-500 fill-current' 
+              : 'text-gray-300'
+          }`}
+        />
+      ))}
+      <span className="ml-2 text-sm font-medium text-gray-600">
+        {score}/100
+      </span>
+    </div>
+  );
+};
+
 const FeedbackSection: React.FC<FeedbackSectionProps> = ({
   feedback,
   isVisible,
@@ -19,32 +43,39 @@ const FeedbackSection: React.FC<FeedbackSectionProps> = ({
     return null;
   }
 
-
-
   return (
     <div className="space-y-4 animate-in slide-in-from-top-2 duration-300">
       {/* 점수 */}
       <div className="grid grid-cols-3 gap-3">
         <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 text-center">
-          <div className="flex items-center justify-center space-x-1 mb-1">
+          <div className="flex items-center justify-center space-x-1 mb-2">
             <Star className="h-4 w-4 text-blue-600" />
             <span className="text-sm font-medium text-blue-800">정확성</span>
           </div>
-          <p className="text-lg font-bold text-blue-600">{feedback.scores.accuracy}</p>
+          <div className="flex justify-center mb-1">
+            <StarRating score={feedback.scores.accuracy} />
+          </div>
+          <p className="text-lg font-bold text-blue-600">{feedback.scores.accuracy}점</p>
         </div>
         <div className="bg-green-50 border border-green-200 rounded-lg p-3 text-center">
-          <div className="flex items-center justify-center space-x-1 mb-1">
+          <div className="flex items-center justify-center space-x-1 mb-2">
             <Star className="h-4 w-4 text-green-600" />
             <span className="text-sm font-medium text-green-800">자연스러움</span>
           </div>
-          <p className="text-lg font-bold text-green-600">{feedback.scores.fluency}</p>
+          <div className="flex justify-center mb-1">
+            <StarRating score={feedback.scores.fluency} />
+          </div>
+          <p className="text-lg font-bold text-green-600">{feedback.scores.fluency}점</p>
         </div>
         <div className="bg-purple-50 border border-purple-200 rounded-lg p-3 text-center">
-          <div className="flex items-center justify-center space-x-1 mb-1">
+          <div className="flex items-center justify-center space-x-1 mb-2">
             <Star className="h-4 w-4 text-purple-600" />
             <span className="text-sm font-medium text-purple-800">적합성</span>
           </div>
-          <p className="text-lg font-bold text-purple-600">{feedback.scores.appropriateness}</p>
+          <div className="flex justify-center mb-1">
+            <StarRating score={feedback.scores.appropriateness} />
+          </div>
+          <p className="text-lg font-bold text-purple-600">{feedback.scores.appropriateness}점</p>
         </div>
       </div>
 

@@ -54,7 +54,7 @@ async function callGeminiAPI(request: ContentRequest) {
   }
   
   // 프롬프트 생성
-  const prompt = generatePromptForType(request);
+  const prompt = generatePrompt(request.topic, request.type, request.style, request.industry, request.language, request.difficulty);
   
   const requestBody = {
     contents: [{
@@ -89,18 +89,12 @@ async function callGeminiAPI(request: ContentRequest) {
 }
 
 // 타입별 상세 프롬프트 생성
-function generatePromptForType(request: ContentRequest): string {
-  const { topic, type, difficulty, style, industry, language = '한국어' } = request;
-  
+export function generatePrompt(topic: string, type: ContentType, style?: string, industry?: string, language: string, difficulty: string): string {
   switch (type) {
     case 'ppt':
       return generatePPTPrompt(topic, style || '전문적인', industry || '', language, difficulty);
-    case 'brochure':
-      return generateBrochurePrompt(topic, style || '마케팅용', industry || '', language, difficulty);
-    case 'manual':
-      return generateManualPrompt(topic, style || '전문적인', industry || '', language, difficulty);
     default:
-      return generateDefaultPrompt(request);
+      throw new Error(`지원하지 않는 콘텐츠 타입: ${type}`);
   }
 }
 
@@ -220,256 +214,6 @@ ${topic}에 대한 PPT 발표 자료를 HTML 형태로 작성해주세요.
 
 반드시 위 JSON 형식으로만 응답하고, 각 html 필드에는 완전한 인라인 스타일 HTML을 포함해주세요.
 `;
-}
-
-// 브로슈어 전용 상세 프롬프트
-function generateBrochurePrompt(topic: string, style: string, industry: string, language: string, difficulty: string): string {
-  return `
-당신은 전문 브로슈어 작성자입니다. ${industry ? `${industry} 업계의 ` : ''}${topic}에 대한 브로슈어를 ${language}로 작성하고, JSON 객체 형태로 응답해주세요.
-
-# JSON 스키마:
-{
-  "title": "<브로슈어 제목>",
-  "subtitle": "<브로슈어 부제목>",
-  "sections": [
-    {
-      "type": "brand_info",
-      "data": {
-        "title": "<브랜드명>",
-        "subtitle": "<브랜드 슬로건>",
-        "concept": "<브랜드 컨셉>",
-        "tagline": "<마케팅 태그라인>"
-      }
-    },
-    {
-      "type": "product_lineup",
-      "data": {
-        "title": "<제품 라인업 제목>",
-        "subtitle": "<제품 라인업 부제목>",
-        "products": [
-          {
-            "name": "<제품명>",
-            "features": ["<특징1>", "<특징2>", "<특징3>"],
-            "price": "<가격 (₩ 표시)>",
-            "target": "<대상 고객>"
-          },
-          {
-            "name": "<제품명>",
-            "features": ["<특징1>", "<특징2>", "<특징3>"],
-            "price": "<가격 (₩ 표시)>",
-            "target": "<대상 고객>"
-          },
-          {
-            "name": "<제품명>",
-            "features": ["<특징1>", "<특징2>", "<특징3>"],
-            "price": "<가격 (₩ 표시)>",
-            "target": "<대상 고객>"
-          }
-        ]
-      }
-    },
-    {
-      "type": "special_offers",
-      "data": {
-        "title": "<특별 혜택 제목>",
-        "subtitle": "<특별 혜택 부제목>",
-        "discount": "<할인 정보>",
-        "freeService": "<무료 서비스>",
-        "additionalBenefits": ["<추가 혜택1>", "<추가 혜택2>"],
-        "eventPeriod": "<이벤트 기간>"
-      }
-    },
-    {
-      "type": "customer_reviews",
-      "data": {
-        "title": "<고객 후기 제목>",
-        "subtitle": "<고객 후기 부제목>",
-        "reviews": [
-          {
-            "name": "<고객명 (○○○ 형태)>",
-            "rating": "<평점 (5점 만점)>",
-            "comment": "<구체적 후기>"
-          },
-          {
-            "name": "<고객명 (○○○ 형태)>",
-            "rating": "<평점 (5점 만점)>",
-            "comment": "<구체적 후기>"
-          }
-        ]
-      }
-    }
-  ]
-}
-
-# 작성 규칙:
-- 제목은 25자, 부제목은 50자 이내로
-- 제품명은 20자 이내
-- 가격은 ₩ 표시로 명확히
-- ${language} 언어로 작성
-- ${style} 톤으로 작성
-- 난이도: ${getDifficultyName(difficulty)}
-
-# 요청 내용:
-- 주제: ${topic}
-- 스타일: ${style}
-- 산업: ${industry}
-- 언어: ${language}
-- 구성: 브랜드 정보, 제품 라인업(3개), 특별 혜택, 고객 후기(2개)
-
-반드시 위 JSON 스키마 형태로만 응답해주세요.
-`;
-}
-
-// 매뉴얼 전용 상세 프롬프트
-function generateManualPrompt(topic: string, style: string, industry: string, language: string, difficulty: string): string {
-  return `
-당신은 전문 사용설명서 작성자입니다. ${industry ? `${industry} 업계의 ` : ''}${topic}에 대한 사용설명서를 ${language}로 작성하고, JSON 객체 형태로 응답해주세요.
-
-# JSON 스키마:
-{
-  "title": "<매뉴얼 제목>",
-  "subtitle": "<매뉴얼 부제목>",
-  "sections": [
-    {
-      "type": "overview",
-      "data": {
-        "title": "<제품 개요 제목>",
-        "subtitle": "<제품 개요 부제목>",
-        "introduction": "<제품 소개>",
-        "components": ["<구성품1>", "<구성품2>", "<구성품3>"],
-        "precautions": ["<사용 전 확인사항1>", "<사용 전 확인사항2>"]
-      }
-    },
-    {
-      "type": "installation",
-      "data": {
-        "title": "<설치 및 설정 제목>",
-        "subtitle": "<설치 및 설정 부제목>",
-        "steps": [
-          { "step": 1, "action": "<설치 단계1>", "detail": "<상세 설명>" },
-          { "step": 2, "action": "<설치 단계2>", "detail": "<상세 설명>" },
-          { "step": 3, "action": "<설치 단계3>", "detail": "<상세 설명>" },
-          { "step": 4, "action": "<설치 단계4>", "detail": "<상세 설명>" },
-          { "step": 5, "action": "<설치 단계5>", "detail": "<상세 설명>" }
-        ]
-      }
-    },
-    {
-      "type": "usage",
-      "data": {
-        "title": "<기본 사용법 제목>",
-        "subtitle": "<기본 사용법 부제목>",
-        "steps": [
-          { "step": 1, "action": "<사용 단계1>", "detail": "<상세 설명>" },
-          { "step": 2, "action": "<사용 단계2>", "detail": "<상세 설명>" },
-          { "step": 3, "action": "<사용 단계3>", "detail": "<상세 설명>" },
-          { "step": 4, "action": "<사용 단계4>", "detail": "<상세 설명>" },
-          { "step": 5, "action": "<사용 단계5>", "detail": "<상세 설명>" }
-        ]
-      }
-    },
-    {
-      "type": "maintenance",
-      "data": {
-        "title": "<유지보수 제목>",
-        "subtitle": "<유지보수 부제목>",
-        "maintenanceItems": [
-          { "item": "<정기 점검 항목1>", "frequency": "<점검 주기>", "method": "<점검 방법>" },
-          { "item": "<정기 점검 항목2>", "frequency": "<점검 주기>", "method": "<점검 방법>" },
-          { "item": "<정기 점검 항목3>", "frequency": "<점검 주기>", "method": "<점검 방법>" }
-        ],
-        "cleaning": ["<청소 방법1>", "<청소 방법2>"],
-        "troubleshooting": ["<문제 해결1>", "<문제 해결2>"]
-      }
-    },
-    {
-      "type": "safety",
-      "data": {
-        "title": "<안전 수칙 제목>",
-        "subtitle": "<안전 수칙 부제목>",
-        "warnings": ["<주의사항1>", "<주의사항2>", "<주의사항3>"],
-        "prohibitions": ["<금지사항1>", "<금지사항2>"],
-        "emergency": ["<비상시 대처법1>", "<비상시 대처법2>"]
-      }
-    }
-  ]
-}
-
-# 작성 규칙:
-- 제목은 25자, 부제목은 50자 이내로
-- 단계별로 명확하게 구분
-- 안전 주의사항 포함
-- 전문 용어 정확히 사용
-- 단계당 50자 이내로 간결
-- ${language} 언어로 작성
-- ${style} 톤으로 작성
-- 난이도: ${getDifficultyName(difficulty)}
-
-# 요청 내용:
-- 주제: ${topic}
-- 스타일: ${style}
-- 산업: ${industry}
-- 언어: ${language}
-- 구성: 제품 개요, 설치 및 설정(5단계), 기본 사용법(5단계), 유지보수, 안전 수칙
-
-반드시 위 JSON 스키마 형태로만 응답해주세요.
-`;
-}
-
-// 기본 프롬프트 (fallback)
-function generateDefaultPrompt(request: ContentRequest): string {
-  const { topic, type, difficulty, style, industry, language = '한국어' } = request;
-  
-  return `
-당신은 전문 콘텐츠 작성자입니다. ${industry ? `${industry} 업계의 ` : ''}${topic}에 대한 ${getTypeName(type)}을 ${language}로 작성해주세요.
-
-난이도: ${getDifficultyName(difficulty)}
-스타일: ${style || '전문적인'}
-
-다음 JSON 형태로 응답해주세요:
-{
-  "title": "제목 (25자 이내)",
-  "subtitle": "부제목 (50자 이내)", 
-  "sections": [
-    "첫 번째 섹션 내용",
-    "두 번째 섹션 내용",
-    "세 번째 섹션 내용",
-    "네 번째 섹션 내용"
-  ]
-}
-
-각 섹션은 ${getSectionCount(type)}개로 구성하고, 번역 연습에 적합한 전문적인 내용으로 작성해주세요.
-`;
-}
-
-// 타입별 이름
-function getTypeName(type: ContentType): string {
-  const names = {
-    ppt: 'PPT 발표 자료',
-    brochure: '브로슈어',
-    manual: '사용 설명서'
-  };
-  return names[type];
-}
-
-// 난이도별 이름
-function getDifficultyName(difficulty: string): string {
-  const names = {
-    beginner: '초급',
-    intermediate: '중급',
-    advanced: '고급'
-  };
-  return names[difficulty as keyof typeof names] || '중급';
-}
-
-// 타입별 섹션 개수
-function getSectionCount(type: ContentType): number {
-  const counts = {
-    ppt: 4,
-    brochure: 4,
-    manual: 5
-  };
-  return counts[type];
 }
 
 // AI 응답 파싱 - JSON 슬라이드 및 텍스트 모두 지원
@@ -825,4 +569,14 @@ export const simulateGenerationProgress = (
     
     runNextStep();
   });
+};
+
+// 콘텐츠 타입별 라벨
+export const contentTypeLabels: Record<ContentType, string> = {
+  ppt: 'PPT 발표 자료'
+};
+
+// 콘텐츠 타입별 예상 섹션 수
+export const contentTypeSections: Record<ContentType, number> = {
+  ppt: 5
 };
