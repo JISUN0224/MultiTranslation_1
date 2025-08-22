@@ -34,7 +34,7 @@ const TopicInput: React.FC<TopicInputProps> = ({
   return (
     <div className="space-y-8">
       {/* 주제 입력 */}
-      <div className="space-y-4">
+      <div className="space-y-4" data-testid="topic-input-field">
         <div className="flex items-center space-x-2">
           <Lightbulb className="w-5 h-5 text-yellow-500" />
           <h3 className="text-lg font-semibold text-gray-900">주제 입력</h3>
@@ -59,7 +59,7 @@ const TopicInput: React.FC<TopicInputProps> = ({
       </div>
 
       {/* 옵션 설정 */}
-      <div className="space-y-6">
+      <div className="space-y-6" data-testid="options-section">
         <div className="flex items-center space-x-2">
           <Settings className="w-5 h-5 text-gray-500" />
           <h3 className="text-lg font-semibold text-gray-900">옵션 설정</h3>

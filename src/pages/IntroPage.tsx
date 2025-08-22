@@ -1,11 +1,12 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Sparkles, ArrowRight, Globe } from 'lucide-react';
+import { Sparkles, ArrowRight, Globe, HelpCircle } from 'lucide-react';
 import { ContentType, ContentRequest } from '../types';
 import { useContent } from '../contexts/ContentContext';
 import ContentTypeSelector from '../components/intro/ContentTypeSelector';
 import TopicInput from '../components/intro/TopicInput';
 import GenerationProgress from '../components/intro/GenerationProgress';
+import { Tour } from '../components/UI/Tour';
 
 const IntroPage: React.FC = () => {
   const navigate = useNavigate();
@@ -16,9 +17,69 @@ const IntroPage: React.FC = () => {
   const [topic, setTopic] = useState('');
   const [difficulty, setDifficulty] = useState<'beginner' | 'intermediate' | 'advanced'>('intermediate');
   const [language, setLanguage] = useState<'ko-zh' | 'zh-ko'>('ko-zh');
+  
+  // 튜토리얼 상태
+  const [showTour, setShowTour] = useState(false);
 
   // 폼 유효성 검사
   const isFormValid = topic.trim().length > 0;
+
+  // 튜토리얼 단계 정의
+  const tourSteps = [
+    {
+      id: 'content-type',
+      title: '콘텐츠 타입 선택 📝',
+      description: 'PPT 또는 설명서 중 원하는 콘텐츠 타입을 선택하세요. 각각 다른 스타일의 번역 연습을 제공합니다.',
+      targetSelector: '[data-testid="content-type-section"]',
+      padding: 15
+    },
+    {
+      id: 'topic-input',
+      title: '주제 입력 💡',
+      description: '번역 연습하고 싶은 주제를 입력하세요. 예: 스마트폰, 갤럭시 워치, 넷플릭스 등',
+      targetSelector: '[data-testid="topic-input-field"]',
+      padding: 15
+    },
+    {
+      id: 'options',
+      title: '옵션 설정 ⚙️',
+      description: '난이도와 생성 언어를 선택하세요. 한국어→중국어 또는 중국어→한국어 번역 연습이 가능합니다.',
+      targetSelector: '[data-testid="options-section"]',
+      padding: 15
+    },
+    {
+      id: 'generate',
+      title: '콘텐츠 생성 🚀',
+      description: '모든 설정이 완료되면 "콘텐츠 생성하기" 버튼을 클릭하세요. AI가 자동으로 번역 연습용 콘텐츠를 만들어줍니다.',
+      targetSelector: '[data-testid="generate-button"]',
+      padding: 10
+    }
+  ];
+
+  // 튜토리얼 시작
+  const handleStartTour = () => {
+    setShowTour(true);
+  };
+
+  // 튜토리얼 종료
+  const handleTourClose = (opts?: { dontShowAgain?: boolean }) => {
+    setShowTour(false);
+    if (opts?.dontShowAgain) {
+      localStorage.setItem('tourCompleted', 'true');
+    }
+  };
+
+  // 컴포넌트 마운트 시 튜토리얼 체크
+  useEffect(() => {
+    const tourCompleted = localStorage.getItem('tourCompleted');
+    if (!tourCompleted) {
+      // 페이지 로드 후 2초 뒤에 자동으로 튜토리얼 시작
+      const timer = setTimeout(() => {
+        setShowTour(true);
+      }, 2000);
+      return () => clearTimeout(timer);
+    }
+  }, []);
 
   // 콘텐츠 생성 핸들러
   const handleGenerateContent = async () => {
@@ -54,14 +115,22 @@ const IntroPage: React.FC = () => {
       {/* 헤더 */}
       <header className="bg-white shadow-sm border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                      <div className="flex items-center justify-center h-16">
-              <div className="flex items-center space-x-3">
-                <Globe className="h-8 w-8 text-primary-600" />
-                <h1 className="text-xl font-semibold text-gray-900">
-                  AI 번역 연습 시스템
-                </h1>
-              </div>
+          <div className="flex items-center justify-between h-16">
+            <div className="flex items-center space-x-3">
+              <Globe className="h-8 w-8 text-primary-600" />
+              <h1 className="text-xl font-semibold text-gray-900">
+                AI 번역 연습 시스템
+              </h1>
             </div>
+            <button
+              onClick={handleStartTour}
+              className="flex items-center space-x-2 px-3 py-2 text-sm font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors duration-200"
+              title="사용법 가이드"
+            >
+              <HelpCircle className="h-4 w-4" />
+              <span>도움말</span>
+            </button>
+          </div>
         </div>
       </header>
 
@@ -98,7 +167,7 @@ const IntroPage: React.FC = () => {
           {/* 폼 내용 */}
           <div className="p-8 space-y-8">
             {/* 1단계: 콘텐츠 타입 선택 */}
-            <div>
+            <div data-testid="content-type-section">
               <ContentTypeSelector
                 selectedType={selectedType}
                 onTypeSelect={setSelectedType}
@@ -109,7 +178,7 @@ const IntroPage: React.FC = () => {
             <div className="border-t border-gray-200"></div>
 
             {/* 2단계: 주제 및 옵션 입력 */}
-            <div>
+            <div data-testid="topic-input-section">
               <TopicInput
                 topic={topic}
                 onTopicChange={setTopic}
@@ -134,6 +203,7 @@ const IntroPage: React.FC = () => {
                           )}
                         </div>
                         <button
+                          data-testid="generate-button"
                           onClick={handleGenerateContent}
                           disabled={!isFormValid || isGenerating || !isAPIKeyValid}
                           className={`
@@ -183,6 +253,13 @@ const IntroPage: React.FC = () => {
           </div>
         </div>
       </main>
+
+      {/* 튜토리얼 */}
+      <Tour
+        steps={tourSteps}
+        visible={showTour}
+        onClose={handleTourClose}
+      />
     </div>
   );
 };
