@@ -4,18 +4,22 @@ import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/24/outline';
 interface ManualSlideViewerProps {
   html: string;
   title: string;
+  language?: string;
 }
 
-const ManualSlideViewer: React.FC<ManualSlideViewerProps> = ({ html, title }) => {
+const ManualSlideViewer: React.FC<ManualSlideViewerProps> = ({ html, title, language }) => {
   const [currentPage, setCurrentPage] = useState(0);
   
-  // HTML을 페이지별로 분할
+  // 언어 감지 (기본값: 한국어)
+  const isKorean = language !== 'zh-ko';
+  
+  // HTML을 페이지별로 분할 (언어별 동적 제목)
   const pages = [
-    { id: 'cover', title: '표지 + 목차', icon: '📑' },
-    { id: 'basic-usage', title: '기본 사용법', icon: '📱' },
-    { id: 'precautions', title: '주의사항', icon: '⚠️' },
-    { id: 'troubleshooting', title: '문제해결', icon: '🔧' },
-    { id: 'faq', title: 'FAQ', icon: '❓' }
+    { id: 'cover', title: isKorean ? '표지 + 목차' : '封面 + 目录', icon: '📑' },
+    { id: 'basic-usage', title: isKorean ? '기본 사용법' : '基本使用方法', icon: '📱' },
+    { id: 'precautions', title: isKorean ? '주의사항' : '注意事项', icon: '⚠️' },
+    { id: 'troubleshooting', title: isKorean ? '문제해결' : '问题解决', icon: '🔧' },
+    { id: 'faq', title: isKorean ? '자주 묻는 질문' : '常见问题', icon: '❓' }
   ];
 
   const goToPage = (pageIndex: number) => {
@@ -31,9 +35,9 @@ const ManualSlideViewer: React.FC<ManualSlideViewerProps> = ({ html, title }) =>
   };
 
   return (
-    <div className="manual-slide-viewer">
+    <div className="manual-slide-viewer" data-testid="manual-container">
       {/* 네비게이션 바 */}
-      <div className="manual-navigation">
+      <div className="manual-navigation" data-testid="slide-navigation">
         <div className="nav-info">
           <h2 className="nav-title">{title}</h2>
           <span className="nav-page">
@@ -74,10 +78,11 @@ const ManualSlideViewer: React.FC<ManualSlideViewerProps> = ({ html, title }) =>
       </div>
 
       {/* 매뉴얼 콘텐츠 */}
-      <div className="manual-content">
+      <div className="manual-content" data-testid="manual-content">
         <div 
           className="manual-html-content"
           dangerouslySetInnerHTML={{ __html: html }}
+          data-testid="manual-sections"
         />
       </div>
 

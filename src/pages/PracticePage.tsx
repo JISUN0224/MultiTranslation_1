@@ -7,18 +7,29 @@ import Header from '../components/layout/Header';
 import TranslationPanel from '../components/translation/TranslationPanel';
 import PPTTemplate from '../components/content/PPTTemplate';
 import PPTDirectRender from '../components/content/PPTDirectRender';
+import { Tour } from '../components/UI/Tour';
 
 // Hooks
 import { useTranslation } from '../hooks/useTranslation';
+import { useTutorial } from '../hooks/useTutorial';
 
 // Context
 import { useContent } from '../contexts/ContentContext';
+
+// Data
+import { tutorialConfigs } from '../data/tutorials';
 
 const PracticePage: React.FC = () => {
   const { generatedContent, currentRequest } = useContent();
   
   // 🔥 생성된 콘텐츠 타입에 따라 동적으로 초기 타입 설정
   const initialContentType = generatedContent?.type || 'ppt';
+  
+  // 튜토리얼 훅 사용 (콘텐츠 타입에 따라 동적 설정)
+  const tutorialConfig = generatedContent?.type === 'manual' 
+    ? tutorialConfigs.manual 
+    : tutorialConfigs.ppt;
+  const tutorial = useTutorial(tutorialConfig);
   
   const {
     // 상태
@@ -158,6 +169,7 @@ const PracticePage: React.FC = () => {
               <ManualSlideViewer 
                 html={manualHTML}
                 title={generatedContent.data?.title || '매뉴얼'}
+                language={currentRequest?.language || 'ko-zh'}
               />
             </React.Suspense>
           );
@@ -229,11 +241,20 @@ const PracticePage: React.FC = () => {
   );
 
   return (
-    <Layout
-      header={headerComponent}
-      contentArea={renderContentTemplate()}
-      translationPanel={translationPanelComponent}
-    />
+    <>
+      <Layout
+        header={headerComponent}
+        contentArea={renderContentTemplate()}
+        translationPanel={translationPanelComponent}
+      />
+      
+      {/* 튜토리얼 */}
+      <Tour
+        steps={tutorial.steps}
+        visible={tutorial.isVisible}
+        onClose={tutorial.closeTutorial}
+      />
+    </>
   );
 };
 

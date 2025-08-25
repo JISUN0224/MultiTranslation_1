@@ -449,8 +449,8 @@ export const generateContentWithAI = async (
     return await generatePPTWithAI(request, onProgress);
   }
   
-  const { generateContent } = await import('./contentGeneration');
-  return await generateContent(request);
+  // contentGeneration.ts 파일이 삭제되어 레거시 모드 지원 중단
+  throw new Error('레거시 모드가 지원되지 않습니다. 하이브리드 모드를 사용해주세요.');
 };
 
 export const simulateGenerationProgress = (
@@ -562,11 +562,16 @@ export const analyzeTranslation = async (
     const data = await response.json();
     const responseText = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
     
-    // JSON 파싱
-    const jsonMatch = responseText.match(/\{[\s\S]*\}/);
-    if (jsonMatch) {
-      const result = JSON.parse(jsonMatch[0]);
-      return result;
+    // JSON 파싱 - 더 안전한 방식
+    try {
+      const jsonMatch = responseText.match(/\{[\s\S]*\}/);
+      if (jsonMatch) {
+        const result = JSON.parse(jsonMatch[0]);
+        return result;
+      }
+    } catch (parseError) {
+      console.error('JSON 파싱 오류:', parseError);
+      console.log('원본 응답:', responseText);
     }
     
     // 파싱 실패시 기본값 반환

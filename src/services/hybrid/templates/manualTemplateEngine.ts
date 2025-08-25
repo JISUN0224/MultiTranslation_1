@@ -6,6 +6,7 @@ interface HybridManualData {
   subtitle: string;
   version: string;
   date: string;
+  language?: string;
   basicUsage: {
     initialSetup: {
       title: string;
@@ -51,7 +52,31 @@ interface HybridManualData {
 }
 
 // 🎯 메인 템플릿 생성 함수
-export const getManualTemplate = (data: HybridManualData): string => {
+export const getManualTemplate = (data: HybridManualData, language?: string): string => {
+  // 언어 감지 - data.language가 없으면 파라미터 language 사용
+  const isChinese = (data.language || language) === 'zh-ko';
+  
+  console.log('🔍 템플릿 언어 감지:', {
+    dataLanguage: data.language,
+    paramLanguage: language,
+    isChinese: isChinese,
+    dataKeys: Object.keys(data),
+    dataLanguageType: typeof data.language,
+    paramLanguageType: typeof language,
+    finalLanguage: data.language || language
+  });
+  
+  // 언어별 섹션 제목
+  const sectionTitles = {
+    toc: isChinese ? '📑 目录' : '📑 목차',
+    basicUsage: isChinese ? '📱 基本使用方法' : '📱 기본 사용법',
+    precautions: isChinese ? '⚠️ 注意事项' : '⚠️ 주의사항',
+    troubleshooting: isChinese ? '🔧 问题解决' : '🔧 문제해결',
+    faq: isChinese ? '❓ 常见问题' : '❓ 자주 묻는 질문'
+  };
+  
+  console.log('🔍 섹션 제목 설정:', sectionTitles);
+  
   return `
 <!DOCTYPE html>
 <html lang="ko">
@@ -109,7 +134,7 @@ export const getManualTemplate = (data: HybridManualData): string => {
             text-align: center;
             position: relative;
             z-index: 2;
-        }
+    }
 
     .manual-title {
       font-size: 3.5rem;
@@ -177,7 +202,7 @@ export const getManualTemplate = (data: HybridManualData): string => {
             transform: translateY(-3px);
             background: rgba(255,255,255,0.25);
             box-shadow: 0 10px 25px rgba(0,0,0,0.2);
-        }
+    }
 
     /* 섹션 스타일 */
     .manual-section {
@@ -421,26 +446,26 @@ export const getManualTemplate = (data: HybridManualData): string => {
     </header>
 
     <section class="table-of-contents">
-      <h2 class="toc-title">📑 목차</h2>
+      <h2 class="toc-title">${sectionTitles.toc}</h2>
       <ul class="toc-list">
           <li class="toc-item">
                         <a href="#basic-usage">
-                            📱 기본 사용법
+                            ${sectionTitles.basicUsage}
             </a>
           </li>
                     <li class="toc-item">
                         <a href="#precautions">
-                            ⚠️ 주의사항
+                            ${sectionTitles.precautions}
                         </a>
                     </li>
                     <li class="toc-item">
                         <a href="#troubleshooting">
-                            🔧 문제해결
+                            ${sectionTitles.troubleshooting}
                         </a>
                     </li>
                     <li class="toc-item">
                         <a href="#faq">
-                            ❓ FAQ
+                            ${sectionTitles.faq}
                         </a>
                     </li>
       </ul>
@@ -451,7 +476,7 @@ export const getManualTemplate = (data: HybridManualData): string => {
         <section id="basic-usage" class="manual-section">
       <div class="section-header">
                 <div class="section-icon">📱</div>
-                <h2 class="section-title">기본 사용법</h2>
+                <h2 class="section-title">${sectionTitles.basicUsage}</h2>
       </div>
       
       <div class="section-content">
@@ -487,7 +512,7 @@ export const getManualTemplate = (data: HybridManualData): string => {
         <section id="precautions" class="manual-section">
       <div class="section-header">
                 <div class="section-icon">⚠️</div>
-                <h2 class="section-title">주의사항</h2>
+                <h2 class="section-title">${sectionTitles.precautions}</h2>
       </div>
       
       <div class="section-content">
@@ -521,7 +546,7 @@ export const getManualTemplate = (data: HybridManualData): string => {
     <section id="troubleshooting" class="manual-section">
       <div class="section-header">
         <div class="section-icon">🔧</div>
-        <h2 class="section-title">문제해결</h2>
+        <h2 class="section-title">${sectionTitles.troubleshooting}</h2>
       </div>
       
       <div class="section-content">
@@ -545,7 +570,7 @@ export const getManualTemplate = (data: HybridManualData): string => {
     <section id="faq" class="manual-section">
       <div class="section-header">
         <div class="section-icon">❓</div>
-                <h2 class="section-title">자주 묻는 질문</h2>
+                <h2 class="section-title">${sectionTitles.faq}</h2>
       </div>
       
       <div class="section-content">
@@ -638,37 +663,57 @@ export const generateManualSlides = async (data: HybridManualData, templateType:
   subtitle?: string;
   html: string;
 }>> => {
+  // 언어 감지
+  const isChinese = request?.language === 'zh-ko';
+  
+  // 언어별 슬라이드 제목
+  const slideTitles = {
+    cover: isChinese ? '封面 + 目录' : '표지 + 목차',
+    basicUsage: isChinese ? '基本使用方法' : '기본 사용법',
+    precautions: isChinese ? '注意事项' : '주의사항',
+    troubleshooting: isChinese ? '问题解决' : '문제해결',
+    faq: isChinese ? '常见问题' : 'FAQ'
+  };
+  
+  const slideSubtitles = {
+    cover: isChinese ? '手册概述及目录' : '매뉴얼 개요 및 목차',
+    basicUsage: isChinese ? '初始设置及基本操作方法' : '초기 설정 및 기본 조작법',
+    precautions: isChinese ? '使用注意事项及提示' : '사용 시 주의사항 및 팁',
+    troubleshooting: isChinese ? '常见问题及解决方法' : '자주 발생하는 문제와 해결방법',
+    faq: isChinese ? '常见问题及回答' : '자주 묻는 질문과 답변'
+  };
+  
   // 각 페이지별 개별 HTML 생성
   const pages = [
     {
       id: 1,
-      title: '표지 + 목차',
-      subtitle: '매뉴얼 개요 및 목차',
-      html: generateCoverPageHTML(data)
+      title: slideTitles.cover,
+      subtitle: slideSubtitles.cover,
+      html: generateCoverPageHTML(data, request?.language)
     },
     {
       id: 2,
-      title: '기본 사용법',
-      subtitle: '초기 설정 및 기본 조작법',
-      html: generateBasicUsagePageHTML(data)
+      title: slideTitles.basicUsage,
+      subtitle: slideSubtitles.basicUsage,
+      html: generateBasicUsagePageHTML(data, request?.language)
     },
     {
       id: 3,
-      title: '주의사항',
-      subtitle: '사용 시 주의사항 및 팁',
-      html: generatePrecautionsPageHTML(data)
+      title: slideTitles.precautions,
+      subtitle: slideSubtitles.precautions,
+      html: generatePrecautionsPageHTML(data, request?.language)
     },
     {
       id: 4,
-      title: '문제해결',
-      subtitle: '자주 발생하는 문제와 해결방법',
-      html: generateTroubleshootingPageHTML(data)
+      title: slideTitles.troubleshooting,
+      subtitle: slideSubtitles.troubleshooting,
+      html: generateTroubleshootingPageHTML(data, request?.language)
     },
     {
       id: 5,
-      title: 'FAQ',
-      subtitle: '자주 묻는 질문과 답변',
-      html: generateFAQPageHTML(data)
+      title: slideTitles.faq,
+      subtitle: slideSubtitles.faq,
+      html: generateFAQPageHTML(data, request?.language)
     }
   ];
 
@@ -676,7 +721,16 @@ export const generateManualSlides = async (data: HybridManualData, templateType:
 };
 
 // 🎯 표지 + 목차 페이지 HTML 생성
-function generateCoverPageHTML(data: HybridManualData): string {
+function generateCoverPageHTML(data: HybridManualData, language?: string): string {
+  const isChinese = language === 'zh-ko';
+  const tocTitle = isChinese ? '📑 目录' : '📑 목차';
+  const tocItems = {
+    basicUsage: isChinese ? '📱 基本使用方法' : '📱 기본 사용법',
+    precautions: isChinese ? '⚠️ 注意事项' : '⚠️ 주의사항',
+    troubleshooting: isChinese ? '🔧 问题解决' : '🔧 문제해결',
+    faq: isChinese ? '❓ 常见问题' : '❓ FAQ'
+  };
+  
   return `
     <!DOCTYPE html>
     <html lang="ko">
@@ -816,26 +870,26 @@ function generateCoverPageHTML(data: HybridManualData): string {
                 </header>
 
                 <section class="table-of-contents">
-                    <h2 class="toc-title">📑 목차</h2>
+                    <h2 class="toc-title">${tocTitle}</h2>
                     <ul class="toc-list">
                         <li class="toc-item">
                             <a href="#basic-usage">
-                                📱 기본 사용법
+                                ${tocItems.basicUsage}
                             </a>
                         </li>
                         <li class="toc-item">
                             <a href="#precautions">
-                                ⚠️ 주의사항
+                                ${tocItems.precautions}
                             </a>
                         </li>
                         <li class="toc-item">
                             <a href="#troubleshooting">
-                                🔧 문제해결
+                                ${tocItems.troubleshooting}
                             </a>
                         </li>
                         <li class="toc-item">
                             <a href="#faq">
-                                ❓ FAQ
+                                ${tocItems.faq}
                             </a>
                         </li>
                     </ul>
@@ -847,14 +901,17 @@ function generateCoverPageHTML(data: HybridManualData): string {
 }
 
 // 🎯 기본 사용법 페이지 HTML 생성
-function generateBasicUsagePageHTML(data: HybridManualData): string {
+function generateBasicUsagePageHTML(data: HybridManualData, language?: string): string {
+  const isChinese = language === 'zh-ko';
+  const basicUsageTitle = isChinese ? '📱 基本使用方法' : '📱 기본 사용법';
+  
   return `
     <!DOCTYPE html>
     <html lang="ko">
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>기본 사용법</title>
+        <title>${basicUsageTitle}</title>
         <style>
             body {
                 margin: 0;
@@ -929,7 +986,7 @@ function generateBasicUsagePageHTML(data: HybridManualData): string {
     </head>
     <body>
         <div class="manual-section">
-            <div class="section-title">📱 기본 사용법</div>
+            <div class="section-title">${basicUsageTitle}</div>
             
                          <div class="content-text">
                  <h3>🎯 ${data.basicUsage.basicGestures.title}</h3>
@@ -947,14 +1004,17 @@ function generateBasicUsagePageHTML(data: HybridManualData): string {
 }
 
 // 🎯 주의사항 페이지 HTML 생성
-function generatePrecautionsPageHTML(data: HybridManualData): string {
+function generatePrecautionsPageHTML(data: HybridManualData, language?: string): string {
+  const isChinese = language === 'zh-ko';
+  const precautionsTitle = isChinese ? '⚠️ 注意事项' : '⚠️ 주의사항';
+  
   return `
     <!DOCTYPE html>
     <html lang="ko">
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>주의사항</title>
+        <title>${precautionsTitle}</title>
         <style>
             body {
                 margin: 0;
@@ -1028,7 +1088,7 @@ function generatePrecautionsPageHTML(data: HybridManualData): string {
     </head>
     <body>
         <div class="manual-section">
-            <div class="section-title">⚠️ 주의사항</div>
+            <div class="section-title">${precautionsTitle}</div>
             
                          <div class="precaution-item">
                  <div class="precaution-header">🔋 ${data.precautions.batteryManagement.title}</div>
@@ -1062,14 +1122,17 @@ function generatePrecautionsPageHTML(data: HybridManualData): string {
 }
 
 // 🎯 문제해결 페이지 HTML 생성
-function generateTroubleshootingPageHTML(data: HybridManualData): string {
+function generateTroubleshootingPageHTML(data: HybridManualData, language?: string): string {
+  const isChinese = language === 'zh-ko';
+  const troubleshootingTitle = isChinese ? '🔧 问题解决' : '🔧 문제해결';
+  
   return `
     <!DOCTYPE html>
     <html lang="ko">
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>문제해결</title>
+        <title>${troubleshootingTitle}</title>
         <style>
             body {
                 margin: 0;
@@ -1135,7 +1198,7 @@ function generateTroubleshootingPageHTML(data: HybridManualData): string {
     </head>
     <body>
         <div class="manual-section">
-            <div class="section-title">🔧 문제해결</div>
+            <div class="section-title">${troubleshootingTitle}</div>
             
                          ${data.troubleshooting.map(item => `
                  <div class="trouble-item">
@@ -1153,14 +1216,17 @@ function generateTroubleshootingPageHTML(data: HybridManualData): string {
 }
 
 // 🎯 FAQ 페이지 HTML 생성
-function generateFAQPageHTML(data: HybridManualData): string {
+function generateFAQPageHTML(data: HybridManualData, language?: string): string {
+  const isChinese = language === 'zh-ko';
+  const faqTitle = isChinese ? '❓ 常见问题' : '❓ 자주 묻는 질문';
+  
   return `
     <!DOCTYPE html>
     <html lang="ko">
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>FAQ</title>
+        <title>${faqTitle}</title>
         <style>
             body {
                 margin: 0;
@@ -1217,7 +1283,7 @@ function generateFAQPageHTML(data: HybridManualData): string {
     </head>
     <body>
         <div class="manual-section">
-            <div class="section-title">❓ 자주 묻는 질문</div>
+            <div class="section-title">${faqTitle}</div>
             
             ${data.faq.map(item => `
                 <div class="faq-item">

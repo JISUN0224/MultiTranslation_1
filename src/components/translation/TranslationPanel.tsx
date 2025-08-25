@@ -114,12 +114,14 @@ const TranslationPanel: React.FC<TranslationPanelProps> = ({ sourceText, content
         />
 
         {/* 피드백 섹션 */}
-        <FeedbackSection
-          feedback={feedback || undefined}
-          isVisible={showFeedback}
-          onShowReference={() => setShowReference(!showReference)}
-          showReference={showReference}
-        />
+        <div data-testid="feedback-section">
+          <FeedbackSection
+            feedback={feedback || undefined}
+            isVisible={showFeedback}
+            onShowReference={() => setShowReference(!showReference)}
+            showReference={showReference}
+          />
+        </div>
       </div>
 
       {/* 복사 성공 알림 */}

@@ -7,6 +7,8 @@ import ContentTypeSelector from '../components/intro/ContentTypeSelector';
 import TopicInput from '../components/intro/TopicInput';
 import GenerationProgress from '../components/intro/GenerationProgress';
 import { Tour } from '../components/UI/Tour';
+import { useTutorial } from '../hooks/useTutorial';
+import { tutorialConfigs } from '../data/tutorials';
 
 const IntroPage: React.FC = () => {
   const navigate = useNavigate();
@@ -18,68 +20,16 @@ const IntroPage: React.FC = () => {
   const [difficulty, setDifficulty] = useState<'beginner' | 'intermediate' | 'advanced'>('intermediate');
   const [language, setLanguage] = useState<'ko-zh' | 'zh-ko'>('ko-zh');
   
-  // 튜토리얼 상태
-  const [showTour, setShowTour] = useState(false);
-
   // 폼 유효성 검사
   const isFormValid = topic.trim().length > 0;
 
-  // 튜토리얼 단계 정의
-  const tourSteps = [
-    {
-      id: 'content-type',
-      title: '콘텐츠 타입 선택 📝',
-      description: 'PPT 또는 설명서 중 원하는 콘텐츠 타입을 선택하세요. 각각 다른 스타일의 번역 연습을 제공합니다.',
-      targetSelector: '[data-testid="content-type-section"]',
-      padding: 15
-    },
-    {
-      id: 'topic-input',
-      title: '주제 입력 💡',
-      description: '번역 연습하고 싶은 주제를 입력하세요. 예: 스마트폰, 갤럭시 워치, 넷플릭스 등',
-      targetSelector: '[data-testid="topic-input-field"]',
-      padding: 15
-    },
-    {
-      id: 'options',
-      title: '옵션 설정 ⚙️',
-      description: '난이도와 생성 언어를 선택하세요. 한국어→중국어 또는 중국어→한국어 번역 연습이 가능합니다.',
-      targetSelector: '[data-testid="options-section"]',
-      padding: 15
-    },
-    {
-      id: 'generate',
-      title: '콘텐츠 생성 🚀',
-      description: '모든 설정이 완료되면 "콘텐츠 생성하기" 버튼을 클릭하세요. AI가 자동으로 번역 연습용 콘텐츠를 만들어줍니다.',
-      targetSelector: '[data-testid="generate-button"]',
-      padding: 10
-    }
-  ];
+  // 튜토리얼 훅 사용
+  const tutorial = useTutorial(tutorialConfigs.intro);
 
   // 튜토리얼 시작
   const handleStartTour = () => {
-    setShowTour(true);
+    tutorial.startTutorial();
   };
-
-  // 튜토리얼 종료
-  const handleTourClose = (opts?: { dontShowAgain?: boolean }) => {
-    setShowTour(false);
-    if (opts?.dontShowAgain) {
-      localStorage.setItem('tourCompleted', 'true');
-    }
-  };
-
-  // 컴포넌트 마운트 시 튜토리얼 체크
-  useEffect(() => {
-    const tourCompleted = localStorage.getItem('tourCompleted');
-    if (!tourCompleted) {
-      // 페이지 로드 후 2초 뒤에 자동으로 튜토리얼 시작
-      const timer = setTimeout(() => {
-        setShowTour(true);
-      }, 2000);
-      return () => clearTimeout(timer);
-    }
-  }, []);
 
   // 콘텐츠 생성 핸들러
   const handleGenerateContent = async () => {
@@ -179,14 +129,16 @@ const IntroPage: React.FC = () => {
 
             {/* 2단계: 주제 및 옵션 입력 */}
             <div data-testid="topic-input-section">
-              <TopicInput
-                topic={topic}
-                onTopicChange={setTopic}
-                difficulty={difficulty}
-                onDifficultyChange={setDifficulty}
-                language={language}
-                onLanguageChange={setLanguage}
-              />
+              <div data-testid="topic-input-field">
+                <TopicInput
+                  topic={topic}
+                  onTopicChange={setTopic}
+                  difficulty={difficulty}
+                  onDifficultyChange={setDifficulty}
+                  language={language}
+                  onLanguageChange={setLanguage}
+                />
+              </div>
             </div>
           </div>
 
@@ -256,9 +208,9 @@ const IntroPage: React.FC = () => {
 
       {/* 튜토리얼 */}
       <Tour
-        steps={tourSteps}
-        visible={showTour}
-        onClose={handleTourClose}
+        steps={tutorial.steps}
+        visible={tutorial.isVisible}
+        onClose={tutorial.closeTutorial}
       />
     </div>
   );

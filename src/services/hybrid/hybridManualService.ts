@@ -3,12 +3,21 @@
 
 import { ContentRequest, GeneratedContent, ContentType } from '../../types';
 
+// 언어에 따른 섹션 제목 생성 함수
+const getSectionTitles = (language: string): string[] => {
+  if (language === 'zh-ko') {
+    return ['基本使用方法', '注意事项', '问题解决', '常见问题'];
+  }
+  return ['기본 사용법', '주의사항', '문제해결', 'FAQ'];
+};
+
 // 하이브리드 설명서 데이터 타입
 interface HybridManualData {
   title: string;
   subtitle: string;
   version: string;
   date: string;
+  language?: string;
   basicUsage: {
     initialSetup: {
       title: string;
@@ -33,7 +42,7 @@ interface HybridManualData {
       tips: string[];
     };
     waterproofPrecautions: {
-      title: string;
+    title: string;
       description: string;
       tips: string[];
     };
@@ -207,7 +216,7 @@ ${languageInstruction}. 모든 텍스트 내용을 반드시 ${targetLanguage}�
   },
      "troubleshooting": ${JSON.stringify(exampleContent.troubleshooting)},
    "faq": ${JSON.stringify(exampleContent.faq)}
- }
+}
 
 **중요한 요구사항:**
 - 주제: ${request.topic}
@@ -258,9 +267,16 @@ export const generateHybridManual = async (
     const templateType = 'user-guide';
     
     onProgress?.(70, '📖 슬라이드 형태 매뉴얼 생성 중...');
+    
+    console.log('🔍 AI 데이터 언어 확인:', {
+      aiDataLanguage: aiData.language,
+      requestLanguage: request.language,
+      aiDataKeys: Object.keys(aiData)
+    });
+    
     // 🔥 슬라이드 형태로 분할 생성
     const manualSlides = await generateManualSlides(aiData, templateType, request);
-    const fullManualHTML = await generateManualWithTemplate(aiData, templateType);
+    const fullManualHTML = await generateManualWithTemplate(aiData, templateType, request.language);
     
     onProgress?.(90, '✨ 최종 검토 및 최적화...');
     
@@ -275,7 +291,7 @@ export const generateHybridManual = async (
         content: fullManualHTML,
         category: 'user-guide',
         templateType: templateType,
-        sections: ['기본 사용법', '주의사항', '문제해결', 'FAQ'],
+        sections: getSectionTitles(request.language),
         totalSections: manualSlides.length,
         slides: manualSlides
       },
@@ -340,7 +356,7 @@ async function callGeminiForManual(prompt: string, request: ContentRequest): Pro
   }
 }
 
-// 🔧 개선된 JSON 파싱 함수
+// 🔧 완전히 새로운 JSON 파싱 함수 - 안전하고 확실한 방식
 function parseManualJSON(responseText: string, language?: string): HybridManualData {
   try {
     // 1. 마크다운 코드 블록 제거
@@ -355,77 +371,41 @@ function parseManualJSON(responseText: string, language?: string): HybridManualD
       throw new Error('JSON을 찾을 수 없음');
     }
     
-    // 3. JSON 정리
-    let jsonText = jsonMatch[0]
-      // 유니코드 인용부호 정규화
+    let jsonText = jsonMatch[0];
+    
+    // 3. 기본 정리
+    jsonText = jsonText
       .replace(/[\u201C\u201D]/g, '"')
       .replace(/[\u2018\u2019]/g, "'")
       .replace(/[\u2013\u2014]/g, '-')
       .replace(/[\u2026]/g, '...')
-      // 후행 쉼표 제거
       .replace(/,(\s*[}\]])/g, '$1')
-      // 이스케이프된 개행 문자 처리
       .replace(/\\n/g, '\\n')
-      // 중복된 따옴표 제거 (AI가 생성한 잘못된 JSON 수정)
       .replace(/""/g, '"')
-      // 잘못된 쉼표 제거
       .replace(/,\s*}/g, '}')
       .replace(/,\s*]/g, ']');
     
-    // 4. 잘린 JSON 복구 시도
-    if (!jsonText.trim().endsWith('}')) {
-      console.log('🔧 잘린 JSON 감지, 복구 시도...');
-      
-      // 마지막 완전한 속성까지만 사용
-      const lastCommaIndex = jsonText.lastIndexOf(',');
-      const lastValidEndIndex = jsonText.lastIndexOf('}', lastCommaIndex);
-      
-      if (lastValidEndIndex > 0) {
-        jsonText = jsonText.substring(0, lastValidEndIndex + 1);
-      } else {
-        // 기본 구조로 마무리
-        if (!jsonText.includes('"appendix"')) {
-          jsonText = jsonText.replace(/,?\s*$/, '') + ',"appendix":{"version":"1.0","lastUpdated":"' + new Date().toISOString().split('T')[0] + '"}}';
-        } else if (!jsonText.trim().endsWith('}')) {
-          jsonText = jsonText.replace(/,?\s*$/, '') + '}';
-        }
-      }
-    }
-    
     console.log('🔧 정리된 JSON (앞부분):', jsonText.substring(0, 500) + '...');
     
-    // 추가 JSON 복구 시도
+    // 4. 첫 번째 파싱 시도
     try {
       const parsed = JSON.parse(jsonText);
+      
+      // 언어 필드 변환
+      if (parsed.language) {
+        if (parsed.language === 'zh-CN' || parsed.language === 'zh') {
+          parsed.language = 'zh-ko';
+        } else if (parsed.language === 'ko-KR' || parsed.language === 'ko') {
+          parsed.language = 'ko-zh';
+        }
+      }
+      
       return createValidatedManualData(parsed);
     } catch (parseError) {
-      console.log('🔧 JSON 파싱 실패, 추가 복구 시도...');
+      console.log('🔧 JSON 파싱 실패, 잘린 부분 제거 시도...', parseError);
       
-             // 더 강력한 복구 로직
-       jsonText = jsonText
-         // 잘못된 배열 요소 수정
-         .replace(/([^"])\s*,\s*([^"]\s*[}\]])/g, '$1$2')
-         // 잘못된 객체 속성 수정
-         .replace(/([^"])\s*,\s*([^"]\s*})/g, '$1$2')
-         // 중복된 속성 제거
-         .replace(/"([^"]+)"\s*:\s*[^,}]+,\s*"([^"]+)"\s*:\s*[^,}]+/g, (match, key1, key2) => {
-           if (key1 === key2) {
-             return match.replace(/,\s*"[^"]+"\s*:\s*[^,}]+/, '');
-           }
-           return match;
-         })
-         // 배열 요소 사이 누락된 쉼표 추가 (객체 배열)
-         .replace(/}\s*{/g, '},{')
-         // 배열 요소 사이 누락된 쉼표 추가 (문자열 배열)
-         .replace(/"\s*"/g, '","')
-         // 배열 끝에 잘못된 쉼표 제거
-         .replace(/,\s*([}\]])/g, '$1')
-         // 객체 속성 사이 누락된 쉼표 추가
-         .replace(/"\s*:\s*[^,}]+"\s*"/g, (match) => {
-           return match.replace(/"\s*"/g, '","');
-         });
-      
-      console.log('🔧 복구된 JSON (앞부분):', jsonText.substring(0, 500) + '...');
+      // 5. 잘린 부분 안전 제거
+      jsonText = safeRemoveIncomplete(jsonText);
       
       try {
         const parsed = JSON.parse(jsonText);
@@ -441,27 +421,247 @@ function parseManualJSON(responseText: string, language?: string): HybridManualD
     console.error('원본 응답 텍스트:', responseText.substring(0, 1000) + '...');
     
     // 백업 파싱 시도
-    try {
-      console.log('🔧 백업 파싱 시도...');
-      
-      // 간단한 정규식으로 주요 필드만 추출
-      const titleMatch = responseText.match(/"title"\s*:\s*"([^"]+)"/);
-      const subtitleMatch = responseText.match(/"subtitle"\s*:\s*"([^"]+)"/);
-      
-      if (titleMatch || subtitleMatch) {
-        console.log('✅ 부분 파싱 성공');
-        // AI가 생성한 실제 제목 사용 (중국어인 경우)
-        const extractedTitle = titleMatch?.[1] || subtitleMatch?.[1] || '사용자 가이드';
-        return createFallbackManualData(extractedTitle, language);
-      }
-      
-    } catch (backupError) {
-      console.error('🚨 백업 파싱도 실패:', backupError);
+    return attemptBackupParsing(responseText, language);
+  }
+}
+
+// 🛡️ 안전한 잘린 부분 제거 함수
+function safeRemoveIncomplete(jsonText: string): string {
+  console.log('🔧 잘린 부분 간단 제거 시작...');
+  
+  let result = jsonText;
+  
+  // 1. 마지막 불완전한 부분 제거 - 뒤에서부터 안전한 지점 찾기
+  let lastSafeIndex = -1;
+  let braceDepth = 0;
+  let bracketDepth = 0;
+  let inString = false;
+  
+  for (let i = 0; i < result.length; i++) {
+    const char = result[i];
+    const prevChar = i > 0 ? result[i - 1] : '';
+    
+    if (char === '"' && prevChar !== '\\') {
+      inString = !inString;
+      continue;
     }
     
-    console.log('🔄 완전 폴백 모드...');
-    return createFallbackManualData(undefined, language);
+    if (!inString) {
+      switch (char) {
+        case '{':
+          braceDepth++;
+          break;
+        case '}':
+          braceDepth--;
+          if (braceDepth >= 0 && bracketDepth >= 0) {
+            lastSafeIndex = i;
+          }
+          break;
+        case '[':
+          bracketDepth++;
+          break;
+        case ']':
+          bracketDepth--;
+          if (braceDepth >= 0 && bracketDepth >= 0) {
+            lastSafeIndex = i;
+          }
+          break;
+        case ',':
+          if (braceDepth >= 0 && bracketDepth >= 0) {
+            lastSafeIndex = i;
+          }
+          break;
+      }
+    }
   }
+  
+  // 2. 마지막 안전한 지점까지 자르기
+  if (lastSafeIndex > 0) {
+    result = result.substring(0, lastSafeIndex + 1);
+  }
+  
+  // 3. 필요한 닫는 괄호 추가
+  const openBraces = (result.match(/\{/g) || []).length;
+  const closeBraces = (result.match(/\}/g) || []).length;
+  const openBrackets = (result.match(/\[/g) || []).length;
+  const closeBrackets = (result.match(/\]/g) || []).length;
+  
+  for (let i = 0; i < (openBrackets - closeBrackets); i++) {
+    result += ']';
+  }
+  for (let i = 0; i < (openBraces - closeBraces); i++) {
+    result += '}';
+  }
+  
+  // 4. 마지막 쉼표 정리
+  result = result
+    .replace(/,(\s*[}\]])/g, '$1')
+    .replace(/,\s*$/, '');
+  
+  console.log('🔧 잘린 부분 제거 완료');
+  return result;
+}
+
+// 🎯 백업 파싱 - 실제 AI 콘텐츠 최대한 활용
+function attemptBackupParsing(responseText: string, language?: string): HybridManualData {
+  console.log('🔧 백업 파싱 시도...');
+  
+  try {
+    // 주요 필드들 정확히 추출
+    const titleMatch = responseText.match(/"title"\s*:\s*"([^"]+)"/);
+    const subtitleMatch = responseText.match(/"subtitle"\s*:\s*"([^"]+)"/);
+    const versionMatch = responseText.match(/"version"\s*:\s*"([^"]+)"/);
+    const dateMatch = responseText.match(/"date"\s*:\s*"([^"]+)"/);
+    
+    // gestures 압축 형태에서 추출
+    const gesturePattern = /\{\s*"name"\s*:\s*"([^"]+)",\s*"description"\s*:\s*"([^"]+)"\s*\}/g;
+    const gestureMatches = [...responseText.matchAll(gesturePattern)];
+    
+    // steps 배열 추출
+    const stepsPattern = /"steps"\s*:\s*\[\s*([\s\S]*?)\s*\]/g;
+    const stepsMatches = [...responseText.matchAll(stepsPattern)];
+    const allSteps: string[][] = [];
+    
+    stepsMatches.forEach(match => {
+      const stepItems = match[1].match(/"([^"]+)"/g);
+      if (stepItems) {
+        allSteps.push(stepItems.map(item => item.replace(/"/g, '')).slice(0, 4));
+      }
+    });
+    
+    // tips 배열들 추출
+    const tipsPattern = /"tips"\s*:\s*\[\s*([\s\S]*?)\s*\]/g;
+    const tipsMatches = [...responseText.matchAll(tipsPattern)];
+    const allTips: string[][] = [];
+    
+    tipsMatches.forEach(match => {
+      const tipItems = match[1].match(/"([^"]+)"/g);
+      if (tipItems) {
+        allTips.push(tipItems.map(item => item.replace(/"/g, '')).slice(0, 4));
+      }
+    });
+    
+    // FAQ 질문과 답변 모두 추출
+    const faqBlockPattern = /"question"\s*:\s*"([^"]+)",\s*"answer"\s*:\s*"([^"]+)"/g;
+    const faqMatches = [...responseText.matchAll(faqBlockPattern)];
+    const extractedFAQs = faqMatches.map(match => ({
+      question: match[1],
+      answer: match[2]
+    }));
+    
+    // Troubleshooting 문제와 솔루션 모두 추출
+    const troubleBlockPattern = /"problem"\s*:\s*"([^"]+)",\s*"solution"\s*:\s*\[\s*([^\]]+)\s*\]/g;
+    const troubleMatches = [...responseText.matchAll(troubleBlockPattern)];
+    const extractedTroubles = troubleMatches.map(match => ({
+      problem: match[1],
+      solution: match[2].match(/"([^"]+)"/g)?.map(s => s.replace(/"/g, '')) || ['해결방법']
+    }));
+    
+    if (titleMatch) {
+      console.log('✅ 부분 파싱 성공 - 실제 AI 콘텐츠 활용');
+      
+      const extractedInfo = {
+        title: titleMatch[1],
+        subtitle: subtitleMatch?.[1],
+        version: versionMatch?.[1] || '1.0',
+        date: dateMatch?.[1] || new Date().toLocaleDateString(),
+        steps: allSteps.length > 0 ? allSteps[0] : undefined,
+        gestures: gestureMatches.map(match => ({
+          name: match[1],
+          description: match[2]
+        })).slice(0, 4),
+        tips: allTips,
+        troubles: extractedTroubles.slice(0, 3),
+        faqs: extractedFAQs.slice(0, 3)
+      };
+      
+      return createEnhancedFallbackData(extractedInfo, language);
+    }
+    
+  } catch (backupError) {
+    console.error('🚨 백업 파싱도 실패:', backupError);
+  }
+  
+  console.log('🔄 완전 폴백 모드...');
+  return createFallbackManualData(undefined, language);
+}
+
+// 🎯 개선된 폴백 데이터 생성 - AI 콘텐츠 최대 활용
+function createEnhancedFallbackData(extractedInfo: any, language?: string): HybridManualData {
+  const isKorean = language === 'ko-zh';
+  
+  return {
+    title: extractedInfo.title,
+    subtitle: extractedInfo.subtitle || (isKorean ? '효과적인 사용 방법' : '有效的使用方法'),
+    version: extractedInfo.version,
+    date: extractedInfo.date,
+    basicUsage: {
+      initialSetup: {
+        title: isKorean ? "초기 설정" : "初始设置",
+        description: isKorean ? "초기 설정 방법" : "初始设置方法",
+        steps: extractedInfo.steps || (isKorean ? ["단계1", "단계2", "단계3", "단계4"] : ["步骤1", "步骤2", "步骤3", "步骤4"])
+      },
+      basicGestures: {
+        title: isKorean ? "기본 조작" : "基本操作",
+        description: isKorean ? "기본적인 조작 방법" : "基本操作方法说明",
+        gestures: extractedInfo.gestures.length > 0 ? extractedInfo.gestures : (isKorean ? [
+          {"name": "기본 조작1", "description": "기본 조작 방법의 상세 설명"},
+          {"name": "기본 조작2", "description": "기본 조작 방법의 상세 설명"},
+          {"name": "기본 조작3", "description": "기본 조작 방법의 상세 설명"},
+          {"name": "기본 조작4", "description": "기본 조작 방법의 상세 설명"}
+        ] : [
+          {"name": "基本操作1", "description": "基本操作方法的详细说明"},
+          {"name": "基本操作2", "description": "基本操作方法的详细说明"},
+          {"name": "基本操作3", "description": "基本操作方法的详细说明"},
+          {"name": "基本操作4", "description": "基本操作方法的详细说明"}
+        ])
+      },
+      watchfaceCustomization: {
+        title: isKorean ? "개인화 설정" : "个性化设置",
+        description: isKorean ? "개인 취향에 맞는 설정" : "个人喜好设置",
+        steps: isKorean ? ["설정1", "설정2", "설정3", "설정4"] : ["设置1", "设置2", "设置3", "设置4"]
+      }
+    },
+    precautions: {
+      batteryManagement: {
+        title: isKorean ? "유지보수" : "维护保养",
+        description: isKorean ? "유지보수 주의사항" : "维护保养注意事项",
+        tips: extractedInfo.tips[0] || (isKorean ? ["팁1", "팁2", "팁3", "팁4"] : ["提示1", "提示2", "提示3", "提示4"])
+      },
+      waterproofPrecautions: {
+        title: isKorean ? "사용 주의사항" : "使用注意事项",
+        description: isKorean ? "사용시 주의사항" : "使用注意事项",
+        tips: extractedInfo.tips[1] || (isKorean ? ["주의1", "주의2", "주의3", "주의4"] : ["注意1", "注意2", "注意3", "注意4"])
+      },
+      smartphoneConnection: {
+        title: isKorean ? "연결 및 동기화" : "连接与同步",
+        description: isKorean ? "연결 및 동기화 방법" : "连接与同步方法",
+        tips: extractedInfo.tips[2] || (isKorean ? ["연결1", "연결2", "연결3", "연결4"] : ["连接1", "连接2", "连接3", "连接4"])
+      }
+    },
+    troubleshooting: extractedInfo.troubles.length > 0 ? 
+      extractedInfo.troubles : 
+      (isKorean ? [
+        { problem: "일반적인 문제1", solution: ["해결1", "해결2", "해결3"] },
+        { problem: "일반적인 문제2", solution: ["해결1", "해결2", "해결3"] },
+        { problem: "일반적인 문제3", solution: ["해결1", "해결2", "해결3"] }
+      ] : [
+        { problem: "常见问题1", solution: ["解决1", "解决2", "解决3"] },
+        { problem: "常见问题2", solution: ["解决1", "解决2", "解决3"] },
+        { problem: "常见问题3", solution: ["解决1", "解决2", "解决3"] }
+      ]),
+    faq: extractedInfo.faqs.length > 0 ?
+      extractedInfo.faqs :
+      (isKorean ? [
+        { question: "질문1", answer: "답변1" },
+        { question: "질문2", answer: "답변2" },
+        { question: "질문3", answer: "답변3" }
+      ] : [
+        { question: "问题1", answer: "回答1" },
+        { question: "问题2", answer: "回答2" },
+        { question: "问题3", answer: "回答3" }
+      ])
+  };
 }
 
 // 🔧 검증된 매뉴얼 데이터 생성 (새로운 HybridManualData 구조)
@@ -531,16 +731,16 @@ function createValidatedManualData(parsed: any): HybridManualData {
   };
 }
 
-// 🔧 폴백 매뉴얼 데이터 생성
-function createFallbackManualData(topic?: string, language?: string): HybridManualData {
-  const topicName = topic || '제품';
+// 🔧 폴백 매뉴얼 데이터 생성 - 추출된 정보 활용
+function createFallbackManualData(topic?: string, language?: string, extractedInfo?: any): HybridManualData {
+  const topicName = extractedInfo?.title || topic || '제품';
   const isKorean = language === 'ko-zh';
   
   return {
-    title: isKorean ? `${topicName} 사용자 가이드` : `${topicName} 用户指南`,
-    subtitle: isKorean ? `${topicName}를 효과적으로 사용하는 방법` : `${topicName}的有效使用方法`,
-    version: "1.0",
-    date: new Date().toLocaleDateString(isKorean ? 'ko-KR' : 'zh-CN'),
+    title: extractedInfo?.title || (isKorean ? `${topicName} 사용자 가이드` : `${topicName} 用户指南`),
+    subtitle: extractedInfo?.subtitle || (isKorean ? `${topicName}를 효과적으로 사용하는 방법` : `${topicName}的有效使用方法`),
+    version: extractedInfo?.version || "1.0",
+    date: extractedInfo?.date || new Date().toLocaleDateString(isKorean ? 'ko-KR' : 'zh-CN'),
     basicUsage: {
       initialSetup: {
         title: isKorean ? "초기 설정" : "初始设置",
@@ -550,7 +750,7 @@ function createFallbackManualData(topic?: string, language?: string): HybridManu
       basicGestures: {
         title: isKorean ? "기본 조작" : "基本操作",
         description: isKorean ? `${topicName}의 기본적인 조작 방법을 설명합니다` : `${topicName}的基本操作方法说明`,
-        gestures: isKorean ? [
+        gestures: extractedInfo?.gestures || (isKorean ? [
           {"name": "기본 조작1", "description": "기본 조작 방법의 상세 설명"},
           {"name": "기본 조작2", "description": "기본 조작 방법의 상세 설명"},
           {"name": "기본 조작3", "description": "기본 조작 방법의 상세 설명"},
@@ -560,7 +760,7 @@ function createFallbackManualData(topic?: string, language?: string): HybridManu
           {"name": "基本操作2", "description": "基本操作方法的详细说明"},
           {"name": "基本操作3", "description": "基本操作方法的详细说明"},
           {"name": "基本操作4", "description": "基本操作方法的详细说明"}
-        ]
+        ])
       },
       watchfaceCustomization: {
         title: isKorean ? "개인화 설정" : "个性化设置",
@@ -607,9 +807,9 @@ function createFallbackManualData(topic?: string, language?: string): HybridManu
 }
 
 // 🎨 템플릿 기반 매뉴얼 HTML 생성
-async function generateManualWithTemplate(data: HybridManualData, templateType: string): Promise<string> {
+async function generateManualWithTemplate(data: HybridManualData, templateType: string, language?: string): Promise<string> {
   const { getManualTemplate } = await import('./templates/manualTemplateEngine');
-  return getManualTemplate(data);
+  return getManualTemplate(data, language);
 }
 
 // 🔥 슬라이드 형태 매뉴얼 생성 함수
@@ -696,7 +896,7 @@ function createManualFallback(request: ContentRequest): GeneratedContent {
       <div style="margin-bottom: 30px; padding: 20px; border-left: 4px solid #e74c3c; background: white;">
         <h3 style="color: #2c3e50; margin-bottom: 15px;">주의사항</h3>
         <p>${fallbackData.precautions.batteryManagement.description}</p>
-      </div>
+        </div>
       <div style="margin-bottom: 30px; padding: 20px; border-left: 4px solid #f39c12; background: white;">
         <h3 style="color: #2c3e50; margin-bottom: 15px;">문제해결</h3>
         <p>${fallbackData.troubleshooting[0]?.problem || '일반적인 문제'}</p>
@@ -704,7 +904,7 @@ function createManualFallback(request: ContentRequest): GeneratedContent {
       <div style="margin-bottom: 30px; padding: 20px; border-left: 4px solid #27ae60; background: white;">
         <h3 style="color: #2c3e50; margin-bottom: 15px;">FAQ</h3>
         <p>${fallbackData.faq[0]?.question || '자주 묻는 질문'}</p>
-      </div>
+        </div>
     </div>
   `;
   
@@ -818,21 +1018,21 @@ function generateDynamicContent(type: string, topic: string, language?: string):
         return `${topicKeyword}에 대한 유용한 정보와 사용 방법을 알아봅니다.`;
     }
   } else {
-    switch (type) {
-      case 'basic':
-        return `了解${topicKeyword}的基本组成部分和基本操作方法。`;
-      
-      case 'advanced':
-        return `了解${topicKeyword}的个性化设置和高效使用的高级功能。`;
-      
-      case 'troubleshooting':
-        return `了解${topicKeyword}使用中常见问题及其解决方法。`;
-      
-      case 'faq':
-        return `查看关于${topicKeyword}的常见问题和答案，以及其他有用信息。`;
-      
-      default:
-        return `了解关于${topicKeyword}的有用信息和使用方法。`;
+  switch (type) {
+    case 'basic':
+      return `了解${topicKeyword}的基本组成部分和基本操作方法。`;
+    
+    case 'advanced':
+      return `了解${topicKeyword}的个性化设置和高效使用的高级功能。`;
+    
+    case 'troubleshooting':
+      return `了解${topicKeyword}使用中常见问题及其解决方法。`;
+    
+    case 'faq':
+      return `查看关于${topicKeyword}的常见问题和答案，以及其他有用信息。`;
+    
+    default:
+      return `了解关于${topicKeyword}的有用信息和使用方法。`;
     }
   }
 }

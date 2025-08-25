@@ -257,7 +257,7 @@ const PPTTemplate: React.FC<PPTTemplateProps> = ({ data, currentSection, navigat
   };
 
   return (
-    <div className="h-full flex flex-col">
+    <div className="h-full flex flex-col" data-testid="ppt-container">
       {/* 헤더 */}
       <div className="p-6 border-b border-gray-200 bg-gradient-to-r from-blue-600 to-purple-600 text-white">
         <h2 className="text-lg font-semibold mb-1">{data.title}</h2>
@@ -273,6 +273,7 @@ const PPTTemplate: React.FC<PPTTemplateProps> = ({ data, currentSection, navigat
             <div 
               className="relative w-full max-w-2xl mx-auto bg-gradient-to-br from-blue-900 via-indigo-800 to-purple-900 rounded-2xl shadow-2xl overflow-hidden border-4 border-white"
               style={{ aspectRatio: '16/9', minHeight: '600px' }}
+              data-testid="slide-content"
             >
             {/* 배경 효과 */}
             <div className="absolute inset-0 opacity-30">
@@ -296,7 +297,7 @@ const PPTTemplate: React.FC<PPTTemplateProps> = ({ data, currentSection, navigat
       </div>
 
       {/* 네비게이션 */}
-      <div className="p-6 border-t border-gray-200 bg-white flex items-center justify-between">
+      <div className="p-6 border-t border-gray-200 bg-white flex items-center justify-between" data-testid="slide-navigation">
         <button
           onClick={navigation.onPrevious}
           disabled={navigation.currentSection === 0}
