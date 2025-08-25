@@ -4,97 +4,54 @@
 interface HybridManualData {
   title: string;
   subtitle: string;
-  category: 'technical' | 'user-guide' | 'tutorial' | 'reference' | 'troubleshooting';
-  overview: {
-    purpose: string;
-    audience: string;
-    requirements: string[];
-  };
-  sections: Array<{
-    id: string;
-    title: string;
-    content: string;
-    type: 'text' | 'steps' | 'warning' | 'note' | 'example';
-    subsections?: Array<{
+  version: string;
+  date: string;
+  basicUsage: {
+    initialSetup: {
       title: string;
-      content: string;
-    }>;
-  }>;
-  troubleshooting?: Array<{
+      description: string;
+      steps: string[];
+    };
+    basicGestures: {
+    title: string;
+      description: string;
+      gestures: Array<{ name: string; description: string; }>;
+    };
+    watchfaceCustomization: {
+      title: string;
+      description: string;
+      steps: string[];
+    };
+  };
+  precautions: {
+    batteryManagement: {
+      title: string;
+      description: string;
+      tips: string[];
+    };
+    waterproofPrecautions: {
+      title: string;
+      description: string;
+      tips: string[];
+    };
+    smartphoneConnection: {
+      title: string;
+      description: string;
+      tips: string[];
+    };
+  };
+  troubleshooting: Array<{
     problem: string;
-    solution: string;
-    severity: 'low' | 'medium' | 'high';
+    solution: string[];
   }>;
-  faq?: Array<{
+  faq: Array<{
     question: string;
     answer: string;
   }>;
-  appendix?: {
-    glossary?: Array<{ term: string; definition: string; }>;
-    references?: string[];
-    version: string;
-    lastUpdated: string;
-  };
 }
 
-// 🎨 카테고리별 테마 색상
-const manualThemes = {
-  technical: {
-    primary: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-    secondary: '#3498db',
-    accent: '#e74c3c',
-    success: '#27ae60',
-    warning: '#f39c12',
-    danger: '#e74c3c',
-    background: '#f8f9fa',
-    text: '#2c3e50'
-  },
-  'user-guide': {
-    primary: 'linear-gradient(135deg, #74b9ff 0%, #0984e3 100%)',
-    secondary: '#00b894',
-    accent: '#fd79a8',
-    success: '#00b894',
-    warning: '#fdcb6e',
-    danger: '#e17055',
-    background: '#ffffff',
-    text: '#2d3436'
-  },
-  tutorial: {
-    primary: 'linear-gradient(135deg, #a29bfe 0%, #6c5ce7 100%)',
-    secondary: '#fd79a8',
-    accent: '#fdcb6e',
-    success: '#00b894',
-    warning: '#e17055',
-    danger: '#d63031',
-    background: '#f1f2f6',
-    text: '#2f3542'
-  },
-  reference: {
-    primary: 'linear-gradient(135deg, #2d3436 0%, #636e72 100%)',
-    secondary: '#74b9ff',
-    accent: '#fd79a8',
-    success: '#00b894',
-    warning: '#fdcb6e',
-    danger: '#e84393',
-    background: '#ffffff',
-    text: '#2d3436'
-  },
-  troubleshooting: {
-    primary: 'linear-gradient(135deg, #e17055 0%, #d63031 100%)',
-    secondary: '#74b9ff',
-    accent: '#fdcb6e',
-    success: '#00b894',
-    warning: '#e17055',
-    danger: '#d63031',
-    background: '#fff5f5',
-    text: '#2d3436'
-  }
-};
-
 // 🎯 메인 템플릿 생성 함수
-export const getManualTemplate = (data: HybridManualData, templateType: string): string => {
-  const theme = manualThemes[data.category] || manualThemes['user-guide'];
-  
+export const getManualTemplate = (data: HybridManualData): string => {
   return `
 <!DOCTYPE html>
 <html lang="ko">
@@ -103,249 +60,6 @@ export const getManualTemplate = (data: HybridManualData, templateType: string):
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>${data.title}</title>
     <style>
-        ${getManualStyles(theme)}
-    </style>
-</head>
-<body>
-    <div class="manual-container">
-        ${createManualHeader(data, theme)}
-        ${createTableOfContents(data)}
-        ${createOverviewSection(data, theme)}
-        ${createMainSections(data, theme)}
-        ${createTroubleshootingSection(data, theme)}
-        ${createFAQSection(data, theme)}
-        ${createAppendixSection(data, theme)}
-        ${createManualFooter(data, theme)}
-    </div>
-    
-    <script>
-        ${getManualScripts()}
-    </script>
-</body>
-</html>
-  `;
-};
-
-// 🔥 슬라이드 형태 매뉴얼 템플릿 생성 함수
-export const getManualSlideTemplate = (data: any, templateType: string): string => {
-  const theme = manualThemes[data.category] || manualThemes['user-guide'];
-  const config = data.slideConfig;
-  
-  return `
-    <div style="
-      background: ${theme.primary};
-      color: white;
-      min-height: 600px;
-      padding: 40px;
-      font-family: 'Segoe UI', 'Malgun Gothic', sans-serif;
-      border-radius: 15px;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-      position: relative;
-      overflow: hidden;
-    ">
-      <!-- 배경 장식 -->
-      <div style="
-        position: absolute;
-        top: -50px;
-        right: -50px;
-        width: 200px;
-        height: 200px;
-        border-radius: 50%;
-        background: rgba(255,255,255,0.1);
-        animation: float 6s ease-in-out infinite;
-      "></div>
-      
-      ${generateSlideContent(config, theme)}
-      
-      <style>
-        @keyframes float {
-          0%, 100% { transform: translateY(0px); }
-          50% { transform: translateY(-20px); }
-        }
-        @keyframes fadeInUp {
-          from { opacity: 0; transform: translateY(30px); }
-          to { opacity: 1; transform: translateY(0); }
-        }
-        .slide-content {
-          animation: fadeInUp 0.8s ease-out;
-        }
-        .slide-item {
-          background: rgba(255,255,255,0.15);
-          margin: 15px 0;
-          padding: 20px;
-          border-radius: 10px;
-          backdrop-filter: blur(10px);
-          border-left: 4px solid ${theme.accent};
-        }
-        .slide-grid {
-          display: grid;
-          grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-          gap: 20px;
-          margin-top: 30px;
-        }
-      </style>
-    </div>
-  `;
-};
-
-// 🔥 슬라이드 콘텐츠 생성 함수
-function generateSlideContent(config: any, theme: any): string {
-  const { id, title, subtitle, type, content } = config;
-  
-  switch (type) {
-    case 'basic':
-      return `
-        <div class="slide-content" style="position: relative; z-index: 2; text-align: center;">
-          <h1 style="font-size: 3.5rem; margin-bottom: 20px; text-shadow: 2px 2px 8px rgba(0,0,0,0.3);">
-            ${title}
-          </h1>
-          <p style="font-size: 1.4rem; margin-bottom: 40px; opacity: 0.9;">${subtitle}</p>
-          
-          <div style="text-align: left; max-width: 800px; margin: 0 auto;">
-            <div class="slide-item">
-              <h3 style="font-size: 1.5rem; margin-bottom: 15px; color: #000000;">📌 목적</h3>
-              <p style="font-size: 1.1rem; line-height: 1.6;">${content.overview?.purpose || '이 가이드의 목적을 설명합니다.'}</p>
-            </div>
-            
-            <div class="slide-item">
-              <h3 style="font-size: 1.5rem; margin-bottom: 15px; color: #000000;">👥 대상 사용자</h3>
-              <p style="font-size: 1.1rem; line-height: 1.6;">${content.overview?.audience || '모든 사용자'}</p>
-            </div>
-            
-            <div class="slide-item">
-              <h3 style="font-size: 1.5rem; margin-bottom: 15px; color: #000000;">✅ 준비사항</h3>
-              <ul style="font-size: 1.1rem; line-height: 1.6;">
-                ${(content.overview?.requirements || ['기본적인 이해', '필요한 도구', '충분한 시간']).map((req: string) => `<li>${req}</li>`).join('')}
-              </ul>
-            </div>
-          </div>
-        </div>
-      `;
-      
-    case 'advanced':
-      return `
-        <div class="slide-content" style="position: relative; z-index: 2;">
-          <div style="text-align: center; margin-bottom: 40px;">
-            <h1 style="font-size: 3.5rem; margin-bottom: 20px; text-shadow: 2px 2px 8px rgba(0,0,0,0.3);">
-              ${title}
-            </h1>
-            <p style="font-size: 1.4rem; opacity: 0.9;">${subtitle}</p>
-          </div>
-          
-          <div class="slide-grid">
-            ${(content.sections || []).slice(0, 4).map((section: any, index: number) => `
-              <div class="slide-item">
-                <h3 style="font-size: 1.3rem; margin-bottom: 15px; color: #000000;">🔧 ${section.title || `고급 기능 ${index + 1}`}</h3>
-                <p style="font-size: 1rem; line-height: 1.6;">${section.content || '스마트폰을 더욱 효율적으로 사용할 수 있는 고급 기능들을 알아봅니다.'}</p>
-              </div>
-            `).join('')}
-          </div>
-          
-          <div style="text-align: center; margin-top: 40px;">
-            <div style="background: rgba(255,255,255,0.2); padding: 15px 30px; border-radius: 25px; backdrop-filter: blur(10px);">
-              💡 <strong>팁:</strong> 각 단계를 차근차근 따라해보며 익숙해져 보세요!
-            </div>
-          </div>
-        </div>
-      `;
-      
-    case 'troubleshooting':
-      return `
-        <div class="slide-content" style="position: relative; z-index: 2;">
-          <div style="text-align: center; margin-bottom: 40px;">
-            <h1 style="font-size: 3.5rem; margin-bottom: 20px; text-shadow: 2px 2px 8px rgba(0,0,0,0.3);">
-              ${title}
-            </h1>
-            <p style="font-size: 1.4rem; opacity: 0.9;">${subtitle}</p>
-          </div>
-          
-          <div style="max-width: 800px; margin: 0 auto;">
-            ${(content.troubleshooting || [
-              { problem: '기기가 느려요', solution: '불필요한 앱을 종료하고 재시작해보세요.', severity: 'medium' },
-              { problem: 'Wi-Fi가 연결되지 않아요', solution: 'Wi-Fi를 껐다 켜거나 공유기를 재시작해보세요.', severity: 'low' },
-              { problem: '배터리가 빨리 닳아요', solution: '화면 밝기를 낮추고 배터리 절약 모드를 사용하세요.', severity: 'medium' }
-            ]).map((item: any, index: number) => {
-              const severityColors = { high: '#e74c3c', medium: '#f39c12', low: '#27ae60' };
-              const severityColor = severityColors[item.severity as keyof typeof severityColors] || '#f39c12';
-              
-              return `
-                <div class="slide-item" style="border-left-color: ${severityColor};">
-                  <div style="display: flex; align-items: flex-start; gap: 15px;">
-                    <div style="background: ${severityColor}; color: white; padding: 8px 12px; border-radius: 20px; font-size: 0.9rem; font-weight: bold;">
-                      문제 ${index + 1}
-                    </div>
-                    <div style="flex: 1;">
-                      <h4 style="font-size: 1.2rem; margin-bottom: 10px; color: #000000;">${item.problem}</h4>
-                      <p style="font-size: 1rem; line-height: 1.6; opacity: 0.9;">${item.solution}</p>
-                    </div>
-                  </div>
-                </div>
-              `;
-            }).join('')}
-          </div>
-          
-          <div style="text-align: center; margin-top: 30px;">
-            <div style="background: rgba(255,255,255,0.2); padding: 15px 30px; border-radius: 25px; backdrop-filter: blur(10px);">
-              ⚠️ 문제가 지속되면 전문가의 도움을 받으세요
-            </div>
-          </div>
-        </div>
-      `;
-      
-    case 'faq':
-      return `
-        <div class="slide-content" style="position: relative; z-index: 2;">
-          <div style="text-align: center; margin-bottom: 40px;">
-            <h1 style="font-size: 3.5rem; margin-bottom: 20px; text-shadow: 2px 2px 8px rgba(0,0,0,0.3);">
-              ${title}
-            </h1>
-            <p style="font-size: 1.4rem; opacity: 0.9;">${subtitle}</p>
-          </div>
-          
-          <div style="max-width: 800px; margin: 0 auto;">
-            ${(content.faq || [
-              { question: '데이터를 새 폰으로 옮기려면?', answer: '제조사 전용 앱이나 클라우드 백업을 활용하세요.' },
-              { question: '보안을 강화하려면?', answer: '복잡한 비밀번호와 최신 업데이트를 유지하세요.' },
-              { question: '사용 시간을 줄이려면?', answer: '화면 시간 관리 기능과 집중 모드를 활용하세요.' }
-            ]).map((item: any, index: number) => `
-              <div class="slide-item">
-                <div style="display: flex; align-items: flex-start; gap: 15px;">
-                  <div style="background: ${theme.accent}; color: white; padding: 8px 12px; border-radius: 50%; font-weight: bold; min-width: 40px; text-align: center;">
-                    Q${index + 1}
-                  </div>
-                  <div style="flex: 1;">
-                    <h4 style="font-size: 1.2rem; margin-bottom: 10px; color: #000000;">${item.question}</h4>
-                    <p style="font-size: 1rem; line-height: 1.6; opacity: 0.9;">${item.answer}</p>
-                  </div>
-                </div>
-              </div>
-            `).join('')}
-          </div>
-          
-          <div style="text-align: center; margin-top: 30px;">
-            <div style="background: rgba(255,255,255,0.2); padding: 15px 30px; border-radius: 25px; backdrop-filter: blur(10px);">
-              💬 더 많은 도움이 필요하시면 제조사 고객센터에 문의하세요
-            </div>
-          </div>
-        </div>
-      `;
-      
-    default:
-      return `
-        <div class="slide-content" style="position: relative; z-index: 2; text-align: center;">
-          <h1 style="font-size: 3.5rem; margin-bottom: 20px; text-shadow: 2px 2px 8px rgba(0,0,0,0.3);">
-            ${title}
-          </h1>
-          <p style="font-size: 1.4rem; opacity: 0.9;">${subtitle}</p>
-          <div style="margin-top: 40px;">
-            <p style="font-size: 1.2rem; line-height: 1.8;">콘텐츠를 준비 중입니다...</p>
-          </div>
-        </div>
-      `;
-  }
-}
-function getManualStyles(theme: any): string {
-  return `
     * {
       margin: 0;
       padding: 0;
@@ -355,8 +69,9 @@ function getManualStyles(theme: any): string {
     body {
       font-family: 'Segoe UI', 'Malgun Gothic', Tahoma, Geneva, Verdana, sans-serif;
       line-height: 1.7;
-      color: ${theme.text};
-      background: ${theme.background};
+            color: #2d3436;
+            background: #ffffff;
+            overflow-x: hidden;
     }
 
     .manual-container {
@@ -367,17 +82,16 @@ function getManualStyles(theme: any): string {
       min-height: 100vh;
     }
 
-    /* 헤더 스타일 */
-    .manual-header {
-      background: ${theme.primary};
+        /* 첫 페이지 전체 스타일 */
+        .first-page {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
       color: white;
-      padding: 60px 40px;
-      text-align: center;
+            min-height: 100vh;
       position: relative;
       overflow: hidden;
     }
 
-    .manual-header::before {
+        .first-page::before {
       content: '';
       position: absolute;
       top: -50%;
@@ -389,20 +103,24 @@ function getManualStyles(theme: any): string {
       animation: float 20s ease-in-out infinite;
     }
 
+        /* 헤더 스타일 */
+        .manual-header {
+            padding: 60px 40px 40px 40px;
+            text-align: center;
+            position: relative;
+            z-index: 2;
+        }
+
     .manual-title {
       font-size: 3.5rem;
       font-weight: bold;
       margin-bottom: 20px;
       text-shadow: 2px 2px 8px rgba(0,0,0,0.3);
-      position: relative;
-      z-index: 2;
     }
 
     .manual-subtitle {
       font-size: 1.4rem;
       opacity: 0.9;
-      position: relative;
-      z-index: 2;
     }
 
     .manual-meta {
@@ -419,237 +137,115 @@ function getManualStyles(theme: any): string {
 
     /* 목차 스타일 */
     .table-of-contents {
-      background: #f8f9fa;
-      padding: 30px 40px;
-      border-bottom: 3px solid ${theme.secondary};
+            padding: 40px;
+            position: relative;
+            z-index: 2;
     }
 
     .toc-title {
       font-size: 1.8rem;
-      color: ${theme.text};
-      margin-bottom: 20px;
-      display: flex;
-      align-items: center;
-      gap: 10px;
+            color: white;
+            margin-bottom: 30px;
+            text-align: center;
     }
 
     .toc-list {
-      list-style: none;
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-      gap: 15px;
-    }
-
-    .toc-item {
-      background: white;
-      padding: 15px 20px;
-      border-radius: 10px;
-      border-left: 4px solid ${theme.secondary};
-      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-      transition: all 0.3s ease;
-      cursor: pointer;
-    }
-
-    .toc-item:hover {
-      transform: translateX(5px);
-      box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            list-style: none;
+            max-width: 600px;
+            margin: 0 auto;
     }
 
     .toc-item a {
+            display: flex;
+            align-items: center;
+            padding: 20px 25px;
+            background: rgba(255,255,255,0.15);
+            border-radius: 15px;
       text-decoration: none;
-      color: ${theme.text};
+            color: white;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.2);
+            font-size: 1.1rem;
       font-weight: 500;
     }
+
+        .toc-item a:hover {
+            transform: translateY(-3px);
+            background: rgba(255,255,255,0.25);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+        }
 
     /* 섹션 스타일 */
     .manual-section {
       padding: 40px;
-      border-bottom: 1px solid #eee;
+            border-bottom: 1px solid #e9ecef;
     }
 
     .section-header {
       display: flex;
       align-items: center;
       margin-bottom: 30px;
-      padding-bottom: 15px;
-      border-bottom: 2px solid ${theme.secondary};
     }
 
     .section-icon {
       font-size: 2rem;
       margin-right: 15px;
-      width: 50px;
-      height: 50px;
-      background: ${theme.secondary};
+            background: linear-gradient(135deg, #74b9ff 0%, #0984e3 100%);
       color: white;
+            width: 60px;
+            height: 60px;
       border-radius: 50%;
       display: flex;
       align-items: center;
       justify-content: center;
+            box-shadow: 0 5px 15px rgba(116, 185, 255, 0.3);
     }
 
     .section-title {
       font-size: 2.2rem;
-      color: ${theme.text};
-      font-weight: 600;
+            color: #2d3436;
+            font-weight: bold;
     }
 
     .section-content {
-      font-size: 1.1rem;
-      line-height: 1.8;
-      color: #555;
-    }
+            background: #f8f9fa;
+            padding: 30px;
+            border-radius: 15px;
+            border-left: 5px solid #74b9ff;
+        }
 
-    /* 콘텐츠 타입별 스타일 */
     .content-text {
-      margin-bottom: 20px;
-    }
+            margin-bottom: 25px;
+        }
 
-    .content-steps {
-      background: #f8f9fa;
-      border-radius: 10px;
-      padding: 25px;
-      margin: 20px 0;
-    }
-
-    .content-steps ol {
-      counter-reset: step-counter;
-      list-style: none;
-    }
-
-    .content-steps li {
-      counter-increment: step-counter;
-      margin-bottom: 15px;
-      padding: 15px;
-      background: white;
-      border-radius: 8px;
-      border-left: 4px solid ${theme.secondary};
-      position: relative;
-    }
-
-    .content-steps li::before {
-      content: counter(step-counter);
-      position: absolute;
-      left: -25px;
-      top: 15px;
-      width: 30px;
-      height: 30px;
-      background: ${theme.secondary};
-      color: white;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: bold;
-      font-size: 0.9rem;
-    }
-
-    .content-warning {
-      background: linear-gradient(135deg, #fff3cd, #ffeaa7);
-      border: 1px solid ${theme.warning};
-      border-left: 4px solid ${theme.warning};
-      border-radius: 10px;
-      padding: 20px;
-      margin: 20px 0;
-      position: relative;
-    }
-
-    .content-warning::before {
-      content: '⚠️';
-      font-size: 1.5rem;
-      position: absolute;
-      top: 20px;
-      left: 20px;
-    }
-
-    .content-warning .warning-title {
-      font-weight: bold;
-      color: #856404;
-      margin-left: 30px;
+        .content-text h3 {
+            font-size: 1.3rem;
+            color: #0984e3;
       margin-bottom: 10px;
-    }
+            font-weight: 600;
+        }
 
-    .content-warning .warning-content {
-      margin-left: 30px;
-      color: #856404;
-    }
+        .content-text p {
+            font-size: 1.1rem;
+            line-height: 1.8;
+            color: #2d3436;
+        }
 
-    .content-note {
-      background: linear-gradient(135deg, #d1ecf1, #bee5eb);
-      border: 1px solid ${theme.secondary};
-      border-left: 4px solid ${theme.secondary};
-      border-radius: 10px;
-      padding: 20px;
-      margin: 20px 0;
-      position: relative;
-    }
+        .content-text ul {
+            margin-left: 20px;
+        }
 
-    .content-note::before {
-      content: '💡';
-      font-size: 1.5rem;
-      position: absolute;
-      top: 20px;
-      left: 20px;
-    }
+        .content-text li {
+            margin-bottom: 8px;
+            font-size: 1.1rem;
+        }
 
-    .content-note .note-title {
-      font-weight: bold;
-      color: #0c5460;
-      margin-left: 30px;
-      margin-bottom: 10px;
-    }
-
-    .content-note .note-content {
-      margin-left: 30px;
-      color: #0c5460;
-    }
-
-    .content-example {
-      background: linear-gradient(135deg, #d4edda, #c3e6cb);
-      border: 1px solid ${theme.success};
-      border-left: 4px solid ${theme.success};
-      border-radius: 10px;
-      padding: 20px;
-      margin: 20px 0;
-      position: relative;
-    }
-
-    .content-example::before {
-      content: '📋';
-      font-size: 1.5rem;
-      position: absolute;
-      top: 20px;
-      left: 20px;
-    }
-
-    .content-example .example-title {
-      font-weight: bold;
-      color: #155724;
-      margin-left: 30px;
-      margin-bottom: 10px;
-    }
-
-    .content-example .example-content {
-      margin-left: 30px;
-      color: #155724;
-    }
-
-    /* 하위 섹션 스타일 */
-    .subsection {
-      margin: 25px 0;
-      padding-left: 20px;
-      border-left: 3px solid ${theme.secondary};
-    }
-
-    .subsection-title {
-      font-size: 1.4rem;
-      font-weight: 600;
-      color: ${theme.text};
-      margin-bottom: 15px;
-    }
-
-    /* 문제해결 섹션 */
-    .troubleshooting-item {
+        /* 문제해결 섹션 - 펼쳐진 형태 */
+        .trouble-item {
       background: white;
       border-radius: 10px;
       margin-bottom: 20px;
@@ -658,131 +254,46 @@ function getManualStyles(theme: any): string {
     }
 
     .trouble-header {
+            background: #fd79a8;
+            color: white;
       padding: 20px;
-      cursor: pointer;
       display: flex;
-      align-items: center;
       justify-content: space-between;
-      transition: background 0.3s ease;
-    }
-
-    .trouble-header:hover {
-      background: #f8f9fa;
-    }
-
-    .trouble-header.severity-high {
-      border-left: 5px solid ${theme.danger};
-    }
-
-    .trouble-header.severity-medium {
-      border-left: 5px solid ${theme.warning};
-    }
-
-    .trouble-header.severity-low {
-      border-left: 5px solid ${theme.success};
-    }
-
-    .trouble-problem {
-      font-weight: 600;
-      color: ${theme.text};
-    }
-
-    .trouble-toggle {
-      font-size: 1.2rem;
-      transition: transform 0.3s ease;
-    }
-
-    .trouble-toggle.open {
-      transform: rotate(180deg);
+            align-items: center;
     }
 
     .trouble-solution {
-      padding: 0 20px 20px 20px;
-      background: #f8f9fa;
-      display: none;
-      border-top: 1px solid #eee;
-    }
+            padding: 20px;
+            background: #fff5f5;
+        }
 
-    .trouble-solution.show {
-      display: block;
-    }
-
-    /* FAQ 섹션 */
+        /* FAQ 섹션 - 펼쳐진 형태 */
     .faq-item {
       background: white;
       border-radius: 10px;
       margin-bottom: 15px;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.08);
       overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
     }
 
     .faq-question {
+            background: #fdcb6e;
+            color: #2d3436;
       padding: 20px;
-      background: #f8f9fa;
-      cursor: pointer;
       display: flex;
-      align-items: center;
       justify-content: space-between;
+            align-items: center;
       font-weight: 600;
-      color: ${theme.text};
-      transition: background 0.3s ease;
-    }
-
-    .faq-question:hover {
-      background: #e9ecef;
     }
 
     .faq-answer {
       padding: 20px;
-      display: none;
-      line-height: 1.8;
-      color: #555;
-    }
-
-    .faq-answer.show {
-      display: block;
-    }
-
-    /* 부록 섹션 */
-    .appendix-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-      gap: 30px;
-      margin-top: 30px;
-    }
-
-    .appendix-card {
-      background: white;
-      border-radius: 15px;
-      padding: 25px;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
-      border-top: 4px solid ${theme.secondary};
-    }
-
-    .appendix-card h4 {
-      font-size: 1.3rem;
-      color: ${theme.text};
-      margin-bottom: 20px;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-
-    .glossary-term {
-      font-weight: bold;
-      color: ${theme.secondary};
-      margin-bottom: 5px;
-    }
-
-    .glossary-definition {
-      margin-bottom: 15px;
-      padding-left: 15px;
-      color: #666;
+            background: #fffbf0;
     }
 
     /* 푸터 */
     .manual-footer {
-      background: ${theme.primary};
+            background: linear-gradient(135deg, #74b9ff 0%, #0984e3 100%);
       color: white;
       padding: 40px;
       text-align: center;
@@ -851,27 +362,28 @@ function getManualStyles(theme: any): string {
       }
 
       .manual-header {
-        padding: 40px 20px;
+                padding: 40px 20px 30px 20px;
       }
 
       .manual-title {
         font-size: 2.5rem;
       }
 
-      .manual-section {
-        padding: 20px;
-      }
-
-      .section-title {
-        font-size: 1.8rem;
+            .table-of-contents {
+                padding: 30px 20px;
       }
 
       .toc-list {
         grid-template-columns: 1fr;
-      }
+                gap: 15px;
+            }
 
-      .appendix-grid {
-        grid-template-columns: 1fr;
+            .manual-section {
+                padding: 20px;
+            }
+
+            .section-title {
+                font-size: 1.8rem;
       }
 
       .footer-content {
@@ -890,122 +402,122 @@ function getManualStyles(theme: any): string {
         display: none;
       }
 
-      .trouble-solution,
-      .faq-answer {
-        display: block !important;
-      }
-
       .manual-section {
         page-break-inside: avoid;
       }
     }
-  `;
-}
-
-// 📋 헤더 섹션 생성
-function createManualHeader(data: HybridManualData, theme: any): string {
-  const currentDate = new Date().toLocaleDateString('ko-KR');
-  
-  return `
+    </style>
+</head>
+<body>
+    <div class="manual-container">
+        <!-- 페이지 1: 표지 + 목차 -->
+        <div class="first-page">
     <header class="manual-header">
       <div class="manual-meta">
-        버전 ${data.appendix?.version || '1.0'} | ${currentDate}
+                    ${data.version} | ${data.date}
       </div>
       <h1 class="manual-title">${data.title}</h1>
       <p class="manual-subtitle">${data.subtitle}</p>
     </header>
-  `;
-}
 
-// 📋 목차 생성
-function createTableOfContents(data: HybridManualData): string {
-  const sections = [
-    { id: 'overview', title: '📋 개요', icon: '📋' },
-    ...data.sections.map(section => ({ 
-      id: section.id, 
-      title: section.title,
-      icon: getSectionIcon(section.type)
-    })),
-    ...(data.troubleshooting ? [{ id: 'troubleshooting', title: '🔧 문제해결', icon: '🔧' }] : []),
-    ...(data.faq ? [{ id: 'faq', title: '❓ FAQ', icon: '❓' }] : []),
-    ...(data.appendix ? [{ id: 'appendix', title: '📚 부록', icon: '📚' }] : [])
-  ];
-
-  return `
     <section class="table-of-contents">
       <h2 class="toc-title">📑 목차</h2>
       <ul class="toc-list">
-        ${sections.map(section => `
           <li class="toc-item">
-            <a href="#${section.id}">
-              ${section.icon} ${section.title}
+                        <a href="#basic-usage">
+                            📱 기본 사용법
             </a>
           </li>
-        `).join('')}
+                    <li class="toc-item">
+                        <a href="#precautions">
+                            ⚠️ 주의사항
+                        </a>
+                    </li>
+                    <li class="toc-item">
+                        <a href="#troubleshooting">
+                            🔧 문제해결
+                        </a>
+                    </li>
+                    <li class="toc-item">
+                        <a href="#faq">
+                            ❓ FAQ
+                        </a>
+                    </li>
       </ul>
     </section>
-  `;
-}
+        </div>
 
-// 📋 개요 섹션 생성
-function createOverviewSection(data: HybridManualData, theme: any): string {
-  return `
-    <section id="overview" class="manual-section">
+        <!-- 페이지 2: 기본 사용법 -->
+        <section id="basic-usage" class="manual-section">
       <div class="section-header">
-        <div class="section-icon">📋</div>
-        <h2 class="section-title">개요</h2>
+                <div class="section-icon">📱</div>
+                <h2 class="section-title">기본 사용법</h2>
       </div>
       
       <div class="section-content">
         <div class="content-text">
-          <h3>📌 목적</h3>
-          <p>${data.overview.purpose}</p>
+                    <h3>🔋 ${data.basicUsage.initialSetup.title}</h3>
+                    <p>${data.basicUsage.initialSetup.description}</p>
+                    <ul>
+                        ${data.basicUsage.initialSetup.steps.map(step => `<li>${step}</li>`).join('')}
+                    </ul>
         </div>
         
         <div class="content-text">
-          <h3>👥 대상 사용자</h3>
-          <p>${data.overview.audience}</p>
+                    <h3>🎯 ${data.basicUsage.basicGestures.title}</h3>
+                    <p>${data.basicUsage.basicGestures.description}</p>
+                    <ul>
+                        ${data.basicUsage.basicGestures.gestures.map(gesture => 
+                            `<li><strong>${gesture.name}:</strong> ${gesture.description}</li>`
+                        ).join('')}
+                    </ul>
         </div>
         
         <div class="content-text">
-          <h3>✅ 준비사항</h3>
+                    <h3>🎨 ${data.basicUsage.watchfaceCustomization.title}</h3>
+                    <p>${data.basicUsage.watchfaceCustomization.description}</p>
           <ul>
-            ${data.overview.requirements.map(req => `<li>${req}</li>`).join('')}
+                        ${data.basicUsage.watchfaceCustomization.steps.map(step => `<li>${step}</li>`).join('')}
           </ul>
         </div>
       </div>
     </section>
-  `;
-}
 
-// 📋 메인 섹션들 생성
-function createMainSections(data: HybridManualData, theme: any): string {
-  return data.sections.map(section => `
-    <section id="${section.id}" class="manual-section">
+        <!-- 페이지 3: 주의사항 -->
+        <section id="precautions" class="manual-section">
       <div class="section-header">
-        <div class="section-icon">${getSectionIcon(section.type)}</div>
-        <h2 class="section-title">${section.title}</h2>
+                <div class="section-icon">⚠️</div>
+                <h2 class="section-title">주의사항</h2>
       </div>
       
       <div class="section-content">
-        ${formatSectionContent(section)}
-        
-        ${section.subsections ? section.subsections.map(subsection => `
-          <div class="subsection">
-            <h3 class="subsection-title">${subsection.title}</h3>
-            <div class="subsection-content">${subsection.content}</div>
+                <div class="content-text">
+                    <h3>🔋 ${data.precautions.batteryManagement.title}</h3>
+                    <p>${data.precautions.batteryManagement.description}</p>
+                    <ul>
+                        ${data.precautions.batteryManagement.tips.map(tip => `<li>${tip}</li>`).join('')}
+                    </ul>
+                </div>
+                
+                <div class="content-text">
+                    <h3>💧 ${data.precautions.waterproofPrecautions.title}</h3>
+                    <p>${data.precautions.waterproofPrecautions.description}</p>
+                    <ul>
+                        ${data.precautions.waterproofPrecautions.tips.map(tip => `<li>${tip}</li>`).join('')}
+                    </ul>
           </div>
-        `).join('') : ''}
+
+                <div class="content-text">
+                    <h3>📱 ${data.precautions.smartphoneConnection.title}</h3>
+                    <p>${data.precautions.smartphoneConnection.description}</p>
+                    <ul>
+                        ${data.precautions.smartphoneConnection.tips.map(tip => `<li>${tip}</li>`).join('')}
+                    </ul>
+                </div>
       </div>
     </section>
-  `).join('');
-}
 
-// 🔧 문제해결 섹션 생성
-function createTroubleshootingSection(data: HybridManualData, theme: any): string {
-  if (!data.troubleshooting || data.troubleshooting.length === 0) return '';
-
-  return `
+        <!-- 페이지 4: 문제해결 -->
     <section id="troubleshooting" class="manual-section">
       <div class="section-header">
         <div class="section-icon">🔧</div>
@@ -1013,201 +525,63 @@ function createTroubleshootingSection(data: HybridManualData, theme: any): strin
       </div>
       
       <div class="section-content">
-        ${data.troubleshooting.map((item, index) => `
-          <div class="troubleshooting-item">
-            <div class="trouble-header severity-${item.severity}" onclick="toggleTrouble(${index})">
-              <div class="trouble-problem">${item.problem}</div>
-              <div class="trouble-toggle" id="toggle-${index}">▼</div>
+                ${data.troubleshooting.map(item => `
+                    <div class="trouble-item">
+                        <div class="trouble-header">
+                            <span>${item.problem}</span>
             </div>
-            <div class="trouble-solution" id="solution-${index}">
-              <p>${item.solution}</p>
+                        <div class="trouble-solution">
+                            <p><strong>해결 방법:</strong></p>
+                            <ul>
+                                ${item.solution.map(step => `<li>${step}</li>`).join('')}
+                            </ul>
             </div>
           </div>
         `).join('')}
       </div>
     </section>
-  `;
-}
 
-// ❓ FAQ 섹션 생성
-function createFAQSection(data: HybridManualData, theme: any): string {
-  if (!data.faq || data.faq.length === 0) return '';
-
-  return `
+        <!-- 페이지 5: FAQ -->
     <section id="faq" class="manual-section">
       <div class="section-header">
         <div class="section-icon">❓</div>
-        <h2 class="section-title">FAQ</h2>
+                <h2 class="section-title">자주 묻는 질문</h2>
       </div>
       
       <div class="section-content">
-        ${data.faq.map((item, index) => `
+                ${data.faq.map(item => `
           <div class="faq-item">
-            <div class="faq-question" onclick="toggleFAQ(${index})">
+                        <div class="faq-question">
               <span>${item.question}</span>
-              <span id="faq-toggle-${index}">▼</span>
             </div>
-            <div class="faq-answer" id="faq-answer-${index}">
+                        <div class="faq-answer">
               <p>${item.answer}</p>
             </div>
           </div>
         `).join('')}
       </div>
     </section>
-  `;
-}
 
-// 📚 부록 섹션 생성
-function createAppendixSection(data: HybridManualData, theme: any): string {
-  if (!data.appendix) return '';
-
-  return `
-    <section id="appendix" class="manual-section">
-      <div class="section-header">
-        <div class="section-icon">📚</div>
-        <h2 class="section-title">부록</h2>
-      </div>
-      
-      <div class="appendix-grid">
-        ${data.appendix.glossary && data.appendix.glossary.length > 0 ? `
-          <div class="appendix-card">
-            <h4>📖 용어집</h4>
-            ${data.appendix.glossary.map(term => `
-              <div class="glossary-term">${term.term}</div>
-              <div class="glossary-definition">${term.definition}</div>
-            `).join('')}
-          </div>
-        ` : ''}
-        
-        ${data.appendix.references && data.appendix.references.length > 0 ? `
-          <div class="appendix-card">
-            <h4>🔗 참고자료</h4>
-            <ul>
-              ${data.appendix.references.map(ref => `<li>${ref}</li>`).join('')}
-            </ul>
-          </div>
-        ` : ''}
-        
-        <div class="appendix-card">
-          <h4>📄 문서 정보</h4>
-          <p><strong>버전:</strong> ${data.appendix.version}</p>
-          <p><strong>최종 업데이트:</strong> ${data.appendix.lastUpdated}</p>
-          <p><strong>카테고리:</strong> ${data.category}</p>
-        </div>
-      </div>
-    </section>
-  `;
-}
-
-// 📋 푸터 생성
-function createManualFooter(data: HybridManualData, theme: any): string {
-  return `
+        <!-- 푸터 -->
     <footer class="manual-footer">
       <div class="footer-content">
         <div class="footer-info">
-          <p>© 2024 AI 설명서 생성 시스템 | 버전 ${data.appendix?.version || '1.0'}</p>
-          <p>문서 생성일: ${new Date().toLocaleDateString('ko-KR')}</p>
+                    <p>${data.title} ${data.version}</p>
+                    <p>© 2024 Samsung Electronics. All rights reserved.</p>
         </div>
         <div class="footer-actions">
-          <button class="footer-btn" onclick="window.print()">🖨️ 인쇄</button>
-          <button class="footer-btn" onclick="copyManualHTML()">📋 복사</button>
-          <button class="footer-btn" onclick="downloadManual()">💾 다운로드</button>
+                    <button class="footer-btn" onclick="copyManualHTML()">HTML 복사</button>
+                    <button class="footer-btn" onclick="downloadManual()">다운로드</button>
         </div>
       </div>
     </footer>
-  `;
-}
-
-// 🔧 유틸리티 함수들
-function getSectionIcon(type: string): string {
-  const icons = {
-    text: '📝',
-    steps: '📋',
-    warning: '⚠️',
-    note: '💡',
-    example: '📊'
-  };
-  return icons[type as keyof typeof icons] || '📝';
-}
-
-function formatSectionContent(section: any): string {
-  const content = section.content.replace(/\n/g, '<br>');
-  
-  switch (section.type) {
-    case 'steps':
-      const steps = section.content.split('\n').filter((s: string) => s.trim());
-      return `
-        <div class="content-steps">
-          <ol>
-            ${steps.map((step: string) => `<li>${step.replace(/^\d+\.\s*/, '')}</li>`).join('')}
-          </ol>
         </div>
-      `;
-    
-    case 'warning':
-      return `
-        <div class="content-warning">
-          <div class="warning-title">⚠️ 주의사항</div>
-          <div class="warning-content">${content}</div>
-        </div>
-      `;
-    
-    case 'note':
-      return `
-        <div class="content-note">
-          <div class="note-title">💡 참고</div>
-          <div class="note-content">${content}</div>
-        </div>
-      `;
-    
-    case 'example':
-      return `
-        <div class="content-example">
-          <div class="example-title">📋 예시</div>
-          <div class="example-content">${content}</div>
-        </div>
-      `;
-    
-    default:
-      return `<div class="content-text">${content}</div>`;
-  }
-}
 
-// 📋 자바스크립트 함수들
-function getManualScripts(): string {
-  return `
-    function toggleTrouble(index) {
-      const solution = document.getElementById('solution-' + index);
-      const toggle = document.getElementById('toggle-' + index);
-      
-      if (solution.classList.contains('show')) {
-        solution.classList.remove('show');
-        toggle.classList.remove('open');
-        toggle.textContent = '▼';
-      } else {
-        solution.classList.add('show');
-        toggle.classList.add('open');
-        toggle.textContent = '▲';
-      }
-    }
-
-    function toggleFAQ(index) {
-      const answer = document.getElementById('faq-answer-' + index);
-      const toggle = document.getElementById('faq-toggle-' + index);
-      
-      if (answer.classList.contains('show')) {
-        answer.classList.remove('show');
-        toggle.textContent = '▼';
-      } else {
-        answer.classList.add('show');
-        toggle.textContent = '▲';
-      }
-    }
-
+    <script>
     function copyManualHTML() {
       const manualHTML = document.documentElement.outerHTML;
       navigator.clipboard.writeText(manualHTML).then(() => {
-        alert('설명서 HTML이 클립보드에 복사되었습니다!');
+                alert('매뉴얼 HTML이 클립보드에 복사되었습니다!');
       }).catch(() => {
         alert('복사에 실패했습니다.');
       });
@@ -1219,7 +593,7 @@ function getManualScripts(): string {
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = 'manual_설명서.html';
+            a.download = 'manual.html';
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
@@ -1252,5 +626,619 @@ function getManualScripts(): string {
     document.querySelectorAll('.manual-section').forEach(section => {
       observer.observe(section);
     });
-  `;
+    </script>
+</body>
+</html>`;
+};
+
+// 🎯 매뉴얼 슬라이드 생성 함수
+export const generateManualSlides = async (data: HybridManualData, templateType: string, request: any): Promise<Array<{
+  id: number;
+  title: string;
+  subtitle?: string;
+  html: string;
+}>> => {
+  // 각 페이지별 개별 HTML 생성
+  const pages = [
+    {
+      id: 1,
+      title: '표지 + 목차',
+      subtitle: '매뉴얼 개요 및 목차',
+      html: generateCoverPageHTML(data)
+    },
+    {
+      id: 2,
+      title: '기본 사용법',
+      subtitle: '초기 설정 및 기본 조작법',
+      html: generateBasicUsagePageHTML(data)
+    },
+    {
+      id: 3,
+      title: '주의사항',
+      subtitle: '사용 시 주의사항 및 팁',
+      html: generatePrecautionsPageHTML(data)
+    },
+    {
+      id: 4,
+      title: '문제해결',
+      subtitle: '자주 발생하는 문제와 해결방법',
+      html: generateTroubleshootingPageHTML(data)
+    },
+    {
+      id: 5,
+      title: 'FAQ',
+      subtitle: '자주 묻는 질문과 답변',
+      html: generateFAQPageHTML(data)
+    }
+  ];
+
+  return pages;
+};
+
+// 🎯 표지 + 목차 페이지 HTML 생성
+function generateCoverPageHTML(data: HybridManualData): string {
+  return `
+    <!DOCTYPE html>
+    <html lang="ko">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>${data.title}</title>
+        <style>
+            * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+            }
+
+            body {
+                font-family: 'Segoe UI', 'Malgun Gothic', Tahoma, Geneva, Verdana, sans-serif;
+                line-height: 1.7;
+                color: #2d3436;
+                background: #ffffff;
+                overflow-x: hidden;
+            }
+
+            .manual-container {
+                max-width: 1000px;
+                margin: 0 auto;
+                background: white;
+                box-shadow: 0 0 30px rgba(0,0,0,0.1);
+            }
+
+                         /* 첫 페이지 전체 스타일 */
+             .first-page {
+                 background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+                 color: white;
+                 min-height: 100vh;
+                 height: 100vh;
+                 position: relative;
+                 overflow: hidden;
+                 display: flex;
+                 flex-direction: column;
+                 justify-content: space-between;
+             }
+
+            .first-page::before {
+                content: '';
+                position: absolute;
+                top: -50%;
+                left: -50%;
+                width: 200%;
+                height: 200%;
+                background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse"><path d="M 10 0 L 0 0 0 10" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="0.5"/></pattern></defs><rect width="100" height="100" fill="url(%23grid)"/></svg>');
+                opacity: 0.3;
+                animation: float 20s ease-in-out infinite;
+            }
+
+                         /* 헤더 스타일 */
+             .manual-header {
+                 padding: 120px 40px 80px 40px;
+                 text-align: center;
+                 position: relative;
+                 z-index: 2;
+                 flex: 1;
+                 display: flex;
+                 flex-direction: column;
+                 justify-content: center;
+             }
+
+            .manual-title {
+                font-size: 3.5rem;
+                font-weight: bold;
+                margin-bottom: 20px;
+                text-shadow: 2px 2px 8px rgba(0,0,0,0.3);
+            }
+
+            .manual-subtitle {
+                font-size: 1.4rem;
+                opacity: 0.9;
+            }
+
+                         /* 목차 스타일 */
+             .table-of-contents {
+                 padding: 80px 40px 120px 40px;
+                 position: relative;
+                 z-index: 2;
+             }
+
+                         .toc-title {
+                 font-size: 1.8rem;
+                 color: white;
+                 margin-bottom: 60px;
+                 text-align: center;
+             }
+
+            .toc-list {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 20px;
+                list-style: none;
+                max-width: 600px;
+                margin: 0 auto;
+            }
+
+            .toc-item a {
+                display: flex;
+                align-items: center;
+                padding: 20px 25px;
+                background: rgba(255,255,255,0.15);
+                border-radius: 15px;
+                text-decoration: none;
+                color: white;
+                transition: all 0.3s ease;
+                backdrop-filter: blur(10px);
+                border: 1px solid rgba(255,255,255,0.2);
+                font-size: 1.1rem;
+                font-weight: 500;
+            }
+
+            .toc-item a:hover {
+                transform: translateY(-3px);
+                background: rgba(255,255,255,0.25);
+                box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            }
+
+            /* 애니메이션 */
+            @keyframes float {
+                0%, 100% { transform: translateY(0px) rotate(0deg); }
+                33% { transform: translateY(-10px) rotate(1deg); }
+                66% { transform: translateY(5px) rotate(-1deg); }
+            }
+        </style>
+    </head>
+    <body>
+        <div class="manual-container">
+            <div class="first-page">
+                <header class="manual-header">
+                    <h1 class="manual-title">${data.title}</h1>
+                    <p class="manual-subtitle">${data.subtitle}</p>
+                </header>
+
+                <section class="table-of-contents">
+                    <h2 class="toc-title">📑 목차</h2>
+                    <ul class="toc-list">
+                        <li class="toc-item">
+                            <a href="#basic-usage">
+                                📱 기본 사용법
+                            </a>
+                        </li>
+                        <li class="toc-item">
+                            <a href="#precautions">
+                                ⚠️ 주의사항
+                            </a>
+                        </li>
+                        <li class="toc-item">
+                            <a href="#troubleshooting">
+                                🔧 문제해결
+                            </a>
+                        </li>
+                        <li class="toc-item">
+                            <a href="#faq">
+                                ❓ FAQ
+                            </a>
+                        </li>
+                    </ul>
+                </section>
+            </div>
+        </div>
+    </body>
+    </html>`;
 }
+
+// 🎯 기본 사용법 페이지 HTML 생성
+function generateBasicUsagePageHTML(data: HybridManualData): string {
+  return `
+    <!DOCTYPE html>
+    <html lang="ko">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>기본 사용법</title>
+        <style>
+            body {
+                margin: 0;
+                padding: 40px;
+                font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;
+                background: #f8f9fa;
+                min-height: 100vh;
+                height: 100vh;
+            }
+            
+            .manual-section {
+                max-width: 1000px;
+                margin: 0 auto;
+                background: white;
+                border-radius: 20px;
+                padding: 40px;
+                box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+                min-height: 100vh;
+                height: 100vh;
+            }
+            
+            .section-title {
+                font-size: 2.5rem;
+                color: #2d3436;
+                font-weight: bold;
+                margin-bottom: 30px;
+                text-align: center;
+            }
+            
+            .content-text {
+                margin-bottom: 30px;
+            }
+            
+            .content-text h3 {
+                font-size: 1.5rem;
+                color: #0984e3;
+                margin-bottom: 15px;
+                font-weight: 600;
+            }
+            
+            .content-text p {
+                font-size: 1.1rem;
+                line-height: 1.8;
+                color: #2d3436;
+                margin-bottom: 15px;
+            }
+            
+            .content-text ul {
+                margin-left: 20px;
+            }
+            
+            .content-text li {
+                margin-bottom: 10px;
+                font-size: 1.1rem;
+                line-height: 1.6;
+            }
+            
+            .gesture-item {
+                background: #f8f9fa;
+                padding: 20px;
+                border-radius: 10px;
+                margin-bottom: 15px;
+                border-left: 4px solid #74b9ff;
+            }
+            
+            .gesture-name {
+                font-weight: 600;
+                color: #0984e3;
+                margin-bottom: 8px;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="manual-section">
+            <div class="section-title">📱 기본 사용법</div>
+            
+                         <div class="content-text">
+                 <h3>🎯 ${data.basicUsage.basicGestures.title}</h3>
+                 <p>${data.basicUsage.basicGestures.description}</p>
+                 ${data.basicUsage.basicGestures.gestures.map(gesture => `
+                     <div class="gesture-item">
+                         <div class="gesture-name">${gesture.name}</div>
+                         <div>${gesture.description}</div>
+                     </div>
+                 `).join('')}
+             </div>
+        </div>
+    </body>
+    </html>`;
+}
+
+// 🎯 주의사항 페이지 HTML 생성
+function generatePrecautionsPageHTML(data: HybridManualData): string {
+  return `
+    <!DOCTYPE html>
+    <html lang="ko">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>주의사항</title>
+        <style>
+            body {
+                margin: 0;
+                padding: 40px;
+                font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;
+                background: #f8f9fa;
+                min-height: 100vh;
+                height: 100vh;
+            }
+            
+            .manual-section {
+                max-width: 1000px;
+                margin: 0 auto;
+                background: white;
+                border-radius: 20px;
+                padding: 40px;
+                box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+                min-height: 100vh;
+                height: 100vh;
+            }
+            
+            .section-title {
+                font-size: 2.5rem;
+                color: #2d3436;
+                font-weight: bold;
+                margin-bottom: 30px;
+                text-align: center;
+            }
+            
+            .precaution-item {
+                background: white;
+                border-radius: 15px;
+                margin-bottom: 25px;
+                overflow: hidden;
+                box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+                border: 1px solid #e9ecef;
+            }
+            
+            .precaution-header {
+                background: #00b894;
+                color: white;
+                padding: 25px;
+                font-size: 1.2rem;
+                font-weight: 600;
+            }
+            
+            .precaution-content {
+                padding: 25px;
+                background: #f0fff4;
+            }
+            
+            .precaution-content p {
+                margin-bottom: 15px;
+                font-size: 1.1rem;
+                line-height: 1.6;
+                color: #2d3436;
+            }
+            
+            .precaution-content ul {
+                margin: 0;
+                padding-left: 20px;
+            }
+            
+            .precaution-content li {
+                margin-bottom: 8px;
+                font-size: 1.1rem;
+                line-height: 1.6;
+                color: #2d3436;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="manual-section">
+            <div class="section-title">⚠️ 주의사항</div>
+            
+                         <div class="precaution-item">
+                 <div class="precaution-header">🔋 ${data.precautions.batteryManagement.title}</div>
+                 <div class="precaution-content">
+                     <ul>
+                         ${data.precautions.batteryManagement.tips.slice(0, 2).map(tip => `<li>${tip}</li>`).join('')}
+                     </ul>
+                 </div>
+             </div>
+            
+                         <div class="precaution-item">
+                 <div class="precaution-header">💧 ${data.precautions.waterproofPrecautions.title}</div>
+                 <div class="precaution-content">
+                     <ul>
+                         ${data.precautions.waterproofPrecautions.tips.slice(0, 2).map(tip => `<li>${tip}</li>`).join('')}
+                     </ul>
+                 </div>
+             </div>
+            
+                         <div class="precaution-item">
+                 <div class="precaution-header">📱 ${data.precautions.smartphoneConnection.title}</div>
+                 <div class="precaution-content">
+                     <ul>
+                         ${data.precautions.smartphoneConnection.tips.slice(0, 2).map(tip => `<li>${tip}</li>`).join('')}
+                     </ul>
+                 </div>
+             </div>
+        </div>
+    </body>
+    </html>`;
+}
+
+// 🎯 문제해결 페이지 HTML 생성
+function generateTroubleshootingPageHTML(data: HybridManualData): string {
+  return `
+    <!DOCTYPE html>
+    <html lang="ko">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>문제해결</title>
+        <style>
+            body {
+                margin: 0;
+                padding: 40px;
+                font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;
+                background: #f8f9fa;
+                min-height: 100vh;
+                height: 100vh;
+            }
+            
+            .manual-section {
+                max-width: 1000px;
+                margin: 0 auto;
+                background: white;
+                border-radius: 20px;
+                padding: 40px;
+                box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+                min-height: 100vh;
+                height: 100vh;
+            }
+            
+            .section-title {
+                font-size: 2.5rem;
+                color: #2d3436;
+                font-weight: bold;
+                margin-bottom: 30px;
+                text-align: center;
+            }
+            
+            .trouble-item {
+                background: white;
+                border-radius: 15px;
+                margin-bottom: 25px;
+                overflow: hidden;
+                box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+                border: 1px solid #e9ecef;
+            }
+            
+            .trouble-header {
+                background: #fd79a8;
+                color: white;
+                padding: 25px;
+                font-size: 1.2rem;
+                font-weight: 600;
+            }
+            
+            .trouble-solution {
+                padding: 25px;
+                background: #fff5f5;
+            }
+            
+            .trouble-solution ul {
+                margin: 0;
+                padding-left: 20px;
+            }
+            
+            .trouble-solution li {
+                margin-bottom: 10px;
+                font-size: 1.1rem;
+                line-height: 1.6;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="manual-section">
+            <div class="section-title">🔧 문제해결</div>
+            
+                         ${data.troubleshooting.map(item => `
+                 <div class="trouble-item">
+                     <div class="trouble-header">${item.problem}</div>
+                     <div class="trouble-solution">
+                         <ul>
+                             ${item.solution.slice(0, 2).map(sol => `<li>${sol}</li>`).join('')}
+                         </ul>
+                     </div>
+                 </div>
+             `).join('')}
+        </div>
+    </body>
+    </html>`;
+}
+
+// 🎯 FAQ 페이지 HTML 생성
+function generateFAQPageHTML(data: HybridManualData): string {
+  return `
+    <!DOCTYPE html>
+    <html lang="ko">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>FAQ</title>
+        <style>
+            body {
+                margin: 0;
+                padding: 40px;
+                font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;
+                background: #f8f9fa;
+                min-height: 100vh;
+                height: 100vh;
+            }
+            
+            .manual-section {
+                max-width: 1000px;
+                margin: 0 auto;
+                background: white;
+                border-radius: 20px;
+                padding: 40px;
+                box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+                min-height: 100vh;
+                height: 100vh;
+            }
+            
+            .section-title {
+                font-size: 2.5rem;
+                color: #2d3436;
+                font-weight: bold;
+                margin-bottom: 30px;
+                text-align: center;
+            }
+            
+            .faq-item {
+                background: white;
+                border-radius: 15px;
+                margin-bottom: 20px;
+                overflow: hidden;
+                box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+                border: 1px solid #e9ecef;
+            }
+            
+            .faq-question {
+                background: #fdcb6e;
+                color: #2d3436;
+                padding: 25px;
+                font-size: 1.2rem;
+                font-weight: 600;
+            }
+            
+            .faq-answer {
+                padding: 25px;
+                background: #fffbf0;
+                font-size: 1.1rem;
+                line-height: 1.6;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="manual-section">
+            <div class="section-title">❓ 자주 묻는 질문</div>
+            
+            ${data.faq.map(item => `
+                <div class="faq-item">
+                    <div class="faq-question">${item.question}</div>
+                    <div class="faq-answer">${item.answer}</div>
+                </div>
+            `).join('')}
+        </div>
+    </body>
+    </html>`;
+}
+
+// 🎯 매뉴얼 템플릿 선택 함수
+export const selectManualTemplate = (category: string): string => {
+  const templateMap: { [key: string]: string } = {
+    'technical': 'technical',
+    'user-guide': 'user-guide',
+    'tutorial': 'tutorial',
+    'reference': 'reference',
+    'troubleshooting': 'troubleshooting'
+  };
+  
+  return templateMap[category] || 'user-guide';
+};

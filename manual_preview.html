@@ -1,0 +1,637 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>갤럭시 워치 사용법 매뉴얼</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', 'Malgun Gothic', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.7;
+            color: #2d3436;
+            background: #ffffff;
+        }
+
+        .manual-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            box-shadow: 0 0 30px rgba(0,0,0,0.1);
+            min-height: 100vh;
+        }
+
+        /* 첫 페이지 전체 스타일 */
+        .first-page {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+            min-height: 100vh;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .first-page::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse"><path d="M 10 0 L 0 0 0 10" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="0.5"/></pattern></defs><rect width="100" height="100" fill="url(%23grid)"/></svg>');
+            opacity: 0.3;
+            animation: float 20s ease-in-out infinite;
+        }
+
+        /* 헤더 스타일 */
+        .manual-header {
+            padding: 60px 40px 40px 40px;
+            text-align: center;
+            position: relative;
+            z-index: 2;
+        }
+
+        .manual-title {
+            font-size: 3.5rem;
+            font-weight: bold;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 8px rgba(0,0,0,0.3);
+        }
+
+        .manual-subtitle {
+            font-size: 1.4rem;
+            opacity: 0.9;
+        }
+
+        .manual-meta {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(255,255,255,0.2);
+            padding: 10px 20px;
+            border-radius: 25px;
+            backdrop-filter: blur(10px);
+            font-size: 0.9rem;
+            z-index: 3;
+        }
+
+        /* 목차 스타일 */
+        .table-of-contents {
+            padding: 40px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .toc-title {
+            font-size: 1.8rem;
+            color: white;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .toc-list {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            list-style: none;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .toc-item a {
+            display: flex;
+            align-items: center;
+            padding: 20px 25px;
+            background: rgba(255,255,255,0.15);
+            border-radius: 15px;
+            text-decoration: none;
+            color: white;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.2);
+            font-size: 1.1rem;
+            font-weight: 500;
+        }
+
+        .toc-item a:hover {
+            transform: translateY(-3px);
+            background: rgba(255,255,255,0.25);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+        }
+
+        /* 섹션 스타일 */
+        .manual-section {
+            padding: 40px;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .section-icon {
+            font-size: 2rem;
+            margin-right: 15px;
+            background: linear-gradient(135deg, #74b9ff 0%, #0984e3 100%);
+            color: white;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 5px 15px rgba(116, 185, 255, 0.3);
+        }
+
+        .section-title {
+            font-size: 2.2rem;
+            color: #2d3436;
+            font-weight: bold;
+        }
+
+        .section-content {
+            background: #f8f9fa;
+            padding: 30px;
+            border-radius: 15px;
+            border-left: 5px solid #74b9ff;
+        }
+
+        .content-text {
+            margin-bottom: 25px;
+        }
+
+        .content-text h3 {
+            font-size: 1.3rem;
+            color: #0984e3;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+
+        .content-text p {
+            font-size: 1.1rem;
+            line-height: 1.8;
+            color: #2d3436;
+        }
+
+        .content-text ul {
+            margin-left: 20px;
+        }
+
+        .content-text li {
+            margin-bottom: 8px;
+            font-size: 1.1rem;
+        }
+
+        /* 문제해결 섹션 - 펼쳐진 형태 */
+        .trouble-item {
+            background: white;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .trouble-header {
+            background: #fd79a8;
+            color: white;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .trouble-solution {
+            padding: 20px;
+            background: #fff5f5;
+        }
+
+        /* FAQ 섹션 - 펼쳐진 형태 */
+        .faq-item {
+            background: white;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .faq-question {
+            background: #fdcb6e;
+            color: #2d3436;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 600;
+        }
+
+        .faq-answer {
+            padding: 20px;
+            background: #fffbf0;
+        }
+
+        /* 푸터 */
+        .manual-footer {
+            background: linear-gradient(135deg, #74b9ff 0%, #0984e3 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+
+        .footer-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .footer-info {
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+
+        .footer-actions {
+            display: flex;
+            gap: 15px;
+        }
+
+        .footer-btn {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .footer-btn:hover {
+            background: rgba(255,255,255,0.3);
+            transform: translateY(-2px);
+        }
+
+        /* 애니메이션 */
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            33% { transform: translateY(-10px) rotate(1deg); }
+            66% { transform: translateY(5px) rotate(-1deg); }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .manual-section {
+            animation: fadeInUp 0.6s ease-out;
+        }
+
+        /* 반응형 디자인 */
+        @media (max-width: 768px) {
+            .manual-container {
+                margin: 0;
+                box-shadow: none;
+            }
+
+            .manual-header {
+                padding: 40px 20px 30px 20px;
+            }
+
+            .manual-title {
+                font-size: 2.5rem;
+            }
+
+            .table-of-contents {
+                padding: 30px 20px;
+            }
+
+            .toc-list {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+
+            .manual-section {
+                padding: 20px;
+            }
+
+            .section-title {
+                font-size: 1.8rem;
+            }
+
+            .footer-content {
+                flex-direction: column;
+                text-align: center;
+            }
+        }
+
+        /* 인쇄 스타일 */
+        @media print {
+            .manual-container {
+                box-shadow: none;
+            }
+
+            .footer-actions {
+                display: none;
+            }
+
+            .manual-section {
+                page-break-inside: avoid;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="manual-container">
+        <!-- 페이지 1: 표지 + 목차 -->
+        <div class="first-page">
+            <header class="manual-header">
+                <div class="manual-meta">
+                    버전 1.0 | 2024-12-19
+                </div>
+                <h1 class="manual-title">갤럭시 워치 사용법 매뉴얼</h1>
+                <p class="manual-subtitle">스마트워치의 모든 기능을 쉽게 배우는 완벽 가이드</p>
+            </header>
+
+            <section class="table-of-contents">
+                <h2 class="toc-title">📑 목차</h2>
+                <ul class="toc-list">
+                    <li class="toc-item">
+                        <a href="#basic-usage">
+                            📱 기본 사용법
+                        </a>
+                    </li>
+                    <li class="toc-item">
+                        <a href="#precautions">
+                            ⚠️ 주의사항
+                        </a>
+                    </li>
+                    <li class="toc-item">
+                        <a href="#troubleshooting">
+                            🔧 문제해결
+                        </a>
+                    </li>
+                    <li class="toc-item">
+                        <a href="#faq">
+                            ❓ FAQ
+                        </a>
+                    </li>
+                </ul>
+            </section>
+        </div>
+
+        <!-- 페이지 2: 기본 사용법 -->
+        <section id="basic-usage" class="manual-section">
+            <div class="section-header">
+                <div class="section-icon">📱</div>
+                <h2 class="section-title">기본 사용법</h2>
+            </div>
+            
+            <div class="section-content">
+                <div class="content-text">
+                    <h3>🔋 초기 설정</h3>
+                    <p>갤럭시 워치를 처음 사용할 때는 다음 단계를 따라주세요:</p>
+                    <ul>
+                        <li>워치를 충전기에 연결하여 충전</li>
+                        <li>전원 버튼을 길게 눌러 전원 켜기</li>
+                        <li>언어 및 지역 설정 선택</li>
+                        <li>스마트폰과 페어링 진행</li>
+                    </ul>
+                </div>
+                
+                <div class="content-text">
+                    <h3>🎯 기본 제스처</h3>
+                    <p>워치의 기본적인 조작 방법을 익혀보세요:</p>
+                    <ul>
+                        <li><strong>터치:</strong> 화면을 터치하여 앱 실행 및 메뉴 선택</li>
+                        <li><strong>스와이프:</strong> 좌우로 스와이프하여 화면 전환</li>
+                        <li><strong>홈 버튼:</strong> 홈 화면으로 돌아가기</li>
+                        <li><strong>뒤로가기:</strong> 이전 화면으로 돌아가기</li>
+                    </ul>
+                </div>
+
+                <div class="content-text">
+                    <h3>🎨 워치페이스 커스터마이징</h3>
+                    <p>개인 취향에 맞게 워치페이스를 설정할 수 있습니다:</p>
+                    <ul>
+                        <li>홈 화면에서 길게 터치</li>
+                        <li>원하는 워치페이스 선택</li>
+                        <li>색상 및 위젯 설정</li>
+                        <li>확인 버튼으로 적용</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- 페이지 3: 주의사항 -->
+        <section id="precautions" class="manual-section">
+            <div class="section-header">
+                <div class="section-icon">⚠️</div>
+                <h2 class="section-title">주의사항</h2>
+            </div>
+            
+            <div class="section-content">
+                <div class="content-text">
+                    <h3>🔋 배터리 관리</h3>
+                    <p>워치의 배터리 수명을 연장하기 위한 주의사항:</p>
+                    <ul>
+                        <li>과도한 밝기 설정을 피하세요</li>
+                        <li>불필요한 앱은 종료하세요</li>
+                        <li>정기적인 충전을 권장합니다</li>
+                        <li>극한 온도에서 사용을 피하세요</li>
+                    </ul>
+                </div>
+                
+                <div class="content-text">
+                    <h3>💧 방수 주의사항</h3>
+                    <p>워치의 방수 기능에 대한 올바른 이해:</p>
+                    <ul>
+                        <li>수영 후에는 반드시 세척하세요</li>
+                        <li>고온의 물에서는 사용을 피하세요</li>
+                        <li>해수에서는 사용하지 마세요</li>
+                        <li>충전 중에는 물에 담그지 마세요</li>
+                    </ul>
+                </div>
+
+                <div class="content-text">
+                    <h3>📱 스마트폰 연동 팁</h3>
+                    <p>스마트폰과의 원활한 연동을 위한 팁:</p>
+                    <ul>
+                        <li>블루투스 연결 상태를 정기적으로 확인</li>
+                        <li>Galaxy Wearable 앱을 최신 버전으로 유지</li>
+                        <li>Wi-Fi 연결을 통한 원격 제어 활용</li>
+                        <li>백업 및 복원 기능 정기 사용</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- 페이지 4: 문제해결 -->
+        <section id="troubleshooting" class="manual-section">
+            <div class="section-header">
+                <div class="section-icon">🔧</div>
+                <h2 class="section-title">문제해결</h2>
+            </div>
+            
+            <div class="section-content">
+                <div class="trouble-item">
+                    <div class="trouble-header">
+                        <span>워치가 켜지지 않습니다</span>
+                    </div>
+                    <div class="trouble-solution">
+                        <p><strong>해결 방법:</strong></p>
+                        <ol>
+                            <li>충전기를 연결하여 충전 상태 확인</li>
+                            <li>전원 버튼을 10초 이상 길게 누르기</li>
+                            <li>충전 후에도 문제가 지속되면 서비스 센터 방문</li>
+                        </ol>
+                    </div>
+                </div>
+
+                <div class="trouble-item">
+                    <div class="trouble-header">
+                        <span>스마트폰과 연결이 안 됩니다</span>
+                    </div>
+                    <div class="trouble-solution">
+                        <p><strong>해결 방법:</strong></p>
+                        <ol>
+                            <li>스마트폰의 블루투스 재시작</li>
+                            <li>워치에서 페어링 초기화</li>
+                            <li>Galaxy Wearable 앱 재설치</li>
+                            <li>스마트폰 재부팅 후 재시도</li>
+                        </ol>
+                    </div>
+                </div>
+
+                <div class="trouble-item">
+                    <div class="trouble-header">
+                        <span>배터리가 빨리 소모됩니다</span>
+                    </div>
+                    <div class="trouble-solution">
+                        <p><strong>해결 방법:</strong></p>
+                        <ol>
+                            <li>화면 밝기를 낮춰 설정</li>
+                            <li>불필요한 앱 종료</li>
+                            <li>GPS 사용 시에만 활성화</li>
+                            <li>배터리 최적화 모드 활성화</li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 페이지 5: FAQ -->
+        <section id="faq" class="manual-section">
+            <div class="section-header">
+                <div class="section-icon">❓</div>
+                <h2 class="section-title">자주 묻는 질문</h2>
+            </div>
+            
+            <div class="section-content">
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <span>갤럭시 워치는 어떤 스마트폰과 호환되나요?</span>
+                    </div>
+                    <div class="faq-answer">
+                        <p>갤럭시 워치는 Android 8.0 이상을 실행하는 삼성 갤럭시 스마트폰과 호환됩니다. 일부 기능은 특정 모델에서만 사용할 수 있습니다.</p>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <span>워치의 배터리는 얼마나 오래 사용할 수 있나요?</span>
+                    </div>
+                    <div class="faq-answer">
+                        <p>사용 패턴에 따라 다르지만, 일반적으로 1-2일 정도 사용할 수 있습니다. GPS 사용 시에는 배터리 소모가 더 빠를 수 있습니다.</p>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <span>워치에서 음악을 들을 수 있나요?</span>
+                    </div>
+                    <div class="faq-answer">
+                        <p>네, 갤럭시 워치에서는 스마트폰의 음악을 제어하거나, 일부 모델에서는 워치에 직접 음악을 저장하여 사용할 수 있습니다.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 푸터 -->
+        <footer class="manual-footer">
+            <div class="footer-content">
+                <div class="footer-info">
+                    <p>갤럭시 워치 사용법 매뉴얼 v1.0</p>
+                    <p>© 2024 Samsung Electronics. All rights reserved.</p>
+                </div>
+                <div class="footer-actions">
+                    <button class="footer-btn" onclick="copyManualHTML()">HTML 복사</button>
+                    <button class="footer-btn" onclick="downloadManual()">다운로드</button>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        function copyManualHTML() {
+            const manualHTML = document.documentElement.outerHTML;
+            navigator.clipboard.writeText(manualHTML).then(() => {
+                alert('매뉴얼 HTML이 클립보드에 복사되었습니다!');
+            }).catch(() => {
+                alert('복사에 실패했습니다.');
+            });
+        }
+
+        function downloadManual() {
+            const manualHTML = document.documentElement.outerHTML;
+            const blob = new Blob([manualHTML], { type: 'text/html' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'galaxy_watch_manual.html';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+        // 부드러운 스크롤
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // 섹션 진입 애니메이션
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.animation = 'fadeInUp 0.6s ease-out';
+                }
+            });
+        });
+
+        document.querySelectorAll('.manual-section').forEach(section => {
+            observer.observe(section);
+        });
+    </script>
+</body>
+</html>

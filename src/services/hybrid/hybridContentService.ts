@@ -77,9 +77,9 @@ async function generatePPTAIData(request: ContentRequest) {
       { year: '2024', value: 25 }
     ],
     timeline: [
-      { phase: '1단계', title: '기획 및 설계', description: '전략 수립 및 기본 설계' },
-      { phase: '2단계', title: '개발 및 테스트', description: '핵심 기능 개발 및 검증' },
-      { phase: '3단계', title: '출시 및 마케팅', description: '시장 진입 및 홍보' }
+      { phase: isChinese ? '第一阶段' : '1단계', title: isChinese ? '规划与设计' : '기획 및 설계', description: isChinese ? '战略制定及基础设计' : '전략 수립 및 기본 설계' },
+      { phase: isChinese ? '第二阶段' : '2단계', title: isChinese ? '开发与测试' : '개발 및 테스트', description: isChinese ? '核心功能开发及验证' : '핵심 기능 개발 및 검증' },
+      { phase: isChinese ? '第三阶段' : '3단계', title: isChinese ? '发布与营销' : '출시 및 마케팅', description: isChinese ? '市场进入及推广' : '시장 진입 및 홍보' }
     ]
   };
 }

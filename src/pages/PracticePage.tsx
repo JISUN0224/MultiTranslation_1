@@ -129,14 +129,15 @@ const PracticePage: React.FC = () => {
         }
         
       case 'manual':
-        // ✅ 매뉴얼도 슬라이드가 있으면 PPTDirectRender 사용 (동일한 네비게이션)
+        // ✅ 매뉴얼 슬라이드가 있으면 PPTDirectRender 사용 (5개 슬라이드 개별 표시)
         if (generatedContent && generatedContent.type === 'manual' && slides.length > 0) {
+          console.log('매뉴얼 슬라이드 렌더링:', slides);
           return <PPTDirectRender 
             slides={slides} 
             onTextExtracted={handleTextExtracted}
           />;
         } else {
-          // 🔥 슬라이드가 없는 기존 매뉴얼은 HTML 직접 렌더링
+          // 🔥 폴백: 전체 HTML을 ManualSlideViewer로 표시
           const manualHTML = generatedContent?.html || generatedContent?.data?.content;
           
           if (!generatedContent || !manualHTML) {
@@ -147,36 +148,18 @@ const PracticePage: React.FC = () => {
             );
           }
           
+          console.log('매뉴얼 폴백 렌더링:', { manualHTML: manualHTML.substring(0, 100) });
+          
+          // ManualSlideViewer 컴포넌트 import 및 사용
+          const ManualSlideViewer = React.lazy(() => import('../components/content/ManualSlideViewer'));
+          
           return (
-            <div 
-              className="manual-content"
-              dangerouslySetInnerHTML={{ __html: manualHTML }}
-              style={{
-                padding: '0',
-                maxWidth: '100%',
-                overflow: 'auto',
-                minHeight: '600px',
-                backgroundColor: '#f8f9fa',
-                borderRadius: '8px'
-              }}
-              ref={(element) => {
-                if (element && manualHTML) {
-                  try {
-                    const parser = new DOMParser();
-                    const doc = parser.parseFromString(manualHTML, 'text/html');
-                    const styleTags = doc.querySelectorAll('style');
-                    styleTags.forEach(tag => tag.remove());
-                    const textContent = doc.body.textContent || doc.body.innerText || '';
-                    const cleanText = textContent.replace(/\s+/g, ' ').trim();
-                    if (cleanText && cleanText !== extractedText) {
-                      handleTextExtracted(cleanText);
-                    }
-                  } catch (error) {
-                    console.error('Manual 텍스트 추출 오류:', error);
-                  }
-                }
-              }}
-            />
+            <React.Suspense fallback={<div className="text-center py-20">로딩 중...</div>}>
+              <ManualSlideViewer 
+                html={manualHTML}
+                title={generatedContent.data?.title || '매뉴얼'}
+              />
+            </React.Suspense>
           );
         }
         

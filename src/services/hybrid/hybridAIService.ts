@@ -8,6 +8,7 @@ interface HybridPPTData {
   title: string;
   subtitle: string;
   theme: 'tech' | 'business' | 'beauty' | 'medical' | 'finance';
+  language?: 'ko-zh' | 'zh-ko';
   stats: Array<{
     value: string;
     label: string;
@@ -45,34 +46,46 @@ const createHybridPrompt = (request: ContentRequest): string => {
 
   const suggestedTheme = themeHints[request.industry as keyof typeof themeHints] || 'business';
 
+  // 언어별 예시 콘텐츠
+  const isKorean = request.language === 'ko-zh';
+  const exampleContent = {
+    title: isKorean ? "매력적인 제목" : "吸引人的标题",
+    subtitle: isKorean ? "설명적인 부제목" : "描述性副标题",
+    stats: [
+      {value: isKorean ? "구체적 수치" : "具体数值", label: isKorean ? "라벨명" : "标签名", color: "gold"},
+      {value: isKorean ? "구체적 수치" : "具体数值", label: isKorean ? "라벨명" : "标签名", color: "blue"},
+      {value: isKorean ? "구체적 수치" : "具体数值", label: isKorean ? "라벨명" : "标签名", color: "red"}
+    ],
+    features: [
+      {icon: "🚀", title: isKorean ? "기능명" : "功能名", description: isKorean ? "상세설명" : "详细说明"},
+      {icon: "⚡", title: isKorean ? "기능명" : "功能名", description: isKorean ? "상세설명" : "详细说明"},
+      {icon: "🎯", title: isKorean ? "기능명" : "功能名", description: isKorean ? "상세설명" : "详细说明"},
+      {icon: "💎", title: isKorean ? "기능명" : "功能名", description: isKorean ? "상세설명" : "详细说明"}
+    ],
+    pricing: [
+      {name: isKorean ? "플랜명" : "套餐名", price: isKorean ? "가격" : "价格", features: [isKorean ? "혜택1" : "优惠1", isKorean ? "혜택2" : "优惠2"], highlight: false},
+      {name: isKorean ? "플랜명" : "套餐名", price: isKorean ? "가격" : "价格", features: [isKorean ? "혜택1" : "优惠1", isKorean ? "혜택2" : "优惠2"], highlight: true},
+      {name: isKorean ? "플랜명" : "套餐名", price: isKorean ? "가격" : "价格", features: [isKorean ? "혜택1" : "优惠1", isKorean ? "혜택2" : "优惠2"], highlight: false}
+    ],
+    timeline: [
+      {year: isKorean ? "연도" : "年份", title: isKorean ? "이벤트" : "事件", description: isKorean ? "설명" : "说明"},
+      {year: isKorean ? "연도" : "年份", title: isKorean ? "이벤트" : "事件", description: isKorean ? "설명" : "说明"},
+      {year: isKorean ? "연도" : "年份", title: isKorean ? "이벤트" : "事件", description: isKorean ? "설명" : "说明"}
+    ]
+  };
+
   return `
-"${request.topic}"에 대한 PPT 데이터를 다음 JSON 형식으로 생성해주세요:
+"${request.topic}"에 대한 PPT 데이터를 ${isKorean ? '한국어' : '중국어'}로 다음 JSON 형식으로 생성해주세요:
 
 {
-  "title": "매력적인 제목 (25자 이내)",
-  "subtitle": "설명적인 부제목 (50자 이내)",
+  "title": "${exampleContent.title}",
+  "subtitle": "${exampleContent.subtitle}",
   "theme": "${suggestedTheme}",
-  "stats": [
-    {"value": "구체적 수치", "label": "라벨명", "color": "gold"},
-    {"value": "구체적 수치", "label": "라벨명", "color": "blue"},
-    {"value": "구체적 수치", "label": "라벨명", "color": "red"}
-  ],
-  "features": [
-    {"icon": "이모지", "title": "기능명", "description": "상세설명"},
-    {"icon": "이모지", "title": "기능명", "description": "상세설명"},
-    {"icon": "이모지", "title": "기능명", "description": "상세설명"},
-    {"icon": "이모지", "title": "기능명", "description": "상세설명"}
-  ],
-  "pricing": [
-    {"name": "플랜명", "price": "가격", "features": ["혜택1", "혜택2"], "highlight": false},
-    {"name": "플랜명", "price": "가격", "features": ["혜택1", "혜택2"], "highlight": true},
-    {"name": "플랜명", "price": "가격", "features": ["혜택1", "혜택2"], "highlight": false}
-  ],
-  "timeline": [
-    {"year": "연도", "title": "이벤트", "description": "설명"},
-    {"year": "연도", "title": "이벤트", "description": "설명"},
-    {"year": "연도", "title": "이벤트", "description": "설명"}
-  ]
+  "language": "${isKorean ? 'ko-zh' : 'zh-ko'}",
+  "stats": ${JSON.stringify(exampleContent.stats)},
+  "features": ${JSON.stringify(exampleContent.features)},
+  "pricing": ${JSON.stringify(exampleContent.pricing)},
+  "timeline": ${JSON.stringify(exampleContent.timeline)}
 }
 
 요구사항:
@@ -81,12 +94,13 @@ const createHybridPrompt = (request: ContentRequest): string => {
 - pricing: 가격 플랜 3개 (중간 플랜 highlight)
 - timeline: 발전/로드맵 3단계
 - 주제: ${request.topic}
-- 스타일: ${request.style || '전문적인'}
+- 스타일: ${request.style || (isKorean ? '전문적인' : '专业的')}
 
 **중요한 언어 요구사항:**
-- 생성 언어: ${request.language === 'ko-zh' ? '한국어' : '중국어'}
-- 모든 텍스트(제목, 설명, 라벨 등)를 ${request.language === 'ko-zh' ? '한국어' : '중국어'}로 작성
-- JSON 내의 모든 문자열을 ${request.language === 'ko-zh' ? '한국어' : '중국어'}로 생성
+- 생성 언어: ${isKorean ? '한국어' : '중국어'}
+- 모든 텍스트(제목, 설명, 라벨 등)를 ${isKorean ? '한국어' : '중국어'}로 작성
+- JSON 내의 모든 문자열을 ${isKorean ? '한국어' : '중국어'}로 생성
+- ${isKorean ? '한국어로만' : '仅使用中文'} 작성하세요
 
 반드시 위 JSON 형식으로만 응답하세요.
 `;
@@ -215,10 +229,19 @@ function parseHybridJSON(responseText: string): HybridPPTData {
     const parsed = JSON.parse(jsonText);
     
     // 데이터 검증 및 기본값 설정
+    // AI 응답의 언어 필드를 우리 시스템에 맞게 변환
+    let language = parsed.language || 'ko-zh';
+    if (language === 'zh-CN' || language === 'zh') {
+      language = 'zh-ko';
+    } else if (language === 'ko-KR' || language === 'ko') {
+      language = 'ko-zh';
+    }
+    
     return {
       title: parsed.title || '새로운 프레젠테이션',
       subtitle: parsed.subtitle || '상세 내용',
       theme: parsed.theme || 'business',
+      language: language,
       stats: Array.isArray(parsed.stats) ? parsed.stats.slice(0, 3) : [
         { value: '100%', label: '만족도', color: 'gold' as const },
         { value: '24/7', label: '지원', color: 'blue' as const },

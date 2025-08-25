@@ -7,130 +7,207 @@ import { ContentRequest, GeneratedContent, ContentType } from '../../types';
 interface HybridManualData {
   title: string;
   subtitle: string;
-  category: 'technical' | 'user-guide' | 'tutorial' | 'reference' | 'troubleshooting';
-  overview: {
-    purpose: string;
-    audience: string;
-    requirements: string[];
-  };
-  sections: Array<{
-    id: string;
-    title: string;
-    content: string;
-    type: 'text' | 'steps' | 'warning' | 'note' | 'example';
-    subsections?: Array<{
+  version: string;
+  date: string;
+  basicUsage: {
+    initialSetup: {
       title: string;
-      content: string;
-    }>;
-  }>;
-  troubleshooting?: Array<{
+      description: string;
+      steps: string[];
+    };
+    basicGestures: {
+      title: string;
+      description: string;
+      gestures: Array<{ name: string; description: string; }>;
+    };
+    watchfaceCustomization: {
+      title: string;
+      description: string;
+      steps: string[];
+    };
+  };
+  precautions: {
+    batteryManagement: {
+      title: string;
+      description: string;
+      tips: string[];
+    };
+    waterproofPrecautions: {
+      title: string;
+      description: string;
+      tips: string[];
+    };
+    smartphoneConnection: {
+      title: string;
+      description: string;
+      tips: string[];
+    };
+  };
+  troubleshooting: Array<{
     problem: string;
-    solution: string;
-    severity: 'low' | 'medium' | 'high';
+    solution: string[];
   }>;
-  faq?: Array<{
+  faq: Array<{
     question: string;
     answer: string;
   }>;
-  appendix?: {
-    glossary?: Array<{ term: string; definition: string; }>;
-    references?: string[];
-    version: string;
-    lastUpdated: string;
-  };
 }
 
 // 🎯 설명서 AI 프롬프트 생성 (언어 설정 수정)
 const createManualPrompt = (request: ContentRequest): string => {
-  const categoryHints = {
-    'IT/기술': 'technical',
-    '화장품/뷰티': 'user-guide',
-    '식품/음료': 'user-guide',
-    '패션/의류': 'user-guide',
-    '자동차': 'technical',
-    '건강/의료': 'reference',
-    '금융': 'reference'
-  };
-
-  const suggestedCategory = categoryHints[request.industry as keyof typeof categoryHints] || 'user-guide';
-
-  // ✅ 언어 설정 수정
-  let targetLanguage = '中文';
-  let languageInstruction = '请用中文生成';
+  // ✅ 언어 설정 수정 - PPT 서비스와 동일한 로직 적용
+  const isKorean = request.language === 'ko-zh';
+  const targetLanguage = isKorean ? '한국어' : '중국어';
+  const languageInstruction = isKorean ? '한국어로 생성해주세요' : '중국어로 생성해주세요';
+  const dateFormat = isKorean ? 'ko-KR' : 'zh-CN';
   
-  if (request.language === 'zh-ko') {
-    targetLanguage = '한국어';
-    languageInstruction = '한국어로 생성해주세요';
-  }
+  const exampleContent = {
+    title: isKorean ? "제품 사용 가이드" : "产品使用指南",
+    subtitle: isKorean ? "상세한 제품 사용법과 주의사항" : "详细的产品使用方法和注意事项",
+    initialSetup: {
+      title: isKorean ? "초기 설정" : "初始设置",
+      description: isKorean ? "제품을 처음 사용할 때 따라야 할 단계를 설명합니다" : "产品首次使用时的设置步骤说明",
+      steps: isKorean ? ["단계1", "단계2", "단계3", "단계4"] : ["步骤1", "步骤2", "步骤3", "步骤4"]
+    },
+    basicGestures: {
+      title: isKorean ? "기본 조작" : "基本操作",
+      description: isKorean ? "제품의 기본적인 조작 방법을 설명합니다" : "产品的基本操作方法说明",
+      gestures: isKorean ? [
+        {"name": "기본 조작1", "description": "기본 조작 방법의 상세 설명"},
+        {"name": "기본 조작2", "description": "기본 조작 방법의 상세 설명"},
+        {"name": "기본 조작3", "description": "기본 조작 방법의 상세 설명"},
+        {"name": "기본 조작4", "description": "기본 조작 방법의 상세 설명"}
+      ] : [
+        {"name": "基本操作1", "description": "基本操作方法的详细说明"},
+        {"name": "基本操作2", "description": "基本操作方法的详细说明"},
+        {"name": "基本操作3", "description": "基本操作方法的详细说明"},
+        {"name": "基本操作4", "description": "基本操作方法的详细说明"}
+      ]
+    },
+    watchfaceCustomization: {
+      title: isKorean ? "개인화 설정" : "个性化设置",
+      description: isKorean ? "개인 취향에 맞게 설정을 변경하는 방법을 설명합니다" : "根据个人喜好更改设置的方法说明",
+      steps: isKorean ? ["단계1", "단계2", "단계3", "단계4"] : ["步骤1", "步骤2", "步骤3", "步骤4"]
+    },
+    batteryManagement: {
+      title: isKorean ? "유지보수" : "维护保养",
+      description: isKorean ? "제품 유지보수와 관리를 위한 주의사항을 설명합니다" : "产品维护和保养的注意事项说明",
+      tips: isKorean ? ["팁1", "팁2", "팁3", "팁4"] : ["提示1", "提示2", "提示3", "提示4"]
+    },
+    waterproofPrecautions: {
+      title: isKorean ? "사용 주의사항" : "使用注意事项",
+      description: isKorean ? "사용 시 주의사항과 예방 조치를 설명합니다" : "使用时的注意事项和预防措施说明",
+      tips: isKorean ? ["팁1", "팁2", "팁3", "팁4"] : ["提示1", "提示2", "提示3", "提示4"]
+    },
+    smartphoneConnection: {
+      title: isKorean ? "연결 및 동기화" : "连接与同步",
+      description: isKorean ? "다른 기기와의 연결 및 동기화를 위한 팁을 제공합니다" : "与其他设备连接和同步的提示",
+      tips: isKorean ? ["팁1", "팁2", "팁3", "팁4"] : ["提示1", "提示2", "提示3", "提示4"]
+    },
+    troubleshooting: isKorean ? [
+      {
+        "problem": "문제 상황 1",
+        "solution": ["해결 방법 1", "해결 방법 2", "해결 방법 3", "해결 방법 4"]
+      },
+      {
+        "problem": "문제 상황 2", 
+        "solution": ["해결 방법 1", "해결 방법 2", "해결 방법 3", "해결 방법 4"]
+      },
+      {
+        "problem": "문제 상황 3",
+        "solution": ["해결 방법 1", "해결 방법 2", "해결 방법 3", "해결 방법 4"]
+      }
+    ] : [
+      {
+        "problem": "问题情况1",
+        "solution": ["解决方法1", "解决方法2", "解决方法3", "解决方法4"]
+      },
+      {
+        "problem": "问题情况2", 
+        "solution": ["解决方法1", "解决方法2", "解决方法3", "解决方法4"]
+      },
+      {
+        "problem": "问题情况3",
+        "solution": ["解决方法1", "解决方法2", "解决方法3", "解决方法4"]
+      }
+    ],
+    faq: isKorean ? [
+      {
+        "question": "자주 묻는 질문 1",
+        "answer": "질문에 대한 답변을 상세히 설명합니다"
+      },
+      {
+        "question": "자주 묻는 질문 2",
+        "answer": "질문에 대한 답변을 상세히 설명합니다"
+      },
+      {
+        "question": "자주 묻는 질문 3",
+        "answer": "질문에 대한 답변을 상세히 설명합니다"
+      }
+    ] : [
+      {
+        "question": "常见问题1",
+        "answer": "详细的问题解答说明"
+      },
+      {
+        "question": "常见问题2",
+        "answer": "详细的问题解答说明"
+      },
+      {
+        "question": "常见问题3",
+        "answer": "详细的问题解答说明"
+      }
+    ]
+  };
   
   return `
-"${request.topic}"에 대한 전문적인 설명서 데이터를 ${targetLanguage}로 다음 JSON 형식으로 생성해주세요.
+"${request.topic}"에 대한 전문적인 매뉴얼 데이터를 ${targetLanguage}로 다음 JSON 형식으로 생성해주세요.
 
 ${languageInstruction}. 모든 텍스트 내용을 반드시 ${targetLanguage}로 작성하세요.
 
 {
-  "title": "명확하고 구체적인 설명서 제목 (40자 이내)",
-  "subtitle": "설명서의 목적과 범위를 설명하는 부제목 (60자 이내)",
-  "category": "${suggestedCategory}",
-  "overview": {
-    "purpose": "이 설명서의 목적과 달성 목표",
-    "audience": "대상 사용자 (예: 초보자, 중급자, 전문가)",
-    "requirements": ["필요한 준비사항1", "필요한 준비사항2", "필요한 준비사항3"]
-  },
-  "sections": [
-    {
-      "id": "section1",
-      "title": "섹션 제목",
-      "content": "상세 내용 설명",
-      "type": "text",
-      "subsections": [
-        {"title": "하위 섹션", "content": "하위 내용"}
-      ]
+  "title": "${exampleContent.title}",
+  "subtitle": "${exampleContent.subtitle}",
+  "version": "1.0",
+  "date": "${new Date().toLocaleDateString(dateFormat)}",
+  "language": "${isKorean ? 'ko-zh' : 'zh-ko'}",
+  "basicUsage": {
+    "initialSetup": {
+      "title": "${exampleContent.initialSetup.title}",
+      "description": "${exampleContent.initialSetup.description}",
+      "steps": ${JSON.stringify(exampleContent.initialSetup.steps)}
     },
-    {
-      "id": "section2", 
-      "title": "단계별 진행",
-      "content": "1. 첫 번째 단계\\n2. 두 번째 단계\\n3. 세 번째 단계",
-      "type": "steps"
+    "basicGestures": {
+      "title": "${exampleContent.basicGestures.title}",
+      "description": "${exampleContent.basicGestures.description}",
+      "gestures": ${JSON.stringify(exampleContent.basicGestures.gestures)}
     },
-    {
-      "id": "section3",
-      "title": "주의사항",
-      "content": "중요한 주의사항 내용",
-      "type": "warning"
-    },
-    {
-      "id": "section4",
-      "title": "팁과 권장사항",
-      "content": "유용한 팁과 권장사항",
-      "type": "note"
-    },
-    {
-      "id": "section5",
-      "title": "실제 예시",
-      "content": "구체적인 예시와 활용 방법",
-      "type": "example"
+    "watchfaceCustomization": {
+      "title": "${exampleContent.watchfaceCustomization.title}",
+      "description": "${exampleContent.watchfaceCustomization.description}",
+      "steps": ${JSON.stringify(exampleContent.watchfaceCustomization.steps)}
     }
-  ],
-  "troubleshooting": [
-    {"problem": "문제 상황", "solution": "해결 방법", "severity": "medium"},
-    {"problem": "문제 상황", "solution": "해결 방법", "severity": "low"}
-  ],
-  "faq": [
-    {"question": "자주 묻는 질문1", "answer": "상세한 답변1"},
-    {"question": "자주 묻는 질문2", "answer": "상세한 답변2"},
-    {"question": "자주 묻는 질문3", "answer": "상세한 답변3"}
-  ],
-  "appendix": {
-    "glossary": [
-      {"term": "전문용어1", "definition": "용어 설명1"},
-      {"term": "전문용어2", "definition": "용어 설명2"}
-    ],
-    "references": ["참고자료1", "참고자료2"],
-    "version": "1.0",
-    "lastUpdated": "2024-12-19"
-  }
-}
+  },
+  "precautions": {
+    "batteryManagement": {
+      "title": "${exampleContent.batteryManagement.title}",
+      "description": "${exampleContent.batteryManagement.description}",
+      "tips": ${JSON.stringify(exampleContent.batteryManagement.tips)}
+    },
+    "waterproofPrecautions": {
+      "title": "${exampleContent.waterproofPrecautions.title}",
+      "description": "${exampleContent.waterproofPrecautions.description}",
+      "tips": ${JSON.stringify(exampleContent.waterproofPrecautions.tips)}
+    },
+    "smartphoneConnection": {
+      "title": "${exampleContent.smartphoneConnection.title}",
+      "description": "${exampleContent.smartphoneConnection.description}",
+      "tips": ${JSON.stringify(exampleContent.smartphoneConnection.tips)}
+    }
+  },
+     "troubleshooting": ${JSON.stringify(exampleContent.troubleshooting)},
+   "faq": ${JSON.stringify(exampleContent.faq)}
+ }
 
 **중요한 요구사항:**
 - 주제: ${request.topic}
@@ -140,8 +217,9 @@ ${languageInstruction}. 모든 텍스트 내용을 반드시 ${targetLanguage}�
 - 대상: 실제 사용자가 따라할 수 있는 실용적인 내용
 - 구조: 체계적이고 논리적인 순서
 - 상세도: 초보자도 이해할 수 있는 수준
+- 언어 필드: 반드시 "language": "${isKorean ? 'ko-zh' : 'zh-ko'}" 포함
 
-${targetLanguage === '中文' ? 
+${targetLanguage === '중국어' ? 
   '请使用简体中文生成所有内容，包括标题、说明、步骤等所有文字。' : 
   '모든 내용을 한국어로 작성해주세요.'}
 
@@ -168,18 +246,18 @@ export const generateHybridManual = async (
   onProgress?: (progress: number, message: string) => void
 ): Promise<GeneratedContent> => {
   try {
-    console.log('📚 하이브리드 설명서 생성 시작:', request);
+    console.log('📚 하이브리드 매뉴얼 생성 시작:', request);
     
     onProgress?.(10, '🧠 AI 콘텐츠 분석 중...');
     const prompt = createManualPrompt(request);
     
-    onProgress?.(25, '🤖 설명서 구조 생성 중...');
-    const aiData = await callGeminiForManual(prompt);
+    onProgress?.(25, '🤖 매뉴얼 구조 생성 중...');
+    const aiData = await callGeminiForManual(prompt, request);
     
     onProgress?.(50, '📋 전문 템플릿 적용 중...');
-    const templateType = selectManualTemplate(aiData.category);
+    const templateType = 'user-guide';
     
-    onProgress?.(70, '📖 슬라이드 형태 설명서 생성 중...');
+    onProgress?.(70, '📖 슬라이드 형태 매뉴얼 생성 중...');
     // 🔥 슬라이드 형태로 분할 생성
     const manualSlides = await generateManualSlides(aiData, templateType, request);
     const fullManualHTML = await generateManualWithTemplate(aiData, templateType);
@@ -195,29 +273,33 @@ export const generateHybridManual = async (
         title: aiData.title,
         subtitle: aiData.subtitle,
         content: fullManualHTML,
-        category: aiData.category,
+        category: 'user-guide',
         templateType: templateType,
-        sections: aiData.sections.map(section => section.title),
+        sections: ['기본 사용법', '주의사항', '문제해결', 'FAQ'],
         totalSections: manualSlides.length,
         slides: manualSlides
       },
-      sections: manualSlides.map(slide => slide.title),
+      sections: manualSlides.map((slide, index) => ({ 
+        id: `section_${index}`, 
+        title: slide.title,
+        originalText: slide.title 
+      })),
       html: fullManualHTML
     };
     
-    onProgress?.(100, '📚 하이브리드 설명서 생성 완료!');
-    console.log('✅ 설명서 생성 결과:', result);
+    onProgress?.(100, '📚 하이브리드 매뉴얼 생성 완료!');
+    console.log('✅ 매뉴얼 생성 결과:', result);
     return result;
     
   } catch (error) {
-    console.error('🚨 설명서 생성 실패:', error);
+    console.error('🚨 매뉴얼 생성 실패:', error);
     onProgress?.(100, '⚠️ 폴백 모드 실행 중...');
     return createManualFallback(request);
   }
 };
 
 // 🤖 Gemini API 호출 (설명서 데이터)
-async function callGeminiForManual(prompt: string): Promise<HybridManualData> {
+async function callGeminiForManual(prompt: string, request: ContentRequest): Promise<HybridManualData> {
   const GEMINI_API_KEY = (import.meta as any).env.VITE_GEMINI_API_KEY;
   
   if (!GEMINI_API_KEY) {
@@ -248,7 +330,7 @@ async function callGeminiForManual(prompt: string): Promise<HybridManualData> {
     
     console.log('📚 설명서 AI 응답:', responseText);
     
-    const parsed = parseManualJSON(responseText);
+    const parsed = parseManualJSON(responseText, request.language);
     console.log('✅ 파싱된 설명서 데이터:', parsed);
     return parsed;
     
@@ -259,7 +341,7 @@ async function callGeminiForManual(prompt: string): Promise<HybridManualData> {
 }
 
 // 🔧 개선된 JSON 파싱 함수
-function parseManualJSON(responseText: string): HybridManualData {
+function parseManualJSON(responseText: string, language?: string): HybridManualData {
   try {
     // 1. 마크다운 코드 블록 제거
     let cleanText = responseText
@@ -283,7 +365,12 @@ function parseManualJSON(responseText: string): HybridManualData {
       // 후행 쉼표 제거
       .replace(/,(\s*[}\]])/g, '$1')
       // 이스케이프된 개행 문자 처리
-      .replace(/\\n/g, '\\n');
+      .replace(/\\n/g, '\\n')
+      // 중복된 따옴표 제거 (AI가 생성한 잘못된 JSON 수정)
+      .replace(/""/g, '"')
+      // 잘못된 쉼표 제거
+      .replace(/,\s*}/g, '}')
+      .replace(/,\s*]/g, ']');
     
     // 4. 잘린 JSON 복구 시도
     if (!jsonText.trim().endsWith('}')) {
@@ -307,8 +394,47 @@ function parseManualJSON(responseText: string): HybridManualData {
     
     console.log('🔧 정리된 JSON (앞부분):', jsonText.substring(0, 500) + '...');
     
-    const parsed = JSON.parse(jsonText);
-    return createValidatedManualData(parsed);
+    // 추가 JSON 복구 시도
+    try {
+      const parsed = JSON.parse(jsonText);
+      return createValidatedManualData(parsed);
+    } catch (parseError) {
+      console.log('🔧 JSON 파싱 실패, 추가 복구 시도...');
+      
+             // 더 강력한 복구 로직
+       jsonText = jsonText
+         // 잘못된 배열 요소 수정
+         .replace(/([^"])\s*,\s*([^"]\s*[}\]])/g, '$1$2')
+         // 잘못된 객체 속성 수정
+         .replace(/([^"])\s*,\s*([^"]\s*})/g, '$1$2')
+         // 중복된 속성 제거
+         .replace(/"([^"]+)"\s*:\s*[^,}]+,\s*"([^"]+)"\s*:\s*[^,}]+/g, (match, key1, key2) => {
+           if (key1 === key2) {
+             return match.replace(/,\s*"[^"]+"\s*:\s*[^,}]+/, '');
+           }
+           return match;
+         })
+         // 배열 요소 사이 누락된 쉼표 추가 (객체 배열)
+         .replace(/}\s*{/g, '},{')
+         // 배열 요소 사이 누락된 쉼표 추가 (문자열 배열)
+         .replace(/"\s*"/g, '","')
+         // 배열 끝에 잘못된 쉼표 제거
+         .replace(/,\s*([}\]])/g, '$1')
+         // 객체 속성 사이 누락된 쉼표 추가
+         .replace(/"\s*:\s*[^,}]+"\s*"/g, (match) => {
+           return match.replace(/"\s*"/g, '","');
+         });
+      
+      console.log('🔧 복구된 JSON (앞부분):', jsonText.substring(0, 500) + '...');
+      
+      try {
+        const parsed = JSON.parse(jsonText);
+        return createValidatedManualData(parsed);
+      } catch (finalError) {
+        console.error('❌ 최종 JSON 파싱 실패:', finalError);
+        throw finalError;
+      }
+    }
     
   } catch (error) {
     console.error('❌ 설명서 JSON 파싱 실패:', error);
@@ -324,7 +450,9 @@ function parseManualJSON(responseText: string): HybridManualData {
       
       if (titleMatch || subtitleMatch) {
         console.log('✅ 부분 파싱 성공');
-        return createFallbackManualData(titleMatch?.[1] || '사용자 가이드');
+        // AI가 생성한 실제 제목 사용 (중국어인 경우)
+        const extractedTitle = titleMatch?.[1] || subtitleMatch?.[1] || '사용자 가이드';
+        return createFallbackManualData(extractedTitle, language);
       }
       
     } catch (backupError) {
@@ -332,112 +460,156 @@ function parseManualJSON(responseText: string): HybridManualData {
     }
     
     console.log('🔄 완전 폴백 모드...');
-    return createFallbackManualData();
+    return createFallbackManualData(undefined, language);
   }
 }
 
-// 🔧 검증된 매뉴얼 데이터 생성
+// 🔧 검증된 매뉴얼 데이터 생성 (새로운 HybridManualData 구조)
 function createValidatedManualData(parsed: any): HybridManualData {
   return {
-    title: parsed.title || '使用指南',
-    subtitle: parsed.subtitle || '详细使用方法说明',
-    category: parsed.category || 'user-guide',
-    overview: {
-      purpose: parsed.overview?.purpose || '本指南旨在帮助用户了解和使用产品。',
-      audience: parsed.overview?.audience || '所有用户',
-      requirements: Array.isArray(parsed.overview?.requirements) ? 
-        parsed.overview.requirements : ['基本了解', '必要工具', '充足时间']
+    title: parsed.title || '사용자 가이드',
+    subtitle: parsed.subtitle || '상세한 사용법과 주의사항',
+    version: parsed.version || '1.0',
+    date: parsed.date || new Date().toLocaleDateString('ko-KR'),
+    basicUsage: {
+      initialSetup: {
+        title: parsed.basicUsage?.initialSetup?.title || '초기 설정',
+        description: parsed.basicUsage?.initialSetup?.description || '제품을 처음 사용할 때 따라야 할 단계를 설명합니다',
+        steps: Array.isArray(parsed.basicUsage?.initialSetup?.steps) ? 
+          parsed.basicUsage.initialSetup.steps : ['단계1', '단계2', '단계3', '단계4']
+      },
+      basicGestures: {
+        title: parsed.basicUsage?.basicGestures?.title || '기본 조작',
+        description: parsed.basicUsage?.basicGestures?.description || '제품의 기본적인 조작 방법을 설명합니다',
+        gestures: Array.isArray(parsed.basicUsage?.basicGestures?.gestures) ? 
+          parsed.basicUsage.basicGestures.gestures : [
+            {"name": "기본 조작1", "description": "기본 조작 방법의 상세 설명"},
+            {"name": "기본 조작2", "description": "기본 조작 방법의 상세 설명"},
+            {"name": "기본 조작3", "description": "기본 조작 방법의 상세 설명"},
+            {"name": "기본 조작4", "description": "기본 조작 방법의 상세 설명"}
+          ]
+      },
+      watchfaceCustomization: {
+        title: parsed.basicUsage?.watchfaceCustomization?.title || '개인화 설정',
+        description: parsed.basicUsage?.watchfaceCustomization?.description || '개인 취향에 맞게 설정을 변경하는 방법을 설명합니다',
+        steps: Array.isArray(parsed.basicUsage?.watchfaceCustomization?.steps) ? 
+          parsed.basicUsage.watchfaceCustomization.steps : ['단계1', '단계2', '단계3', '단계4']
+      }
     },
-    sections: Array.isArray(parsed.sections) && parsed.sections.length > 0 ? 
-      parsed.sections : [
-        {
-          id: 'intro',
-          title: '开始使用',
-          content: '基本介绍和说明。',
-          type: 'text'
-        },
-        {
-          id: 'steps',
-          title: '步骤说明',
-          content: '1. 第一步\n2. 第二步\n3. 第三步',
-          type: 'steps'
-        }
-      ],
+    precautions: {
+      batteryManagement: {
+        title: parsed.precautions?.batteryManagement?.title || '유지보수',
+        description: parsed.precautions?.batteryManagement?.description || '제품 유지보수와 관리를 위한 주의사항을 설명합니다',
+        tips: Array.isArray(parsed.precautions?.batteryManagement?.tips) ? 
+          parsed.precautions.batteryManagement.tips : ['팁1', '팁2', '팁3', '팁4']
+      },
+      waterproofPrecautions: {
+        title: parsed.precautions?.waterproofPrecautions?.title || '사용 주의사항',
+        description: parsed.precautions?.waterproofPrecautions?.description || '사용 시 주의사항과 예방 조치를 설명합니다',
+        tips: Array.isArray(parsed.precautions?.waterproofPrecautions?.tips) ? 
+          parsed.precautions.waterproofPrecautions.tips : ['팁1', '팁2', '팁3', '팁4']
+      },
+      smartphoneConnection: {
+        title: parsed.precautions?.smartphoneConnection?.title || '연결 및 동기화',
+        description: parsed.precautions?.smartphoneConnection?.description || '다른 기기와의 연결 및 동기화를 위한 팁을 제공합니다',
+        tips: Array.isArray(parsed.precautions?.smartphoneConnection?.tips) ? 
+          parsed.precautions.smartphoneConnection.tips : ['팁1', '팁2', '팁3', '팁4']
+      }
+    },
     troubleshooting: Array.isArray(parsed.troubleshooting) && parsed.troubleshooting.length > 0 ? 
       parsed.troubleshooting : [
-        { problem: '常见问题', solution: '解决方法', severity: 'medium' }
+        { problem: "일반적인 문제1", solution: ["해결 방법1", "해결 방법2", "해결 방법3"] },
+        { problem: "일반적인 문제2", solution: ["해결 방법1", "해결 방법2", "해결 방법3"] },
+        { problem: "일반적인 문제3", solution: ["해결 방법1", "해결 방법2", "해결 방법3"] }
       ],
     faq: Array.isArray(parsed.faq) && parsed.faq.length > 0 ? 
       parsed.faq : [
-        { question: '常见问题', answer: '详细解答' }
-      ],
-    appendix: {
-      glossary: Array.isArray(parsed.appendix?.glossary) ? 
-        parsed.appendix.glossary : [],
-      references: Array.isArray(parsed.appendix?.references) ? 
-        parsed.appendix.references : [],
-      version: parsed.appendix?.version || '1.0',
-      lastUpdated: parsed.appendix?.lastUpdated || new Date().toISOString().split('T')[0]
-    }
+        { question: "자주 묻는 질문1", answer: "질문에 대한 답변을 상세히 설명합니다" },
+        { question: "자주 묻는 질문2", answer: "질문에 대한 답변을 상세히 설명합니다" },
+        { question: "자주 묻는 질문3", answer: "질문에 대한 답변을 상세히 설명합니다" }
+      ]
   };
 }
 
 // 🔧 폴백 매뉴얼 데이터 생성
-function createFallbackManualData(topic?: string): HybridManualData {
-  const topicName = topic || 'Galaxy Watch';
+function createFallbackManualData(topic?: string, language?: string): HybridManualData {
+  const topicName = topic || '제품';
+  const isKorean = language === 'ko-zh';
+  
   return {
-    title: `${topicName} 사용자 가이드`,
-    subtitle: `${topicName}를 효과적으로 사용하는 방법`,
-    category: 'user-guide',
-    overview: {
-      purpose: `${topicName}의 기본 기능부터 고급 활용법까지 전반적인 사용법을 안내합니다.`,
-      audience: `${topicName} 사용자`,
-      requirements: ['기본 준비사항', '필요한 설정', '인터넷 연결']
-    },
-    sections: [
-      {
-        id: 'basic',
-        title: '기본 설정 및 준비',
-        content: `${topicName}의 기본 설정 방법과 올바른 준비 과정을 알아봅니다.`,
-        type: 'text'
+    title: isKorean ? `${topicName} 사용자 가이드` : `${topicName} 用户指南`,
+    subtitle: isKorean ? `${topicName}를 효과적으로 사용하는 방법` : `${topicName}的有效使用方法`,
+    version: "1.0",
+    date: new Date().toLocaleDateString(isKorean ? 'ko-KR' : 'zh-CN'),
+    basicUsage: {
+      initialSetup: {
+        title: isKorean ? "초기 설정" : "初始设置",
+        description: isKorean ? `${topicName}를 처음 사용할 때 따라야 할 단계를 설명합니다` : `${topicName}首次使用时的设置步骤说明`,
+        steps: isKorean ? ["단계1", "단계2", "단계3", "단계4"] : ["步骤1", "步骤2", "步骤3", "步骤4"]
       },
-      {
-        id: 'functions',
-        title: '주요 기능 활용',
-        content: '1. 알림 확인하기\n2. 건강 데이터 모니터링\n3. 앱 사용하기\n4. 설정 조정하기',
-        type: 'steps'
+      basicGestures: {
+        title: isKorean ? "기본 조작" : "基本操作",
+        description: isKorean ? `${topicName}의 기본적인 조작 방법을 설명합니다` : `${topicName}的基本操作方法说明`,
+        gestures: isKorean ? [
+          {"name": "기본 조작1", "description": "기본 조작 방법의 상세 설명"},
+          {"name": "기본 조작2", "description": "기본 조작 방법의 상세 설명"},
+          {"name": "기본 조작3", "description": "기본 조작 방법의 상세 설명"},
+          {"name": "기본 조작4", "description": "기본 조작 방법의 상세 설명"}
+        ] : [
+          {"name": "基本操作1", "description": "基本操作方法的详细说明"},
+          {"name": "基本操作2", "description": "基本操作方法的详细说明"},
+          {"name": "基本操作3", "description": "基本操作方法的详细说明"},
+          {"name": "基本操作4", "description": "基本操作方法的详细说明"}
+        ]
       },
-      {
-        id: 'health',
-        title: '건강 기능 활용',
-        content: '심박수 측정, 운동 추적, 수면 모니터링 등 건강 관련 기능을 활용하는 방법을 설명합니다.',
-        type: 'text'
+      watchfaceCustomization: {
+        title: isKorean ? "개인화 설정" : "个性化设置",
+        description: isKorean ? "개인 취향에 맞게 설정을 변경하는 방법을 설명합니다" : "根据个人喜好更改设置的方法说明",
+        steps: isKorean ? ["단계1", "단계2", "단계3", "단계4"] : ["步骤1", "步骤2", "步骤3", "步骤4"]
       }
+    },
+    precautions: {
+      batteryManagement: {
+        title: isKorean ? "유지보수" : "维护保养",
+        description: isKorean ? "제품 유지보수와 관리를 위한 주의사항을 설명합니다" : "产品维护和保养的注意事项说明",
+        tips: isKorean ? ["팁1", "팁2", "팁3", "팁4"] : ["提示1", "提示2", "提示3", "提示4"]
+      },
+      waterproofPrecautions: {
+        title: isKorean ? "사용 주의사항" : "使用注意事项",
+        description: isKorean ? "사용 시 주의사항과 예방 조치를 설명합니다" : "使用时的注意事项和预防措施说明",
+        tips: isKorean ? ["팁1", "팁2", "팁3", "팁4"] : ["提示1", "提示2", "提示3", "提示4"]
+      },
+      smartphoneConnection: {
+        title: isKorean ? "연결 및 동기화" : "连接与同步",
+        description: isKorean ? "다른 기기와의 연결 및 동기화를 위한 팁을 제공합니다" : "与其他设备连接和同步的提示",
+        tips: isKorean ? ["팁1", "팁2", "팁3", "팁4"] : ["提示1", "提示2", "提示3", "提示4"]
+      }
+    },
+    troubleshooting: isKorean ? [
+      { problem: "일반적인 문제1", solution: ["해결 방법1", "해결 방법2", "해결 방법3"] },
+      { problem: "일반적인 문제2", solution: ["해결 방법1", "해결 방법2", "해결 방법3"] },
+      { problem: "일반적인 문제3", solution: ["해결 방법1", "해결 방법2", "해결 방법3"] }
+    ] : [
+      { problem: "常见问题1", solution: ["解决方法1", "解决方法2", "解决方法3"] },
+      { problem: "常见问题2", solution: ["解决方法1", "解决方法2", "解决方法3"] },
+      { problem: "常见问题3", solution: ["解决方法1", "解决方法2", "解决方法3"] }
     ],
-    troubleshooting: [
-      { problem: '워치가 연결되지 않아요', solution: '블루투스 연결을 확인하고 Galaxy Wearable 앱을 재시작해보세요.', severity: 'medium' },
-      { problem: '배터리가 빨리 닳아요', solution: '화면 밝기를 낮추고 불필요한 알림을 끄세요.', severity: 'low' }
-    ],
-    faq: [
-      { question: '워치 페이스를 어떻게 바꾸나요?', answer: '워치 화면을 길게 누르거나 Galaxy Wearable 앱에서 변경할 수 있습니다.' },
-      { question: '방수 기능이 있나요?', answer: '갤럭시 워치는 5ATM 방수를 지원하여 수영 시에도 사용 가능합니다.' }
-    ],
-    appendix: {
-      glossary: [
-        { term: 'Galaxy Wearable', definition: '갤럭시 워치를 관리하는 스마트폰 앱' },
-        { term: '5ATM', definition: '50미터 수심까지 방수가 되는 등급' }
-      ],
-      references: ['갤럭시 워치 공식 매뉴얼', 'Samsung Health 가이드'],
-      version: '1.0',
-      lastUpdated: new Date().toISOString().split('T')[0]
-    }
+    faq: isKorean ? [
+      { question: "자주 묻는 질문1", answer: "질문에 대한 답변을 상세히 설명합니다" },
+      { question: "자주 묻는 질문2", answer: "질문에 대한 답변을 상세히 설명합니다" },
+      { question: "자주 묻는 질문3", answer: "질문에 대한 답변을 상세히 설명합니다" }
+    ] : [
+      { question: "常见问题1", answer: "详细的问题解答说明" },
+      { question: "常见问题2", answer: "详细的问题解答说明" },
+      { question: "常见问题3", answer: "详细的问题解答说明" }
+    ]
   };
 }
 
-// 🎨 템플릿 기반 설명서 HTML 생성
+// 🎨 템플릿 기반 매뉴얼 HTML 생성
 async function generateManualWithTemplate(data: HybridManualData, templateType: string): Promise<string> {
   const { getManualTemplate } = await import('./templates/manualTemplateEngine');
-  return getManualTemplate(data, templateType);
+  return getManualTemplate(data);
 }
 
 // 🔥 슬라이드 형태 매뉴얼 생성 함수
@@ -447,121 +619,64 @@ async function generateManualSlides(data: HybridManualData, templateType: string
   subtitle?: string;
   html: string;
 }>> {
-  const { getManualSlideTemplate } = await import('./templates/manualTemplateEngine');
-  
-  // 언어별 제목 설정
-  const isChinese = request?.language === 'zh-ko';
-  const slideTitles = {
-    basic: {
-      title: isChinese ? '📱 基本了解' : '📱 기본 이해',
-      subtitle: isChinese ? '基本概念及使用方法介绍' : '기본 개념 및 사용법 소개'
-    },
-    advanced: {
-      title: isChinese ? '⚙️ 高级设置及实用功能' : '⚙️ 고급 설정 및 유용한 기능',
-      subtitle: isChinese ? '高级功能及使用方法' : '고급 기능과 활용법'
-    },
-    troubleshooting: {
-      title: isChinese ? '🔧 问题解决' : '🔧 문제 해결',
-      subtitle: isChinese ? '常见问题及解决方法' : '일반적인 문제와 해결 방법'
-    },
-    faq: {
-      title: isChinese ? '❓ 常见问题' : '❓ 자주 묻는 질문',
-      subtitle: isChinese ? 'FAQ及其他信息' : 'FAQ 및 추가 정보'
-    }
-  };
-  
-  const slideConfig = [
-    {
-      id: 1,
-      title: slideTitles.basic.title,
-      subtitle: slideTitles.basic.subtitle,
-      type: 'basic',
-      content: {
-        overview: data.overview,
-        sections: data.sections.filter(s => 
-          s.title.includes('기본') || s.title.includes('이해') || s.title.includes('소개')
-        ).slice(0, 3)
-      }
-    },
-    {
-      id: 2,
-      title: slideTitles.advanced.title,
-      subtitle: slideTitles.advanced.subtitle,
-      type: 'advanced',
-      content: {
-        sections: data.sections.filter(s => 
-          s.title.includes('고급') || s.title.includes('설정') || s.title.includes('기능') || s.title.includes('활용')
-        ).slice(0, 3)
-      }
-    },
-    {
-      id: 3,
-      title: slideTitles.troubleshooting.title,
-      subtitle: slideTitles.troubleshooting.subtitle,
-      type: 'troubleshooting',
-      content: {
-        troubleshooting: data.troubleshooting?.slice(0, 4) || []
-      }
-    },
-    {
-      id: 4,
-      title: slideTitles.faq.title,
-      subtitle: slideTitles.faq.subtitle,
-      type: 'faq',
-      content: {
-        faq: data.faq?.slice(0, 4) || [],
-        appendix: data.appendix
-      }
-    }
-  ];
-  
-  const slides = [];
-  
-  for (const config of slideConfig) {
-    const slideHTML = await getManualSlideTemplate({
-      ...data,
-      slideConfig: config
-    }, templateType);
-    
-    slides.push({
-      id: config.id,
-      title: config.title,
-      subtitle: config.subtitle,
-      html: slideHTML
-    });
-  }
-  
-  return slides;
+  const { generateManualSlides } = await import('./templates/manualTemplateEngine');
+  return generateManualSlides(data, templateType, request);
 }
 
 // ⚠️ 설명서 폴백 생성
 function createManualFallback(request: ContentRequest): GeneratedContent {
-  const fallbackData: HybridManualData = createFallbackManualData(request.topic);
+  const fallbackData: HybridManualData = createFallbackManualData(request.topic, request.language);
+  
+  // 언어별 폴백 슬라이드 제목
+  const isKorean = request.language === 'ko-zh';
+  const slideTitles = isKorean ? {
+    basic: '📱 기본 이해',
+    advanced: '⚙️ 고급 설정 및 실용 기능',
+    troubleshooting: '🔧 문제 해결',
+    faq: '❓ 자주 묻는 질문'
+  } : {
+    basic: '📱 基本了解',
+    advanced: '⚙️ 高级设置及实用功能',
+    troubleshooting: '🔧 问题解决',
+    faq: '❓ 常见问题'
+  };
+  
+  const slideSubtitles = isKorean ? {
+    basic: '기본 개념 및 사용법 소개',
+    advanced: '개인화 설정 및 스마트 사용법',
+    troubleshooting: '자주 발생하는 문제와 해결방법',
+    faq: 'FAQ 및 기타 정보'
+  } : {
+    basic: '基本概念及使用方法介绍',
+    advanced: '个性化设置和智能使用方法',
+    troubleshooting: '常见问题及解决方法',
+    faq: 'FAQ及其他信息'
+  };
   
   const fallbackSlides = [
     {
       id: 1,
-      title: '📱 基本了解',
-      subtitle: '基本概念及使用方法介绍',
-      html: createFallbackSlideHTML('基本了解', '', 'basic', request.topic)
+      title: slideTitles.basic,
+      subtitle: slideSubtitles.basic,
+      html: createFallbackSlideHTML(slideTitles.basic, '', 'basic', request.topic, request.language)
     },
     {
       id: 2,
-      title: '⚙️ 高级设置及实用功能',
-      subtitle: '个性化设置和智能使用方法',
-      html: createFallbackSlideHTML('高级设置', '', 'advanced', request.topic)
+      title: slideTitles.advanced,
+      subtitle: slideSubtitles.advanced,
+      html: createFallbackSlideHTML(slideTitles.advanced, '', 'advanced', request.topic, request.language)
     },
     {
       id: 3,
-      title: '🔧 问题解决',
-      subtitle: '常见问题及解决方法',
-      html: createFallbackSlideHTML('问题解决', '', 'troubleshooting', request.topic)
+      title: slideTitles.troubleshooting,
+      subtitle: slideSubtitles.troubleshooting,
+      html: createFallbackSlideHTML(slideTitles.troubleshooting, '', 'troubleshooting', request.topic, request.language)
     },
     {
       id: 4,
-      title: '❓ 常见问题',
-      subtitle: 'FAQ及其他信息',
-      html: createFallbackSlideHTML('FAQ', '', 'faq', request.topic)
+      title: slideTitles.faq,
+      subtitle: slideSubtitles.faq,
+      html: createFallbackSlideHTML(slideTitles.faq, '', 'faq', request.topic, request.language)
     }
   ];
   
@@ -570,19 +685,26 @@ function createManualFallback(request: ContentRequest): GeneratedContent {
       <h1 style="color: #2c3e50; margin-bottom: 20px;">${fallbackData.title}</h1>
       <p style="color: #7f8c8d; margin-bottom: 30px;">${fallbackData.subtitle}</p>
       <div style="background: #f8f9fa; padding: 20px; border-radius: 10px; margin-bottom: 30px;">
-        <h3 style="color: #34495e; margin-bottom: 15px;">📋 개요</h3>
-        <p><strong>목적:</strong> ${fallbackData.overview.purpose}</p>
-        <p><strong>대상:</strong> ${fallbackData.overview.audience}</p>
-        <div><strong>준비사항:</strong>
-          <ul>${fallbackData.overview.requirements.map(req => `<li>${req}</li>`).join('')}</ul>
-        </div>
+        <h3 style="color: #34495e; margin-bottom: 15px;">📋 매뉴얼 개요</h3>
+        <p><strong>버전:</strong> ${fallbackData.version}</p>
+        <p><strong>날짜:</strong> ${fallbackData.date}</p>
       </div>
-      ${fallbackData.sections.map(section => `
-        <div style="margin-bottom: 30px; padding: 20px; border-left: 4px solid #3498db; background: white;">
-          <h3 style="color: #2c3e50; margin-bottom: 15px;">${section.title}</h3>
-          <p>${section.content}</p>
-        </div>
-      `).join('')}
+      <div style="margin-bottom: 30px; padding: 20px; border-left: 4px solid #3498db; background: white;">
+        <h3 style="color: #2c3e50; margin-bottom: 15px;">기본 사용법</h3>
+        <p>${fallbackData.basicUsage.initialSetup.description}</p>
+      </div>
+      <div style="margin-bottom: 30px; padding: 20px; border-left: 4px solid #e74c3c; background: white;">
+        <h3 style="color: #2c3e50; margin-bottom: 15px;">주의사항</h3>
+        <p>${fallbackData.precautions.batteryManagement.description}</p>
+      </div>
+      <div style="margin-bottom: 30px; padding: 20px; border-left: 4px solid #f39c12; background: white;">
+        <h3 style="color: #2c3e50; margin-bottom: 15px;">문제해결</h3>
+        <p>${fallbackData.troubleshooting[0]?.problem || '일반적인 문제'}</p>
+      </div>
+      <div style="margin-bottom: 30px; padding: 20px; border-left: 4px solid #27ae60; background: white;">
+        <h3 style="color: #2c3e50; margin-bottom: 15px;">FAQ</h3>
+        <p>${fallbackData.faq[0]?.question || '자주 묻는 질문'}</p>
+      </div>
     </div>
   `;
   
@@ -595,18 +717,26 @@ function createManualFallback(request: ContentRequest): GeneratedContent {
       title: fallbackData.title,
       subtitle: fallbackData.subtitle,
       content: fallbackHTML,
-      category: fallbackData.category,
-      sections: fallbackSlides.map(s => s.title),
+      category: 'user-guide',
+      sections: fallbackSlides.map((s, index) => ({ 
+        id: `fallback_${index}`, 
+        title: s.title,
+        originalText: s.title 
+      })),
       totalSections: fallbackSlides.length,
       slides: fallbackSlides
     },
-    sections: fallbackSlides.map(s => s.title),
+    sections: fallbackSlides.map((s, index) => ({ 
+      id: `fallback_${index}`, 
+      title: s.title,
+      originalText: s.title 
+    })),
     html: fallbackHTML
   };
 }
 
 // 🔥 폴백 슬라이드 HTML 생성
-function createFallbackSlideHTML(title: string, content: string, type: string, topic?: string): string {
+function createFallbackSlideHTML(title: string, content: string, type: string, topic?: string, language?: string): string {
   const themeColors = {
     basic: '#3498db',
     advanced: '#9b59b6',
@@ -615,7 +745,10 @@ function createFallbackSlideHTML(title: string, content: string, type: string, t
   };
   
   const color = themeColors[type as keyof typeof themeColors] || '#3498db';
-  const dynamicContent = generateDynamicContent(type, topic || '해당 주제');
+  const dynamicContent = generateDynamicContent(type, topic || '해당 주제', language);
+  
+  // 언어별 버튼 텍스트
+  const buttonText = language === 'ko-zh' ? '주제를 입력하여 상세한 AI 매뉴얼을 생성하세요 🚀' : '请输入主题生成详细的AI手册 🚀';
   
   return `
     <div style="
@@ -654,31 +787,53 @@ function createFallbackSlideHTML(title: string, content: string, type: string, t
         backdrop-filter: blur(10px);
         font-size: 1rem;
       ">
-        请输入主题生成详细的AI手册 🚀
+        ${buttonText}
       </div>
     </div>
   `;
 }
 
-// 🎯 주제에 맞는 동적 콘텐츠 생성 (중국어 버전)
-function generateDynamicContent(type: string, topic: string): string {
-  const topicKeyword = topic.replace(/使用法|指南|手册|说明书/g, '').trim();
+// 🎯 주제에 맞는 동적 콘텐츠 생성 (언어별)
+function generateDynamicContent(type: string, topic: string, language?: string): string {
+  const isKorean = language === 'ko-zh';
+  const topicKeyword = isKorean ? 
+    topic.replace(/사용법|가이드|매뉴얼|설명서/g, '').trim() :
+    topic.replace(/使用法|指南|手册|说明书/g, '').trim();
   
-  switch (type) {
-    case 'basic':
-      return `了解${topicKeyword}的基本组成部分和基本操作方法。`;
-    
-    case 'advanced':
-      return `了解${topicKeyword}的个性化设置和高效使用的高级功能。`;
-    
-    case 'troubleshooting':
-      return `了解${topicKeyword}使用中常见问题及其解决方法。`;
-    
-    case 'faq':
-      return `查看关于${topicKeyword}的常见问题和答案，以及其他有用信息。`;
-    
-    default:
-      return `了解关于${topicKeyword}的有用信息和使用方法。`;
+  if (isKorean) {
+    switch (type) {
+      case 'basic':
+        return `${topicKeyword}의 기본 구성 요소와 기본 조작 방법을 알아봅니다.`;
+      
+      case 'advanced':
+        return `${topicKeyword}의 개인화 설정과 효율적인 사용을 위한 고급 기능을 알아봅니다.`;
+      
+      case 'troubleshooting':
+        return `${topicKeyword} 사용 중 자주 발생하는 문제와 해결 방법을 알아봅니다.`;
+      
+      case 'faq':
+        return `${topicKeyword}에 대한 자주 묻는 질문과 답변, 그리고 기타 유용한 정보를 확인하세요.`;
+      
+      default:
+        return `${topicKeyword}에 대한 유용한 정보와 사용 방법을 알아봅니다.`;
+    }
+  } else {
+    switch (type) {
+      case 'basic':
+        return `了解${topicKeyword}的基本组成部分和基本操作方法。`;
+      
+      case 'advanced':
+        return `了解${topicKeyword}的个性化设置和高效使用的高级功能。`;
+      
+      case 'troubleshooting':
+        return `了解${topicKeyword}使用中常见问题及其解决方法。`;
+      
+      case 'faq':
+        return `查看关于${topicKeyword}的常见问题和答案，以及其他有用信息。`;
+      
+      default:
+        return `了解关于${topicKeyword}的有用信息和使用方法。`;
+    }
   }
 }
 

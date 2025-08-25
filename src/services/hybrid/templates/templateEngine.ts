@@ -5,6 +5,7 @@ interface HybridPPTData {
   title: string;
   subtitle: string;
   theme: 'tech' | 'business' | 'beauty' | 'medical' | 'finance';
+  language?: 'ko-zh' | 'zh-ko';
   stats: Array<{
     value: string;
     label: string;
@@ -84,6 +85,9 @@ export const getTemplateSlides = (data: HybridPPTData, templateType: string): Sl
 
 // 나머지 함수들은 여기서 완성됩니다...
 function createTitleSlide(data: HybridPPTData, colors: any): SlideData {
+  // 언어별 제목 설정
+  const isChinese = data.language === 'zh-ko';
+  
   // 개선된 타이틀 슬라이드 구현
   return {
     id: 1,
@@ -92,14 +96,15 @@ function createTitleSlide(data: HybridPPTData, colors: any): SlideData {
     html: `<div style="
       background: ${colors.primary};
       width: 100%;
-      min-height: 600px;
+      min-height: 100vh;
+      height: 100vh;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
       text-align: center;
-      color: white;
-      font-family: 'Segoe UI', 'Malgun Gothic', sans-serif;
+             color: white;
+       font-family: ${isChinese ? "'Microsoft YaHei', 'PingFang SC', 'SimHei', sans-serif" : "'Segoe UI', 'Malgun Gothic', sans-serif"};
       position: relative;
       overflow: hidden;
     ">
@@ -167,7 +172,7 @@ function createTitleSlide(data: HybridPPTData, colors: any): SlideData {
           cursor: pointer;
           transition: all 0.3s ease;
           animation: pulse 2s infinite;
-        ">자세히 알아보기 →</div>
+                 ">${isChinese ? '了解更多 →' : '자세히 알아보기 →'}</div>
       </div>
 
       <style>
@@ -206,7 +211,7 @@ function createFeaturesSlide(data: HybridPPTData, colors: any): SlideData {
   return {
     id: 2,
     title: title,
-    html: `<div style="background: ${colors.secondary}; color: white; min-height: 600px; padding: 60px;">
+         html: `<div style="background: ${colors.secondary}; color: white; min-height: 100vh; height: 100vh; padding: 60px; font-family: ${isChinese ? "'Microsoft YaHei', 'PingFang SC', 'SimHei', sans-serif" : "'Segoe UI', 'Malgun Gothic', sans-serif"};">
       <h2 style="text-align: center; font-size: 3rem; margin-bottom: 40px;">${title}</h2>
       <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 30px;">
         ${data.features.map(feature => `
@@ -229,61 +234,61 @@ function createStatsSlide(data: HybridPPTData, colors: any): SlideData {
   return {
     id: 3,
     title: title,
-    html: `<div style="background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); color: white; min-height: 600px; padding: 40px; display: flex; flex-direction: column;">
-      <!-- 상단: 제목 -->
-      <h2 style="text-align: center; font-size: 3rem; margin-bottom: 30px;">📊 ${title}</h2>
-      
-      <!-- 중단: 통계 카드들 -->
-      <div style="display: flex; justify-content: center; gap: 40px; margin-bottom: 40px;">
-        ${data.stats.map(stat => `
-          <div style="background: rgba(255,255,255,0.15); padding: 30px; border-radius: 20px; text-align: center; min-width: 180px; backdrop-filter: blur(10px);">
-            <div style="font-size: 2.5rem; font-weight: bold; color: ${colors.stats[stat.color]}; margin-bottom: 10px;">${stat.value}</div>
-            <div style="font-size: 1rem;">${stat.label}</div>
-          </div>
-        `).join('')}
-      </div>
-      
-      <!-- 하단: 그래프와 설명 -->
-      <div style="flex: 1; display: flex; gap: 30px; align-items: stretch;">
-        <!-- 왼쪽: 그래프 -->
-        <div style="flex: 1; background: rgba(255,255,255,0.1); border-radius: 15px; padding: 25px; backdrop-filter: blur(10px);">
-          <h3 style="text-align: center; font-size: 1.5rem; margin-bottom: 20px; color: ${colors.accent};">📈 ${isChinese ? '增长趋势' : '성장 추이'}</h3>
-          <div style="display: flex; align-items: end; justify-content: space-around; height: 120px; margin-bottom: 15px;">
-            <div style="display: flex; flex-direction: column; align-items: center;">
-              <div style="width: 30px; background: linear-gradient(to top, ${colors.stats.gold}, ${colors.stats.blue}); border-radius: 5px 5px 0 0; height: 60px; margin-bottom: 8px;"></div>
-              <span style="font-size: 0.8rem;">2022</span>
-            </div>
-            <div style="display: flex; flex-direction: column; align-items: center;">
-              <div style="width: 30px; background: linear-gradient(to top, ${colors.stats.gold}, ${colors.stats.blue}); border-radius: 5px 5px 0 0; height: 80px; margin-bottom: 8px;"></div>
-              <span style="font-size: 0.8rem;">2023</span>
-            </div>
-            <div style="display: flex; flex-direction: column; align-items: center;">
-              <div style="width: 30px; background: linear-gradient(to top, ${colors.stats.gold}, ${colors.stats.blue}); border-radius: 5px 5px 0 0; height: 100px; margin-bottom: 8px;"></div>
-              <span style="font-size: 0.8rem;">2024</span>
-            </div>
-            <div style="display: flex; flex-direction: column; align-items: center;">
-              <div style="width: 30px; background: linear-gradient(to top, ${colors.stats.gold}, ${colors.stats.blue}); border-radius: 5px 5px 0 0; height: 120px; margin-bottom: 8px;"></div>
-              <span style="font-size: 0.8rem;">2025</span>
-            </div>
-          </div>
-          <div style="text-align: center; font-size: 0.9rem; opacity: 0.8;">${isChinese ? '年增长率: +25%' : '연간 성장률: +25%'}</div>
-        </div>
-        
-        <!-- 오른쪽: 텍스트 설명 -->
-        <div style="flex: 1; background: rgba(255,255,255,0.1); border-radius: 15px; padding: 25px; backdrop-filter: blur(10px);">
-          <h3 style="text-align: center; font-size: 1.5rem; margin-bottom: 20px; color: ${colors.accent};">💡 ${isChinese ? '市场洞察' : '시장 인사이트'}</h3>
-          <div style="line-height: 1.6; font-size: 0.95rem;">
-            <p style="margin-bottom: 15px;">• <strong>${isChinese ? '全球扩张:' : '글로벌 확장:'}</strong> ${isChinese ? '海外市场进入加速营收增长' : '해외 시장 진출로 매출 성장 가속화'}</p>
-            <p style="margin-bottom: 15px;">• <strong>${isChinese ? '技术创新:' : '기술 혁신:'}</strong> ${isChinese ? 'AI技术引入增强竞争力' : 'AI 기술 도입으로 경쟁력 강화'}</p>
-            <p style="margin-bottom: 15px;">• <strong>${isChinese ? '客户满意:' : '고객 만족:'}</strong> ${isChinese ? '服务质量改善提高回购率' : '서비스 품질 개선으로 재구매율 증가'}</p>
-            <p style="margin-bottom: 15px;">• <strong>${isChinese ? '市场份额:' : '시장 점유율:'}</strong> ${isChinese ? '主要竞争对手相比保持优势' : '주요 경쟁사 대비 우위 확보'}</p>
-          </div>
-          <div style="text-align: center; margin-top: 20px; padding: 10px; background: rgba(255,255,255,0.1); border-radius: 10px; font-size: 0.9rem;">
-            🎯 <strong>${isChinese ? '目标:' : '목표:'}</strong> ${isChinese ? '2025年之前实现市场份额第一' : '2025년까지 시장 점유율 1위 달성'}
-          </div>
-        </div>
-      </div>
-    </div>`
+                   html: `<div style="background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); color: white; min-height: 100vh; height: 100vh; padding: 40px; display: flex; flex-direction: column; justify-content: center; font-family: ${isChinese ? "'Microsoft YaHei', 'PingFang SC', 'SimHei', sans-serif" : "'Segoe UI', 'Malgun Gothic', sans-serif"};">
+       <!-- 상단: 제목 -->
+       <h2 style="text-align: center; font-size: 3rem; margin-bottom: 50px;">📊 ${title}</h2>
+       
+       <!-- 중단: 통계 카드들 -->
+       <div style="display: flex; justify-content: center; gap: 40px; margin-bottom: 60px;">
+         ${data.stats.map(stat => `
+           <div style="background: rgba(255,255,255,0.15); padding: 35px; border-radius: 20px; text-align: center; min-width: 200px; backdrop-filter: blur(10px);">
+             <div style="font-size: 3rem; font-weight: bold; color: ${colors.stats[stat.color]}; margin-bottom: 15px;">${stat.value}</div>
+             <div style="font-size: 1.1rem;">${stat.label}</div>
+           </div>
+         `).join('')}
+       </div>
+       
+       <!-- 하단: 그래프와 설명 -->
+       <div style="flex: 1; display: flex; gap: 40px; align-items: stretch; max-height: 400px;">
+         <!-- 왼쪽: 그래프 -->
+         <div style="flex: 1; background: rgba(255,255,255,0.1); border-radius: 15px; padding: 35px; backdrop-filter: blur(10px); display: flex; flex-direction: column; justify-content: space-between;">
+           <h3 style="text-align: center; font-size: 1.8rem; margin-bottom: 30px; color: ${colors.accent};">📈 ${isChinese ? '增长趋势' : '성장 추이'}</h3>
+           <div style="display: flex; align-items: end; justify-content: space-around; height: 180px; margin-bottom: 20px;">
+             <div style="display: flex; flex-direction: column; align-items: center;">
+               <div style="width: 40px; background: linear-gradient(to top, ${colors.stats.gold}, ${colors.stats.blue}); border-radius: 8px 8px 0 0; height: 90px; margin-bottom: 12px;"></div>
+               <span style="font-size: 1rem;">2022</span>
+             </div>
+             <div style="display: flex; flex-direction: column; align-items: center;">
+               <div style="width: 40px; background: linear-gradient(to top, ${colors.stats.gold}, ${colors.stats.blue}); border-radius: 8px 8px 0 0; height: 120px; margin-bottom: 12px;"></div>
+               <span style="font-size: 1rem;">2023</span>
+             </div>
+             <div style="display: flex; flex-direction: column; align-items: center;">
+               <div style="width: 40px; background: linear-gradient(to top, ${colors.stats.gold}, ${colors.stats.blue}); border-radius: 8px 8px 0 0; height: 150px; margin-bottom: 12px;"></div>
+               <span style="font-size: 1rem;">2024</span>
+             </div>
+             <div style="display: flex; flex-direction: column; align-items: center;">
+               <div style="width: 40px; background: linear-gradient(to top, ${colors.stats.gold}, ${colors.stats.blue}); border-radius: 8px 8px 0 0; height: 180px; margin-bottom: 12px;"></div>
+               <span style="font-size: 1rem;">2025</span>
+             </div>
+           </div>
+           <div style="text-align: center; font-size: 1.1rem; opacity: 0.9; font-weight: 500;">${isChinese ? '年增长率: +25%' : '연간 성장률: +25%'}</div>
+         </div>
+         
+         <!-- 오른쪽: 텍스트 설명 -->
+         <div style="flex: 1; background: rgba(255,255,255,0.1); border-radius: 15px; padding: 35px; backdrop-filter: blur(10px); display: flex; flex-direction: column; justify-content: space-between;">
+           <h3 style="text-align: center; font-size: 1.8rem; margin-bottom: 30px; color: ${colors.accent};">💡 ${isChinese ? '市场洞察' : '시장 인사이트'}</h3>
+           <div style="line-height: 1.8; font-size: 1.1rem; flex: 1;">
+             <p style="margin-bottom: 20px;">• <strong>${isChinese ? '全球扩张:' : '글로벌 확장:'}</strong> ${isChinese ? '海外市场进入加速营收增长' : '해외 시장 진출로 매출 성장 가속화'}</p>
+             <p style="margin-bottom: 20px;">• <strong>${isChinese ? '技术创新:' : '기술 혁신:'}</strong> ${isChinese ? 'AI技术引入增强竞争力' : 'AI 기술 도입으로 경쟁력 강화'}</p>
+             <p style="margin-bottom: 20px;">• <strong>${isChinese ? '客户满意:' : '고객 만족:'}</strong> ${isChinese ? '服务质量改善提高回购率' : '서비스 품질 개선으로 재구매율 증가'}</p>
+             <p style="margin-bottom: 20px;">• <strong>${isChinese ? '市场份额:' : '시장 점유율:'}</strong> ${isChinese ? '主要竞争对手相比保持优势' : '주요 경쟁사 대비 우위 확보'}</p>
+           </div>
+           <div style="text-align: center; margin-top: 20px; padding: 15px; background: rgba(255,255,255,0.15); border-radius: 12px; font-size: 1rem; font-weight: 500;">
+             🎯 <strong>${isChinese ? '目标:' : '목표:'}</strong> ${isChinese ? '2025年之前实现市场份额第一' : '2025년까지 시장 점유율 1위 달성'}
+           </div>
+         </div>
+       </div>
+     </div>`
   };
 }
 
@@ -307,16 +312,26 @@ function createPricingSlide(data: HybridPPTData, colors: any): SlideData {
   return {
     id: 4,
     title: title,
-    html: `<div style="background: ${colors.primary}; color: white; min-height: 600px; padding: 60px;">
-      <h2 style="text-align: center; font-size: 3rem; margin-bottom: 40px;">💰 ${title}</h2>
-      <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 30px; max-width: 1000px; margin: 0 auto;">
+         html: `<div style="background: ${colors.primary}; color: white; min-height: 100vh; height: 100vh; padding: 40px; display: flex; flex-direction: column; justify-content: center; font-family: ${isChinese ? "'Microsoft YaHei', 'PingFang SC', 'SimHei', sans-serif" : "'Segoe UI', 'Malgun Gothic', sans-serif"};">
+      <!-- 상단: 제목 -->
+      <h2 style="text-align: center; font-size: 3.5rem; margin-bottom: 60px;">💰 ${title}</h2>
+      
+      <!-- 중단: 가격 카드들 -->
+      <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 40px; max-width: 1200px; margin: 0 auto; flex: 1;">
         ${pricing.map(plan => `
-          <div style="background: rgba(255,255,255,0.2); padding: 40px; border-radius: 20px; text-align: center; ${plan.highlight ? 'border: 2px solid #FFD700; transform: scale(1.05);' : ''}">
-            <h3 style="font-size: 1.5rem; margin-bottom: 20px;">${plan.name}</h3>
-            <div style="font-size: 2.5rem; font-weight: bold; color: #FFD700; margin-bottom: 20px;">${plan.price}</div>
-            <ul style="list-style: none; padding: 0;">
-              ${plan.features.map(feature => `<li style="margin-bottom: 10px;">✓ ${feature}</li>`).join('')}
-            </ul>
+          <div style="background: rgba(255,255,255,0.2); padding: 50px 40px; border-radius: 25px; text-align: center; ${plan.highlight ? 'border: 3px solid #FFD700; transform: scale(1.05);' : ''} backdrop-filter: blur(10px); display: flex; flex-direction: column; justify-content: space-between;">
+            <div>
+              <h3 style="font-size: 1.8rem; margin-bottom: 25px; font-weight: bold;">${plan.name}</h3>
+              <div style="font-size: 3rem; font-weight: bold; color: #FFD700; margin-bottom: 30px;">${plan.price}</div>
+              <ul style="list-style: none; padding: 0; font-size: 1.1rem; line-height: 1.6;">
+                ${plan.features.map(feature => `<li style="margin-bottom: 15px;">✓ ${feature}</li>`).join('')}
+              </ul>
+            </div>
+            <div style="margin-top: 30px;">
+              <button style="background: linear-gradient(45deg, ${colors.accent}, #FFA500); color: white; padding: 15px 30px; border: none; border-radius: 25px; font-size: 1.1rem; font-weight: bold; cursor: pointer; width: 100%;">
+                ${isChinese ? '选择方案' : '선택하기'}
+              </button>
+            </div>
           </div>
         `).join('')}
       </div>
@@ -344,22 +359,35 @@ function createTimelineSlide(data: HybridPPTData, colors: any): SlideData {
   return {
     id: 5,
     title: title,
-    html: `<div style="background: ${colors.secondary}; color: white; min-height: 600px; padding: 60px;">
-              <h2 style="text-align: center; font-size: 3rem; margin-bottom: 40px;">🚀 ${title}</h2>
-      <div style="display: flex; justify-content: space-between; max-width: 800px; margin: 0 auto;">
-        ${timeline.map(item => `
-          <div style="text-align: center;">
-            <div style="width: 80px; height: 80px; background: rgba(255,255,255,0.3); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; border: 3px solid ${colors.accent};">
-              <span style="font-size: 1.2rem; font-weight: bold;">${item.year}</span>
+         html: `<div style="background: ${colors.secondary}; color: white; min-height: 100vh; height: 100vh; padding: 40px; display: flex; flex-direction: column; justify-content: center; font-family: ${isChinese ? "'Microsoft YaHei', 'PingFang SC', 'SimHei', sans-serif" : "'Segoe UI', 'Malgun Gothic', sans-serif"};">
+      <!-- 상단: 제목 -->
+      <h2 style="text-align: center; font-size: 3.5rem; margin-bottom: 60px;">🚀 ${title}</h2>
+      
+      <!-- 중단: 타임라인 -->
+      <div style="display: flex; justify-content: space-between; max-width: 1000px; margin: 0 auto; flex: 1; align-items: center;">
+        ${timeline.map((item, index) => `
+          <div style="text-align: center; flex: 1; position: relative; min-width: 280px;">
+            <!-- 연결선 (모든 아이템에 일관되게 적용) -->
+            <div style="position: absolute; top: 50px; left: 50%; width: 100%; height: 3px; background: linear-gradient(90deg, ${colors.accent}, rgba(255,255,255,0.3)); transform: translateX(-50%); z-index: 1;"></div>
+            
+            <!-- 연도 원형 (통일된 크기) -->
+            <div style="width: 120px; height: 120px; background: rgba(255,255,255,0.2); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 40px; border: 4px solid ${colors.accent}; backdrop-filter: blur(10px); position: relative; z-index: 2;">
+              <span style="font-size: 1.8rem; font-weight: bold;">${item.year}</span>
             </div>
-            <h4 style="font-size: 1.3rem; margin-bottom: 10px;">${item.title}</h4>
-            <p style="font-size: 0.9rem; opacity: 0.9;">${item.description}</p>
+            
+            <!-- 제목과 설명 (통일된 크기) -->
+            <div style="background: rgba(255,255,255,0.1); padding: 35px 25px; border-radius: 20px; backdrop-filter: blur(10px); min-height: 140px; display: flex; flex-direction: column; justify-content: center;">
+              <h4 style="font-size: 1.7rem; margin-bottom: 20px; font-weight: bold;">${item.title}</h4>
+              <p style="font-size: 1.2rem; opacity: 0.9; line-height: 1.6; margin: 0;">${item.description}</p>
+            </div>
           </div>
         `).join('')}
       </div>
-      <div style="text-align: center; margin-top: 60px;">
-        <button style="background: linear-gradient(45deg, ${colors.accent}, #FFA500); color: white; padding: 20px 40px; border: none; border-radius: 50px; font-size: 1.2rem; font-weight: bold; cursor: pointer;">
-          함께 성장하기
+      
+      <!-- 하단: CTA 버튼 -->
+      <div style="text-align: center; margin-top: 50px;">
+        <button style="background: linear-gradient(45deg, ${colors.accent}, #FFA500); color: white; padding: 25px 50px; border: none; border-radius: 50px; font-size: 1.4rem; font-weight: bold; cursor: pointer; box-shadow: 0 10px 30px rgba(0,0,0,0.3);">
+          ${isChinese ? '共同成长' : '함께 성장하기'}
         </button>
       </div>
     </div>`
